@@ -1,0 +1,30 @@
+[
+  {
+    "confidence": "medium",
+    "count": 50,
+    "sampleHTML": "<div class=\"job-item \" id=\"job-item-35C5FE5E\"><div class=\"figure\"><div class=\"asset-wrapper\"><div class=\"image\"><a target=\"_blank\" href=\"https://careerviet.vn/vi/nha-tuyen-dung/cong-ty-tnhh-reeracoen-viet-nam.35A7932C.html\" title=\"Công Ty TNHH Reeracoen Việt Nam\"><img class=\"lazy-img\" data-src=\"https://images.careerviet.vn/employer_folders/lot6/174636/155x155/100053logo500-01.png\" src=\"../kiemviecv32/images/graphics/blank.gif\" alt=\"Công Ty TNHH Reeracoen Việt Nam\"></a></div><div class=\"icon-robo",
+    "selector": ".job-item",
+    "type": "class"
+  },
+  {
+    "confidence": "low",
+    "count": 50,
+    "sampleHTML": "<div class=\"job-item \" id=\"job-item-35C5FE5E\"><div class=\"figure\"><div class=\"asset-wrapper\"><div class=\"image\"><a target=\"_blank\" href=\"https://careerviet.vn/vi/nha-tuyen-dung/cong-ty-tnhh-reeracoen-viet-nam.35A7932C.html\" title=\"Công Ty TNHH Reeracoen Việt Nam\"><img class=\"lazy-img\" data-src=\"https://images.careerviet.vn/employer_folders/lot6/174636/155x155/100053logo500-01.png\" src=\"../kiemviecv32/images/graphics/blank.gif\" alt=\"Công Ty TNHH Reeracoen Việt Nam\"></a></div><div class=\"icon-robo",
+    "selector": "[class*=\"job-item\"]",
+    "type": "attribute"
+  },
+  {
+    "confidence": "medium",
+    "count": 7,
+    "level": 7,
+    "sampleHTML": "\n                        <li class=\"dropdown\">\n                            <a tabindex=\"0\" role=\"button\" title=\"Tìm Việc Làm\">\n                                Tìm Việc Làm\n                            </a>\n                            <div class=\"dropdown-menu setWidth\">\n                                <div class=\"col-12 row Cate-SearchJob\">\n                                    <div class=\"col-sm-3 mb-0\">\n                                        <div class=\"block\">\n                                  ",
+    "selector": ".menu > *"
+  },
+  {
+    "confidence": "medium",
+    "count": 4,
+    "level": 1,
+    "sampleHTML": "\n                                                <li><a href=\"https://careerviet.vn/viec-lam/tat-ca-viec-lam-vi.html\" title=\"Việc làm mới nhất\">Việc làm mới nhất</a></li>\n                                                <li><a href=\"https://careerviet.vn/viec-lam/muc-luong-20trvnd-s20-vi.html\" title=\"Việc làm Vip (1000$)\">Việc làm Vip (1000$)</a></li>\n                                                <li><a href=\"https://careerviet.vn/top-headhunt?utm_source=Home_TopHeadhunt&amp;utm_medium=TopHeadh",
+    "selector": "ul > *"
+  }
+]
