@@ -72,7 +72,7 @@ function EmployerRegisterForm() {
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
       
-      alert('🎉 Đăng ký thành công! Chuyển đến trang đăng nhập...');
+      alert(' Đăng ký thành công! Chuyển đến trang đăng nhập...');
       navigate('/employer-login');
     } catch (err) {
       console.error(' Lỗi đăng ký:', err);

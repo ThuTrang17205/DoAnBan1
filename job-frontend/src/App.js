@@ -22,6 +22,7 @@ import EmployerLanding from "./components/EmployerLanding";
 import EmployerLoginForm from "./components/EmployerLoginForm";
 import EmployerRegisterForm from "./components/EmployerRegisterForm";
 import EmployerDashboard from "./components/EmployerDashboard";
+import Footer from "./components/Footer";
 
 function AppContent() {
   const [jobs, setJobs] = useState([]);
@@ -122,13 +123,15 @@ function AppContent() {
     console.log('🎨 App rendered with isLoggedIn:', isLoggedIn);
   }, [isLoggedIn]);
 
-  // Danh sách routes không hiển thị Navbar
+  // Danh sách routes không hiển thị Navbar và Footer
   const hideNavbarRoutes = ['/employer-dashboard', '/employer-login', '/employer-register'];
   const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
+  const shouldShowFooter = !hideNavbarRoutes.includes(location.pathname);
 
   return (
     <>
       {shouldShowNavbar && <Navbar isLoggedIn={isLoggedIn} onLogout={handleLogout} />}
+      
       <Routes>
         {/* Trang chủ */}
         <Route
@@ -191,6 +194,9 @@ function AppContent() {
           }
         />
       </Routes>
+
+      {/* Footer - hiển thị trên tất cả trang trừ employer dashboard/login/register */}
+      {shouldShowFooter && <Footer />}
     </>
   );
 }
