@@ -60,34 +60,253 @@ function normalizeSalary(salary) {
 }
 
 // ========================
-// 🧠 Phân loại ngành nghề
+// 🧠 Phân loại ngành nghề (IMPROVED - Xử lý tiếng Việt tốt hơn)
 // ========================
 function detectCategory(title, description = "") {
+  // Chuẩn hóa text
   const text = (title + " " + description)
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
-  const categories = [
-    { key: /developer|engineer|it|software|frontend|backend|fullstack|devops|tester|qa|lap trinh|code|data|ai|machine learning|system admin|mang may tinh|it support/, cat: "Công nghệ thông tin" },
-    { key: /ke toan|accountant|finance|thu ngan|kiem toan|ngan hang|bank|auditor|bao cao tai chinh|giao dich vien/, cat: "Kế toán - Tài chính - Ngân hàng" },
-    { key: /sales|kinh doanh|telesales|cham soc khach hang|customer service|ban hang|sale admin|tu van vien|cham soc kh/, cat: "Kinh doanh - Bán hàng" },
-    { key: /marketing|seo|content|social|brand|digital|pr|truyen thong|quang cao|copywriter|facebook ads|google ads|tiktok/, cat: "Marketing - Truyền thông" },
-    { key: /nhan su|hanh chinh|hr|tuyen dung|recruiter|hanh chanh|bao hiem|cham cong|quan ly nhan vien/, cat: "Nhân sự - Hành chính" },
-    { key: /designer|thiet ke|ui|ux|graphic|hoa si|illustrator|figma|photoshop|indesign|3d|animation/, cat: "Thiết kế - Đồ hoạ" },
-    { key: /ky su|construction|civil|co khi|dien|xay dung|maintenance|mechanical|dien lanh|ky thuat vien|autocad/, cat: "Kỹ thuật - Xây dựng" },
-    { key: /giao vien|training|giang vien|education|teacher|gia su|dao tao|day hoc/, cat: "Giáo dục - Đào tạo" },
-    { key: /bat dong san|real estate|moi gioi|sales bds|dat nen|chung cu/, cat: "Bất động sản" },
-    { key: /lao dong pho thong|phu kho|boc vac|shipper|phuc vu|tap vu|bao ve|giao hang|cong nhan|tho ho|tho dien/, cat: "Lao động phổ thông" },
-    { key: /chef|phuc vu|nha hang|bep|barista|dau bep|phuc vu ban|le tan|khach san|housekeeping|bartender/, cat: "Nhà hàng - Khách sạn" },
-    { key: /support|dich vu|care|service|tong dai vien|customer support|bao hanh|ky thuat ho tro/, cat: "Dịch vụ - Khách hàng" },
-    { key: /manager|truong phong|giam doc|lead|supervisor|quan ly|chief|head/, cat: "Quản lý / Cấp cao" },
-  ];
+  // Helper function để check từ khóa linh hoạt hơn
+  const contains = (keywords) => {
+    return keywords.some(kw => text.includes(kw.replace(/\s+/g, " ")));
+  };
 
-  for (const k of categories) {
-    if (k.key.test(text)) return k.cat;
+  // 🎯 CHIẾN LƯỢC MỚI: Ưu tiên các từ CỤ THỂ trước
+  
+  // 1️⃣ QUẢN LÝ / CẤP CAO - Kiểm tra TRƯỚC để không bị overlap
+  const isManager = contains([
+    "giam doc", "tong giam doc", "pho giam doc",
+    "truong phong", "pho phong",
+    "quan ly", "country manager", "general manager",
+    "ceo", "cfo", "coo", "cto",
+    "director", "head of", "chief"
+  ]);
+  
+  // Nếu là quản lý và KHÔNG có từ khóa chuyên môn mạnh → Quản lý
+  const hasStrongSpecialty = contains([
+    "ke toan", "ky toan", "accountant",
+    "kinh doanh", "sales",
+    "marketing",
+    "nhan su", "hr",
+    "ky su", "engineer", "ky thuat"
+  ]);
+  
+  if (isManager && !hasStrongSpecialty) {
+    return "Quản lý / Cấp cao";
   }
 
+  // 2️⃣ KẾ TOÁN - TÀI CHÍNH - NGÂN HÀNG (Rất cụ thể)
+  if (contains([
+    "ke toan", "ky toan", "accountant", "accounting",
+    "kiem toan", "auditor", "audit",
+    "thu ngan", "cashier",
+    "bao cao tai chinh", "financial report"
+  ])) {
+    return "Kế toán - Tài chính - Ngân hàng";
+  }
+  
+  if (contains([
+    "tai chinh", "finance", "financial",
+    "ngan hang", "banking", "bank",
+    "credit", "tin dung",
+    "treasury", "investment", "dau tu",
+    "risk management"
+  ])) {
+    return "Kế toán - Tài chính - Ngân hàng";
+  }
+
+  // 3️⃣ GIÁO DỤC - ĐÀO TẠO (Kiểm tra sớm)
+  if (contains([
+    "giao vien", "teacher", "giang vien", "lecturer",
+    "gia su", "tutor",
+    "dao tao", "training", "instructor",
+    "huan luyen vien", "coach",
+    "nghien cuu", "research", "khoa hoc", "scientist",
+    "tro giang", "teaching assistant"
+  ])) {
+    return "Giáo dục - Đào tạo";
+  }
+
+  // 4️⃣ MARKETING - TRUYỀN THÔNG
+  if (contains([
+    "marketing", "mkt",
+    "seo", "sem", "content",
+    "social media", "truyen thong",
+    "quang cao", "advertising",
+    "pr", "public relation",
+    "copywriter", "brand",
+    "facebook ads", "google ads", "tiktok"
+  ])) {
+    return "Marketing - Truyền thông";
+  }
+
+  // 5️⃣ KINH DOANH - BÁN HÀNG
+  if (contains([
+    "kinh doanh", "business",
+    "sales", "ban hang",
+    "telesales", "tele sale",
+    "tu van ban hang", "sale executive",
+    "nhan vien ban hang",
+    "tro ly kinh doanh",
+    "bdm", "business development",
+    "account manager", "key account",
+    "sales engineer", "presales", "pre sales"
+  ])) {
+    return "Kinh doanh - Bán hàng";
+  }
+
+  // 6️⃣ KỸ THUẬT - XÂY DỰNG (Kiểm tra trước IT)
+  // Check các từ khóa kỹ thuật KHÔNG PHẢI IT
+  const isITEngineer = contains([
+    "software", "phan mem",
+    "web developer", "app developer", "mobile developer",
+    "frontend", "backend", "fullstack",
+    "data scientist", "data engineer", "ai engineer",
+    "machine learning", "ml engineer"
+  ]);
+  
+  if (!isITEngineer) {
+    if (contains([
+      "ky su", "ky thuat", "engineer",
+      "kien truc su", "architect",
+      "thi cong", "xay dung", "construction",
+      "co khi", "mechanical",
+      "dien", "electrical", "electronics",
+      "tu dong hoa", "automation",
+      "che tao", "manufacturing",
+      "san xuat", "production",
+      "qc", "qaqc", "quality control",
+      "qhse", "ehs", "an toan",
+      "maintenance", "bao tri", "bao duong",
+      "van hanh", "operator",
+      "thiet bi", "equipment",
+      "may moc", "machinery",
+      "lap rap", "assembly",
+      "han", "welding",
+      "cat", "cutting",
+      "khuon", "mold",
+      "cnc", "autocad", "solidworks", "revit",
+      "civil", "cong trinh",
+      "dau thau", "dao thau", "tender",
+      "quy hoach", "planning"
+    ])) {
+      return "Kỹ thuật - Xây dựng";
+    }
+  }
+
+  // 7️⃣ CÔNG NGHỆ THÔNG TIN (Rất cụ thể)
+  if (contains([
+    "lap trinh", "developer", "programmer", "coder",
+    "software engineer", "software developer",
+    "web developer", "web dev",
+    "mobile developer", "app developer",
+    "frontend", "backend", "fullstack",
+    "devops", "devsecops",
+    "data scientist", "data analyst", "data engineer",
+    "ai engineer", "machine learning", "ml engineer",
+    "deep learning", "ai", "ml",
+    "cloud engineer", "cloud architect",
+    "solution architect",
+    "system analyst", "business analyst",
+    "product owner", "scrum master",
+    "tester", "qa", "qc software",
+    "automation test", "manual test",
+    "security engineer", "cybersecurity",
+    "network engineer", "network admin",
+    "system admin", "sysadmin",
+    "database admin", "dba",
+    "it support", "helpdesk", "technical support",
+    "reactjs", "react", "nodejs", "node",
+    "java", "python", "php", "dotnet", ".net",
+    "angular", "vue", "laravel", "django",
+    "ios", "android", "flutter", "react native",
+    "phan mem", "software", "cntt", "cong nghe thong tin"
+  ])) {
+    return "Công nghệ thông tin";
+  }
+
+  // 8️⃣ NHÂN SỰ - HÀNH CHÍNH
+  if (contains([
+    "nhan su", "hr", "human resource",
+    "tuyen dung", "recruiter", "recruitment",
+    "c&b", "compensation", "payroll",
+    "hanh chinh", "admin", "van phong",
+    "tong vu", "thu ky", "secretary",
+    "assistant", "tro ly"
+  ])) {
+    return "Nhân sự - Hành chính";
+  }
+
+  // 9️⃣ THIẾT KẾ - ĐỒ HOẠ
+  if (contains([
+    "designer", "thiet ke",
+    "ui", "ux", "ui/ux",
+    "graphic", "do hoa",
+    "hoa sy", "illustrator",
+    "motion", "animation",
+    "3d", "2d",
+    "video editor", "editor",
+    "photoshop", "illustrator", "figma", "sketch"
+  ])) {
+    return "Thiết kế - Đồ hoạ";
+  }
+
+  // 🔟 DỊCH VỤ - KHÁCH HÀNG
+  if (contains([
+    "cham soc khach hang", "customer care", "customer service",
+    "cskh", "cs", "telesale cskh",
+    "call center", "contact center",
+    "hotline", "support",
+    "customer experience", "customer success"
+  ])) {
+    return "Dịch vụ - Khách hàng";
+  }
+
+  // 1️⃣1️⃣ BẤT ĐỘNG SẢN
+  if (contains([
+    "bat dong san", "real estate", "bds",
+    "moi gioi", "broker",
+    "nha dat", "property",
+    "dat nen", "chung cu"
+  ])) {
+    return "Bất động sản";
+  }
+
+  // 1️⃣2️⃣ NHÀ HÀNG - KHÁCH SẠN
+  if (contains([
+    "nha hang", "restaurant",
+    "khach san", "hotel",
+    "chef", "dau bep", "cook",
+    "phuc vu", "waiter", "waitress",
+    "le tan", "receptionist",
+    "f&b", "food and beverage",
+    "barista", "bartender",
+    "housekeeping"
+  ])) {
+    return "Nhà hàng - Khách sạn";
+  }
+
+  // 1️⃣3️⃣ LAO ĐỘNG PHỔ THÔNG
+  if (contains([
+    "lao dong pho thong", "lao dong",
+    "phu kho", "kho", "warehouse",
+    "boc vac", "porter",
+    "shipper", "giao hang", "delivery",
+    "bao ve", "security", "guard",
+    "tap vu", "ve sinh", "cleaning",
+    "lai xe", "driver",
+    "cong nhan", "worker",
+    "tho", "may", "theu", "cat"
+  ])) {
+    return "Lao động phổ thông";
+  }
+
+  // Nếu không match gì → Khác
   return "Khác";
 }
 
@@ -110,7 +329,6 @@ async function isDuplicate(title, company, location) {
     const { rows } = await pool.query("SELECT * FROM raw_jobs");
     console.log(`📦 Có ${rows.length} job thô cần xử lý`);
 
-    // ✅ SỬA: Đổi created_at → posted_at
     await pool.query(`
       CREATE TABLE IF NOT EXISTS jobs (
         id SERIAL PRIMARY KEY,

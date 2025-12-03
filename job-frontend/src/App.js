@@ -8,21 +8,28 @@ import {
   useNavigate,
   useLocation,
 } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import LoginForm from "./components/LoginForm";
-import RegisterForm from "./components/RegisterForm";
-import { CategoriesSection, CategoryJobsPage } from "./CategoriesSection";
-import ToolsSection from "./ToolsSection";
-import TrendingJobsSection from "./components/TrendingJobsSection";
-import CVBuilder from "./components/CVBuilder";
-import UserProfile from "./components/UserProfile";
-import JobDetailPage from "./components/JobDetailPage";
-import JobListPage from "./components/JobListPage";
-import EmployerLanding from "./components/EmployerLanding";
-import EmployerLoginForm from "./components/EmployerLoginForm";
-import EmployerRegisterForm from "./components/EmployerRegisterForm";
-import EmployerDashboard from "./components/EmployerDashboard";
-import Footer from "./components/Footer";
+import Navbar from "./components/common/Navbar";
+import LoginForm from "./components/auth/LoginForm";
+import RegisterForm from "./components/auth/RegisterForm";
+import { CategoriesSection, CategoryJobsPage } from "./pages/Jobs/CategoryJobsPage";
+import ToolsSection from "./pages/Tools/ToolsSection";
+import TrendingJobsSection from "./components/jobs/TrendingJobsSection";
+import CVBuilder from "./components/CV/CVBuilder";
+import UserProfile from "./components/profile/UserProfile";
+import JobDetailPage from "./pages/Jobs/JobDetailPage";
+import JobListPage from "./pages/Jobs/JobListPage";
+import EmployerLanding from "./pages/Employer/EmployerLanding";
+import EmployerLoginForm from "./pages/Employer/EmployerLoginForm";
+import EmployerRegisterForm from "./pages/Employer/EmployerRegisterForm";
+import EmployerDashboard from "./pages/Employer/EmployerDashboard";
+import Footer from "./components/common/Footer";
+import CVTemplatesPage from "./components/CV/CVTemplatesPage";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import AdminLoginForm from "./pages/Admin/AdminLoginForm";
+import LoginPage from './pages/User/LoginPage';
+import RegisterPage from './pages/User/RegisterPage';
+import ProfilePage from './pages/User/ProfilePage';
+
 
 function AppContent() {
   const [jobs, setJobs] = useState([]);
@@ -32,7 +39,7 @@ function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ⭐ FIX: KIỂM TRA TOKEN KHI MOUNT VÀ KHI LOCATION THAY ĐỔI
+  // Kiểm tra token khi mount và khi location thay đổi
   useEffect(() => {
     const token = localStorage.getItem('token');
     const shouldBeLoggedIn = !!token;
@@ -43,12 +50,12 @@ function AppContent() {
       currentIsLoggedIn: isLoggedIn
     });
 
-    // ⭐ CHỈ UPDATE STATE NẾU KHÁC BIỆT - Tránh infinite loop
+    // Chỉ update state nếu khác biệt - Tránh infinite loop
     if (shouldBeLoggedIn !== isLoggedIn) {
       console.log(`🔄 Updating isLoggedIn from ${isLoggedIn} to ${shouldBeLoggedIn}`);
       setIsLoggedIn(shouldBeLoggedIn);
     }
-  }, [location.pathname]); // ✅ Bỏ isLoggedIn khỏi dependency array
+  }, [location.pathname, isLoggedIn]);
 
   // Xử lý thông báo login/register success
   useEffect(() => {
@@ -60,7 +67,6 @@ function AppContent() {
       console.log('✅ Login successful!');
       alert('Đăng nhập thành công!');
       window.history.replaceState({}, document.title, '/');
-      // Force re-check auth
       const token = localStorage.getItem('token');
       if (token) setIsLoggedIn(true);
     }
@@ -69,11 +75,10 @@ function AppContent() {
       console.log('✅ Register successful!');
       alert('✅ Đăng ký thành công!');
       window.history.replaceState({}, document.title, '/');
-      // Force re-check auth
       const token = localStorage.getItem('token');
       if (token) setIsLoggedIn(true);
     }
-  }, [location]); // ✅ Dependency on location để trigger khi URL thay đổi
+  }, [location]);
 
   // Fetch jobs - chỉ chạy 1 lần khi mount
   useEffect(() => {
@@ -102,6 +107,7 @@ function AppContent() {
   const handleLogout = () => {
     console.log('🚪 Logging out...');
     localStorage.removeItem("token");
+    localStorage.removeItem("adminToken");
     setIsLoggedIn(false);
     navigate('/');
     console.log('✅ Logged out successfully');
@@ -113,18 +119,22 @@ function AppContent() {
     if (token) {
       setIsLoggedIn(true);
       console.log('✅ isLoggedIn set to true');
-      // Navigate sau khi set state
       setTimeout(() => navigate('/'), 100);
     }
   };
 
-  // 🔍 DEBUG: Log state khi render (có thể bỏ sau khi fix xong)
   useEffect(() => {
     console.log('🎨 App rendered with isLoggedIn:', isLoggedIn);
   }, [isLoggedIn]);
 
-  // Danh sách routes không hiển thị Navbar và Footer
-  const hideNavbarRoutes = ['/employer-dashboard', '/employer-login', '/employer-register'];
+  const hideNavbarRoutes = [
+    '/employer-dashboard', 
+    '/employer-login', 
+    '/employer-register', 
+    '/admin-dashboard',
+    '/admin-login'
+  ];
+  
   const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
   const shouldShowFooter = !hideNavbarRoutes.includes(location.pathname);
 
@@ -145,6 +155,10 @@ function AppContent() {
             </>
           }
         />
+
+        {/* Admin Routes */}
+        <Route path="/admin-login" element={<AdminLoginForm />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
 
         {/* Trang Nhà tuyển dụng */}
         <Route path="/employer" element={<EmployerLanding />} />
@@ -169,7 +183,38 @@ function AppContent() {
             )
           }
         />
+<Route
+  path="/login"
+  element={
+    isLoggedIn ? (
+      <Navigate to="/" replace />
+    ) : (
+      <LoginPage />
+    )
+  }
+/>
 
+<Route
+  path="/register"
+  element={
+    isLoggedIn ? (
+      <Navigate to="/" replace />
+    ) : (
+      <RegisterPage />
+    )
+  }
+/>
+
+<Route
+  path="/profile"
+  element={
+    isLoggedIn ? (
+      <ProfilePage />
+    ) : (
+      <Navigate to="/login" replace />
+    )
+  }
+/>
         <Route
           path="/register"
           element={
@@ -183,6 +228,9 @@ function AppContent() {
 
         {/* Other routes */}
         <Route path="/create-cv" element={<CVBuilder />} />
+        <Route path="/cv-templates" element={<CVTemplatesPage />} />
+        
+        {/* User Profile - Protected Route */}
         <Route
           path="/profile"
           element={
@@ -195,7 +243,7 @@ function AppContent() {
         />
       </Routes>
 
-      {/* Footer - hiển thị trên tất cả trang trừ employer dashboard/login/register */}
+      {/* Footer */}
       {shouldShowFooter && <Footer />}
     </>
   );
