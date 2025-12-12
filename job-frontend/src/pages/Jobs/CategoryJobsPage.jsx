@@ -1,82 +1,98 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import "./CategoryJobsPage.css";
 
-// ==================== CATEGORIES SECTION ====================
 export function CategoriesSection() {
   const navigate = useNavigate();
 
   const categories = [
     { 
-      name: "Công nghệ thông tin", 
-      slug: "cong-nghe-thong-tin"
+      name: "IT - Phần mềm", 
+      slug: "cong-nghe-thong-tin",
+      count: 1250,
+      color: '#667eea'
     },
     { 
-      name: "Kế toán - Tài chính - Ngân hàng",  
-      slug: "ke-toan-tai-chinh"
+      name: "Marketing",  
+      slug: "marketing-truyen-thong",
+      count: 890,
+      color: '#f093fb'
     },
     { 
-      name: "Marketing - Truyền thông", 
-      slug: "marketing-truyen-thong"
+      name: "Kinh doanh", 
+      slug: "kinh-doanh-ban-hang",
+      count: 756,
+      color: '#4facfe'
     },
     { 
-      name: "Kinh doanh - Bán hàng", 
-      slug: "kinh-doanh-ban-hang"
+      name: "Thiết kế",
+      slug: "thiet-ke-do-hoa",
+      count: 543,
+      color: '#fa709a'
     },
     { 
-      name: "Kỹ thuật - Xây dựng",
-      slug: "ky-thuat-xay-dung"
+      name: "Tài chính",
+      slug: "ke-toan-tai-chinh",
+      count: 432,
+      color: '#30cfd0'
     },
     { 
-      name: "Dịch vụ - Khách hàng",
-      slug: "dich-vu-khach-hang"
+      name: "Nhân sự",
+      slug: "nhan-su-hanh-chinh",
+      count: 321,
+      color: '#a8edea'
     },
     { 
-      name: "Nhân sự - Hành chính", 
-      slug: "nhan-su-hanh-chinh"
+      name: "Giáo dục", 
+      slug: "giao-duc-dao-tao",
+      count: 298,
+      color: '#fbc2eb'
     },
     { 
-      name: "Thiết kế - Đồ hoạ", 
-      slug: "thiet-ke-do-hoa"
-    },
-    { 
-      name: "Giáo dục - Đào tạo",
-      slug: "giao-duc-dao-tao"
-    },
-    { 
-      name: "Bất động sản", 
-      slug: "bat-dong-san"
-    },
-    { 
-      name: "Nhà hàng - Khách sạn",
-      slug: "nha-hang-khach-san"
-    },
-    { 
-      name: "Quản lý / Cấp cao",
-      slug: "quan-ly-cap-cao"
+      name: "Y tế",
+      slug: "y-te",
+      count: 267,
+      color: '#92fe9d'
     }
   ];
 
   return (
     <section className="categories-section">
       <div className="categories-container">
-        <h2 className="section-title nganh-nghe">Ngành nghề nổi bật</h2>
+        <h2 className="section-title">Khám phá theo ngành nghề</h2>
+        <p className="section-subtitle">Tìm công việc phù hợp với chuyên môn của bạn</p>
+        
         <div className="categories-grid">
           {categories.map((cat) => (
             <div 
               key={cat.slug}
               className="category-card"
               onClick={() => navigate(`/category/${cat.slug}`)}
+              style={{ '--category-color': cat.color }}
             >
-              <h3 className="category-name">{cat.name}</h3>
+              {/* TÊN NGÀNH */}
+              <div className="category-info">
+                <h3 className="category-name">{cat.name}</h3>
+                <p className="category-count">{cat.count} việc làm</p>
+              </div>
             </div>
           ))}
+        </div>
+
+        <div className="section-action">
+          <button
+            className="btn-view-all"
+            onClick={() => navigate('/jobs')}
+          >
+            Xem tất cả ngành nghề
+          </button>
         </div>
       </div>
     </section>
   );
 }
+
 
 // ==================== CATEGORY JOBS PAGE ====================
 export function CategoryJobsPage() {
@@ -122,9 +138,8 @@ export function CategoryJobsPage() {
         }
       });
       
-      console.log("📊 Category response:", response.data);
+      console.log("📂 Category response:", response.data);
       
-      // ✅ Backend trả về {jobs: [...], total: ...}
       const jobsData = response.data.jobs || [];
       const total = response.data.total || 0;
       
@@ -197,7 +212,7 @@ export function CategoryJobsPage() {
         </div>
       </div>
 
-      {/* Jobs List */}
+      {/* Jobs Container */}
       <div className="category-jobs-container">
         {jobs.length === 0 ? (
           <div className="no-jobs">
@@ -229,7 +244,6 @@ export function CategoryJobsPage() {
                   
                   {job.min_salary && job.max_salary && (
                     <div className="job-info-item">
-                      <span className="icon">💰</span>
                       <span className="info-text">
                         {(job.min_salary / 1000000).toFixed(0)} - {(job.max_salary / 1000000).toFixed(0)} triệu {job.currency}
                       </span>
@@ -238,7 +252,6 @@ export function CategoryJobsPage() {
                   
                   {(!job.min_salary || !job.max_salary) && (
                     <div className="job-info-item">
-                      <span className="icon">💰</span>
                       <span className="info-text">Thương lượng</span>
                     </div>
                   )}

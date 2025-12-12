@@ -74,10 +74,10 @@ function Navbar({ isLoggedIn, onLogout }) {
             {jobsDropdownOpen && (
               <div className="dropdown-menu">
                 <button onClick={() => handleNavigation("/")}>Tìm việc làm</button>
-                <button onClick={() => handleNavigation("/jobs/it")}>Việc làm IT</button>
-                <button onClick={() => handleNavigation("/jobs/marketing")}>Việc làm Marketing</button>
-                <button onClick={() => handleNavigation("/jobs/sales")}>Việc làm Kinh doanh</button>
-                <button onClick={() => handleNavigation("/jobs/all")}>Tất cả việc làm</button>
+                <button onClick={() => handleNavigation("/jobs?q=IT")}>Việc làm IT</button>
+                <button onClick={() => handleNavigation("/jobs?q=+Marketing+")}>Việc làm Marketing</button>
+                <button onClick={() => handleNavigation("/jobs?q=Kinh+doanh")}>Việc làm Kinh doanh</button>
+                <button onClick={() => handleNavigation("/jobs")}>Tất cả việc làm</button>
               </div>
             )}
           </div>
@@ -95,8 +95,8 @@ function Navbar({ isLoggedIn, onLogout }) {
               <div className="dropdown-menu">
                 <button onClick={() => handleNavigation("/create-cv")}>Tạo CV mới</button>
                 <button onClick={() => handleNavigation("/cv-templates")}>Mẫu CV</button>
-                <button onClick={() => handleNavigation("/my-cvs")}>CV của tôi</button>
-                <button onClick={() => handleNavigation("/cv-tips")}>Hướng dẫn viết CV</button>
+                <button onClick={() => handleNavigation("/cover-letter")}>Cover Letter</button>
+                <button onClick={() => handleNavigation("/guidewritring-cv")}>Hướng dẫn viết CV</button>
               </div>
             )}
           </div>

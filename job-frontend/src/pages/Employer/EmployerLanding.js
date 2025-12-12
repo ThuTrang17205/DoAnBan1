@@ -6,10 +6,6 @@ function EmployerLanding() {
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
 
-  const handleNavigate = (path) => {
-    window.location.href = path;
-  };
-
   const features = [
     {
       title: 'Đăng tin nhanh chóng',
@@ -41,6 +37,7 @@ function EmployerLanding() {
     {
       name: 'Gói Cơ bản',
       price: 'Miễn phí',
+      priceValue: 0,
       features: [
         '1 tin tuyển dụng',
         'Hiển thị 30 ngày',
@@ -52,6 +49,7 @@ function EmployerLanding() {
     {
       name: 'Gói Chuyên nghiệp',
       price: '2.990.000đ/tháng',
+      priceValue: 2990000,
       features: [
         '10 tin tuyển dụng',
         'Hiển thị ưu tiên',
@@ -65,6 +63,7 @@ function EmployerLanding() {
     {
       name: 'Gói Doanh nghiệp',
       price: 'Liên hệ',
+      priceValue: 0,
       features: [
         'Tin tuyển dụng không giới hạn',
         'Trang thương hiệu riêng',
@@ -76,26 +75,46 @@ function EmployerLanding() {
     }
   ];
 
+  
+  const handleStartPackage = (pkg) => {
+    localStorage.setItem('selectedPackage', JSON.stringify({
+      name: pkg.name,
+      price: pkg.price,
+      priceValue: pkg.priceValue,
+      features: pkg.features
+    }));
+    
+    localStorage.setItem('redirectAfterLogin', 'payment');
+    
+    const token = localStorage.getItem('token');
+    if (token) {
+      window.location.href = '/payment';
+    } else {
+      setShowLoginForm(true);
+    }
+  };
+
   return (
     <div className="employer-page">
-      {/* Header */}
+      {}
       <div className="employer-header">
         <div className="header-actions">
-          {/* Header actions */}
+          {}
         </div>
       </div>
 
-      {/* Hero Section */}
+      {}
       <div className="employer-hero">
         <div className="employer-hero-content">
           <h1>
-            Tìm kiếm nhân tài <br />
+            Tìm kiếm nhân tài
+            <br />
             <span className="gradient-text">Nhanh chóng & Hiệu quả</span>
           </h1>
           <p className="hero-subtitle">
             Kết nối với hàng triệu ứng viên chất lượng cao trên Job Portal
           </p>
-          
+
           <div className="hero-stats">
             <div className="stat-item">
               <div className="stat-number">1M+</div>
@@ -112,13 +131,13 @@ function EmployerLanding() {
           </div>
 
           <div className="hero-actions">
-            <button 
+            <button
               className="btn-employer-register"
               onClick={() => setShowRegisterForm(true)}
             >
               Đăng ký nhà tuyển dụng
             </button>
-            <button 
+            <button
               className="btn-employer-login"
               onClick={() => setShowLoginForm(true)}
             >
@@ -128,8 +147,8 @@ function EmployerLanding() {
         </div>
 
         <div className="employer-hero-image">
-          <img 
-            src="https://www.topcv.vn/v4/image/welcome/employer/img-employer-hero.png" 
+          <img
+            src="https://www.topcv.vn/v4/image/welcome/employer/img-employer-hero.png"
             alt="Employer Hero"
             onError={(e) => {
               e.target.style.display = 'none';
@@ -138,10 +157,11 @@ function EmployerLanding() {
         </div>
       </div>
 
-      {/* Features */}
+      {}
       <div className="employer-features">
         <h2 className="section-title">Tại sao chọn Job Portal ?</h2>
         <p className="section-subtitle">Giải pháp tuyển dụng toàn diện cho doanh nghiệp</p>
+
         <div className="features-grid">
           {features.map((feature, index) => (
             <div key={index} className="feature-card">
@@ -153,14 +173,15 @@ function EmployerLanding() {
         </div>
       </div>
 
-      {/* Pricing */}
+      {}
       <div className="pricing-section">
         <h2 className="section-title">Bảng giá dịch vụ</h2>
         <p className="section-subtitle">Lựa chọn gói phù hợp với nhu cầu của bạn</p>
+
         <div className="pricing-grid">
           {packages.map((pkg, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className={`pricing-card ${pkg.popular ? 'popular' : ''}`}
             >
               {pkg.popular && <div className="popular-badge">Phổ biến nhất</div>}
@@ -176,10 +197,10 @@ function EmployerLanding() {
                   </li>
                 ))}
               </ul>
-              <button 
+              <button
                 className="package-button"
                 style={{ backgroundColor: pkg.color }}
-                onClick={() => setShowRegisterForm(true)}
+                onClick={() => handleStartPackage(pkg)}
               >
                 Bắt đầu ngay
               </button>
@@ -188,12 +209,12 @@ function EmployerLanding() {
         </div>
       </div>
 
-      {/* CTA */}
+      {}
       <div className="cta-section">
         <div className="cta-content">
           <h2>Sẵn sàng tìm kiếm nhân tài?</h2>
           <p>Tham gia cùng hàng ngàn doanh nghiệp đang tin dùng Job Portal</p>
-          <button 
+          <button
             className="cta-button"
             onClick={() => setShowRegisterForm(true)}
           >
@@ -202,12 +223,17 @@ function EmployerLanding() {
         </div>
       </div>
 
-      {/* Login Modal */}
+      {}
       {showLoginForm && (
         <div className="modal-overlay" onClick={() => setShowLoginForm(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setShowLoginForm(false)}>✕</button>
-            <EmployerLoginForm 
+            <button
+              className="modal-close"
+              onClick={() => setShowLoginForm(false)}
+            >
+              ✕
+            </button>
+            <EmployerLoginForm
               onClose={() => setShowLoginForm(false)}
               onSwitchToRegister={() => {
                 setShowLoginForm(false);
@@ -218,12 +244,17 @@ function EmployerLanding() {
         </div>
       )}
 
-      {/* Register Modal */}
+      {}
       {showRegisterForm && (
         <div className="modal-overlay" onClick={() => setShowRegisterForm(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setShowRegisterForm(false)}>✕</button>
-            <EmployerRegisterForm 
+            <button
+              className="modal-close"
+              onClick={() => setShowRegisterForm(false)}
+            >
+              ✕
+            </button>
+            <EmployerRegisterForm
               onClose={() => setShowRegisterForm(false)}
               onSwitchToLogin={() => {
                 setShowRegisterForm(false);
@@ -237,7 +268,7 @@ function EmployerLanding() {
   );
 }
 
-/* Login Form */
+
 function EmployerLoginForm({ onSwitchToRegister, onClose }) {
   const [formData, setFormData] = useState({
     email: "",
@@ -249,34 +280,34 @@ function EmployerLoginForm({ onSwitchToRegister, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
     setError("");
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/users/login', {
+      const response = await axios.post('http://localhost:5000/api/employers/login', {
         email: formData.email,
         password: formData.password
       });
 
       console.log(" Đăng nhập thành công:", response.data);
 
-      // Kiểm tra role
-      if (response.data.user.role !== 'employer') {
-        setError("Tài khoản này không phải là nhà tuyển dụng");
-        setLoading(false);
-        return;
-      }
-
-      // Lưu token và user info
+      
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
 
-      alert("🎉 Đăng nhập thành công!");
       
-      // Redirect to employer dashboard
-      window.location.href = '/employer-dashboard';
+      const redirectTo = localStorage.getItem('redirectAfterLogin');
       
+      if (redirectTo === 'payment') {
+        
+        localStorage.removeItem('redirectAfterLogin');
+        
+        window.location.href = '/payment';
+      } else {
+        
+        window.location.href = '/employer-dashboard';
+      }
+
     } catch (err) {
       console.error(" Lỗi đăng nhập:", err);
       if (err.response?.data?.message) {
@@ -294,7 +325,7 @@ function EmployerLoginForm({ onSwitchToRegister, onClose }) {
       <h2>Đăng nhập nhà tuyển dụng</h2>
       <p className="form-subtitle">Quản lý tuyển dụng hiệu quả cùng Job Portal</p>
 
-      {error && <div className="error-message">⚠️ {error}</div>}
+      {error && <div className="error-message"> {error}</div>}
 
       <form onSubmit={handleSubmit} className="employer-form">
         <div className="form-group">
@@ -304,6 +335,7 @@ function EmployerLoginForm({ onSwitchToRegister, onClose }) {
             value={formData.email}
             onChange={(e) => setFormData({...formData, email: e.target.value})}
             placeholder="company@example.com"
+            autoComplete="email"
             required
             disabled={loading}
           />
@@ -316,6 +348,7 @@ function EmployerLoginForm({ onSwitchToRegister, onClose }) {
             value={formData.password}
             onChange={(e) => setFormData({...formData, password: e.target.value})}
             placeholder="••••••••"
+            autoComplete="current-password"
             required
             disabled={loading}
           />
@@ -327,8 +360,8 @@ function EmployerLoginForm({ onSwitchToRegister, onClose }) {
       </form>
 
       <div className="form-footer">
-        <p>Chưa có tài khoản? 
-          <button onClick={onSwitchToRegister} className="link-button">
+        <p>Chưa có tài khoản?{' '}
+          <button type="button" onClick={onSwitchToRegister} className="link-button">
             Đăng ký ngay
           </button>
         </p>
@@ -337,7 +370,7 @@ function EmployerLoginForm({ onSwitchToRegister, onClose }) {
   );
 }
 
-/* Register Form */
+
 function EmployerRegisterForm({ onSwitchToLogin, onClose }) {
   const [formData, setFormData] = useState({
     companyName: "",
@@ -355,11 +388,10 @@ function EmployerRegisterForm({ onSwitchToLogin, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
     setError("");
     setLoading(true);
 
-    // Validation
+   
     if (!formData.companyName.trim() || !formData.email.trim() || 
         !formData.password.trim() || !formData.confirmPassword.trim()) {
       setError("Vui lòng nhập đầy đủ thông tin bắt buộc");
@@ -380,11 +412,9 @@ function EmployerRegisterForm({ onSwitchToLogin, onClose }) {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/users/register', {
-        name: formData.contactPerson || formData.companyName,
+      const response = await axios.post('http://localhost:5000/api/employers/register', {
         email: formData.email,
         password: formData.password,
-        role: 'employer',
         companyName: formData.companyName,
         contactPerson: formData.contactPerson,
         phone: formData.phone,
@@ -394,23 +424,29 @@ function EmployerRegisterForm({ onSwitchToLogin, onClose }) {
 
       console.log(" Đăng ký thành công:", response.data);
 
-      // Lưu token
+     
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
 
-      alert(" Đăng ký thành công!");
       
-      // Chuyển sang login hoặc redirect
-      if (onSwitchToLogin) {
-        onSwitchToLogin();
+      const redirectTo = localStorage.getItem('redirectAfterLogin');
+      
+      if (redirectTo === 'payment') {
+       
+        localStorage.removeItem('redirectAfterLogin');
+        alert(" Đăng ký thành công!");
+       
+        window.location.href = '/payment';
       } else {
+        alert(" Đăng ký thành công! Vui lòng chờ xác thực tài khoản.");
+       
         window.location.href = '/employer-dashboard';
       }
-      
+
     } catch (err) {
-      console.error("❌ Lỗi đăng ký:", err);
+      console.error(" Lỗi đăng ký:", err);
       if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else {
@@ -426,7 +462,7 @@ function EmployerRegisterForm({ onSwitchToLogin, onClose }) {
       <h2>Đăng ký nhà tuyển dụng</h2>
       <p className="form-subtitle">Bắt đầu tuyển dụng hiệu quả cùng Job Portal</p>
 
-      {error && <div className="error-message">⚠️ {error}</div>}
+      {error && <div className="error-message"> {error}</div>}
 
       <form onSubmit={handleSubmit} className="employer-form">
         <div className="form-group">
@@ -436,6 +472,7 @@ function EmployerRegisterForm({ onSwitchToLogin, onClose }) {
             value={formData.companyName}
             onChange={(e) => setFormData({...formData, companyName: e.target.value})}
             placeholder="Nhập tên công ty"
+            autoComplete="organization"
             required
             disabled={loading}
           />
@@ -448,6 +485,7 @@ function EmployerRegisterForm({ onSwitchToLogin, onClose }) {
             value={formData.contactPerson}
             onChange={(e) => setFormData({...formData, contactPerson: e.target.value})}
             placeholder="Họ tên người phụ trách"
+            autoComplete="name"
             disabled={loading}
           />
         </div>
@@ -459,6 +497,7 @@ function EmployerRegisterForm({ onSwitchToLogin, onClose }) {
             value={formData.email}
             onChange={(e) => setFormData({...formData, email: e.target.value})}
             placeholder="company@example.com"
+            autoComplete="email"
             required
             disabled={loading}
           />
@@ -471,6 +510,7 @@ function EmployerRegisterForm({ onSwitchToLogin, onClose }) {
             value={formData.phone}
             onChange={(e) => setFormData({...formData, phone: e.target.value})}
             placeholder="0912345678"
+            autoComplete="tel"
             disabled={loading}
           />
         </div>
@@ -480,6 +520,7 @@ function EmployerRegisterForm({ onSwitchToLogin, onClose }) {
           <select
             value={formData.companySize}
             onChange={(e) => setFormData({...formData, companySize: e.target.value})}
+            autoComplete="off"
             disabled={loading}
           >
             <option value="">Chọn quy mô</option>
@@ -496,6 +537,7 @@ function EmployerRegisterForm({ onSwitchToLogin, onClose }) {
           <select
             value={formData.industry}
             onChange={(e) => setFormData({...formData, industry: e.target.value})}
+            autoComplete="off"
             disabled={loading}
           >
             <option value="">Chọn ngành nghề</option>
@@ -516,6 +558,7 @@ function EmployerRegisterForm({ onSwitchToLogin, onClose }) {
             value={formData.password}
             onChange={(e) => setFormData({...formData, password: e.target.value})}
             placeholder="Tối thiểu 6 ký tự"
+            autoComplete="new-password"
             required
             disabled={loading}
           />
@@ -528,6 +571,7 @@ function EmployerRegisterForm({ onSwitchToLogin, onClose }) {
             value={formData.confirmPassword}
             onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
             placeholder="Nhập lại mật khẩu"
+            autoComplete="new-password"
             required
             disabled={loading}
           />
@@ -539,8 +583,8 @@ function EmployerRegisterForm({ onSwitchToLogin, onClose }) {
       </form>
 
       <div className="form-footer">
-        <p>Đã có tài khoản? 
-          <button onClick={onSwitchToLogin} className="link-button">
+        <p>Đã có tài khoản?{' '}
+          <button type="button" onClick={onSwitchToLogin} className="link-button">
             Đăng nhập ngay
           </button>
         </p>

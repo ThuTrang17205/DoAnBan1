@@ -104,32 +104,31 @@ class Job {
     }
   }
 
-  /**
-   * Tìm job theo ID
-   * @param {Number} id - Job ID
-   * @returns {Promise<Object|null>}
-   */
-  static async findById(id) {
-    try {
-      const result = await pool.query(
-        `SELECT j.*, 
-                COALESCE(u.company_name, e.company, j.company) as company_name,
-                u.email as employer_email, 
-                u.phone as employer_phone,
-                e.user_id as employer_user_id
-         FROM jobs j
-         LEFT JOIN employers e ON j.employer_id = e.id
-         LEFT JOIN users u ON e.user_id = u.id
-         WHERE j.id = $1`,
-        [id]
-      );
-      return result.rows[0] || null;
-    } catch (error) {
-      console.error('❌ Error in Job.findById:', error.message);
-      throw error;
-    }
+ /**
+ * Tìm job theo ID
+ * @param {Number} id - Job ID
+ * @returns {Promise<Object|null>}
+ */
+static async findById(id) {
+  try {
+    const result = await pool.query(
+      `SELECT j.*, 
+              u.company_name,
+              u.email as employer_email, 
+              u.phone as employer_phone,
+              u.id as employer_user_id,
+              u.username as employer_username
+       FROM jobs j
+       LEFT JOIN users u ON j.posted_by = u.id
+       WHERE j.id = $1`,
+      [id]
+    );
+    return result.rows[0] || null;
+  } catch (error) {
+    console.error('❌ Error in Job.findById:', error.message);
+    throw error;
   }
-
+}
   /**
    * Tìm jobs theo category
    * @param {String} category - Category name

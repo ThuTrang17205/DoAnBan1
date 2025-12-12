@@ -10,7 +10,7 @@ const { seedJobs, countJobs } = require('./jobSeeder');
  * Run all seeders in order
  */
 async function seedAll() {
-  console.log('\n🌱 ==================== STARTING SEED PROCESS ====================\n');
+  console.log('\n ==================== STARTING SEED PROCESS ====================\n');
   
   try {
     // 1. Display categories (không cần seed vào DB)

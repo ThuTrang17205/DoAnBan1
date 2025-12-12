@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './EmployerLoginForm.css';
 
-function EmployerLoginForm() {
+function EmployerLoginForm({ redirectToCheckout = false }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -22,36 +22,78 @@ function EmployerLoginForm() {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/users/login', {
+      const response = await axios.post('http://localhost:5000/api/employers/login', {
         email,
         password
       });
 
       console.log(' Đăng nhập thành công:', response.data);
       
-      // Kiểm tra role
-      if (response.data.user && response.data.user.role !== 'employer') {
-        setError('Tài khoản này không phải là tài khoản nhà tuyển dụng');
+      
+      if (!response.data.token) {
+        console.error(' Không có token trong response!');
+        setError('Lỗi server: Không nhận được token');
+        setLoading(false);
+        return;
+      }
+      
+      
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('userRole', 'employer');
+      
+      if (response.data.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
+      
+      
+      console.log(' VERIFY LocalStorage:');
+      console.log('  - token:', localStorage.getItem('token') ? 'EXISTS ' : 'MISSING ');
+      console.log('  - userRole:', localStorage.getItem('userRole'));
+      console.log('  - user:', localStorage.getItem('user') ? 'EXISTS ' : 'MISSING ');
+      
+      
+      const savedRole = localStorage.getItem('userRole');
+      if (savedRole !== 'employer') {
+        console.error(' Role không đúng! Expected: employer, Got:', savedRole);
+        setError('Lỗi: Không thể lưu role');
         setLoading(false);
         return;
       }
 
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('userRole', 'employer'); // Lưu role
-        console.log(' Token đã được lưu!');
-      }
+      console.log(' All checks passed! Redirecting...');
+      
+      
+      setTimeout(() => {
+        const redirectTarget = localStorage.getItem("redirectAfterLogin");
 
-      alert(' Đăng nhập thành công!');
-      navigate('/employer-dashboard');
+        
+        if (redirectTarget === "payment") {
+          console.log(" Redirecting to PAYMENT PAGE...");
+          
+          localStorage.removeItem("redirectAfterLogin");
+          navigate('/payment');
+        } 
+        
+        else if (redirectTarget === "checkout") {
+          console.log(" Redirecting to CHECKOUT PAGE...");
+          localStorage.removeItem("redirectAfterLogin");
+          navigate('/employer-checkout');
+        } 
+        
+        else {
+          console.log(" Redirecting to EMPLOYER DASHBOARD...");
+          navigate('/employer-dashboard');
+        }
+      }, 300);
+
+      
     } catch (err) {
-      console.error(' Lỗi đăng nhập:', err);
+      console.error('❌ Lỗi đăng nhập:', err);
       if (err.response) {
         setError(err.response.data.message || 'Email hoặc mật khẩu không đúng');
       } else {
         setError('Không thể kết nối đến server');
       }
-    } finally {
       setLoading(false);
     }
   };
@@ -72,7 +114,7 @@ function EmployerLoginForm() {
           <p>Quản lý tin tuyển dụng của bạn</p>
         </div>
 
-        {error && <div className="error-message"> {error}</div>}
+        {error && <div className="error-message">⚠️ {error}</div>}
 
         <form className="employer-login-form" onSubmit={handleSubmit}>
           <div className="form-group">

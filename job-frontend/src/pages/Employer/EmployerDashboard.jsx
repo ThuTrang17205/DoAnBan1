@@ -1,18 +1,37 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import './EmployerDashboard.css';
 
 export default function EmployerDashboard() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState(null);
   const [employer, setEmployer] = useState(null);
   const [jobs, setJobs] = useState([]);
+  const [applications, setApplications] = useState([]);
   const [stats, setStats] = useState({
     totalJobs: 0,
     activeJobs: 0,
     totalApplications: 0,
-    pendingApplications: 0
+    pendingApplications: 0,
+    approvedApplications: 0,
+    rejectedApplications: 0,
+    totalViews: 0
   });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
+  
+  useEffect(() => {
+    if (location.state?.refresh) {
+      console.log(' Refreshing dashboard after job creation...');
+      fetchDashboardData();
+      // Clear state sau khi refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
+  //  Fetch data khi mount
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -21,160 +40,200 @@ export default function EmployerDashboard() {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        window.location.href = '/employer-login';
+        navigate('/employer-login');
         return;
       }
 
-      // Lấy thông tin user
-      const userResponse = await fetch('http://localhost:5000/api/auth/me', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const userData = await userResponse.json();
+      console.log(' Fetching dashboard data...');
 
-      if (userData.role !== 'employer') {
-        alert('Bạn không có quyền truy cập trang này');
-        window.location.href = '/';
-        return;
+      // Lấy thông tin từ localStorage
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
       }
 
-      setUser(userData);
-      setEmployer(userData.profile);
+      //  Lấy profile
+      try {
+        const profileResponse = await fetch('http://localhost:5000/api/employers/me/profile', {
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
+          },
+          cache: 'no-store'
+        });
 
-      // Lấy danh sách jobs của employer
-      const jobsResponse = await fetch('http://localhost:5000/api/employer/jobs', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const jobsData = await jobsResponse.json();
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json();
+          if (profileData.success && profileData.employer) {
+            setUser(profileData.employer);
+            setEmployer(profileData.employer.profile);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
 
-      setJobs(jobsData);
+      //  Lấy jobs với timestamp để bypass cache
+      try {
+        const timestamp = new Date().getTime();
+        const jobsResponse = await fetch(`http://localhost:5000/api/employers/me/jobs?_t=${timestamp}`, {
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
+          },
+          cache: 'no-store'
+        });
 
-      // Tính toán stats
-      const totalJobs = jobsData.length;
-      const activeJobs = jobsData.filter(job => job.status === 'open').length;
-      const totalApplications = jobsData.reduce((sum, job) => sum + (parseInt(job.application_count) || 0), 0);
+        console.log(' Jobs response status:', jobsResponse.status);
 
-      setStats({
-        totalJobs,
-        activeJobs,
-        totalApplications,
-        pendingApplications: totalApplications
-      });
+        if (jobsResponse.ok) {
+          const jobsData = await jobsResponse.json();
+          console.log(' Jobs data received:', jobsData);
+          
+          const jobsList = jobsData.jobs || jobsData.data || [];
+          console.log(' Jobs list:', jobsList.length, 'jobs');
+          setJobs(jobsList);
+
+          //  Lấy applications
+          try {
+            const appsResponse = await fetch(`http://localhost:5000/api/employers/me/applications?_t=${timestamp}`, {
+              headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
+              },
+              cache: 'no-store'
+            });
+
+            if (appsResponse.ok) {
+              const appsData = await appsResponse.json();
+              const appsList = appsData.applications || appsData.data || [];
+              setApplications(appsList);
+              calculateStats(jobsList, appsList);
+            }
+          } catch (error) {
+            console.error('Error fetching applications:', error);
+            calculateStats(jobsList, []);
+          }
+        } else {
+          console.warn(' Failed to fetch jobs, status:', jobsResponse.status);
+          setJobs([]);
+          calculateStats([], []);
+        }
+      } catch (error) {
+        console.error(' Error fetching jobs:', error);
+        setJobs([]);
+      }
 
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error(' Error fetching dashboard data:', error);
       setLoading(false);
     }
+  };
+
+  const calculateStats = (jobsList, appsList) => {
+    const totalJobs = jobsList.length;
+    const activeJobs = jobsList.filter(j => j.status === 'open' || j.status === 'active').length;
+    const totalApplications = appsList.length;
+    const pendingApplications = appsList.filter(a => a.status === 'pending').length;
+    const approvedApplications = appsList.filter(a => a.status === 'approved' || a.status === 'accepted').length;
+    const rejectedApplications = appsList.filter(a => a.status === 'rejected').length;
+    const totalViews = jobsList.reduce((sum, job) => sum + (job.views || 0), 0);
+
+    setStats({
+      totalJobs,
+      activeJobs,
+      totalApplications,
+      pendingApplications,
+      approvedApplications,
+      rejectedApplications,
+      totalViews
+    });
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '/employer-landing';
+    localStorage.removeItem('userRole');
+    navigate('/employer');
   };
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
-          <div>Đang tải...</div>
-        </div>
+      <div className="dashboard-loading">
+        <div className="spinner"></div>
+        <div>Đang tải...</div>
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f7fa' }}>
+    <div className="employer-dashboard">
       {/* Header */}
-      <header style={{
-        background: 'white',
-        padding: '1rem 2rem',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
+      <header className="dashboard-header">
         <div>
-          <h1 style={{ margin: 0, fontSize: '1.5rem', color: '#2563eb' }}>
-            Job Portal - Nhà tuyển dụng
-          </h1>
-          <p style={{ margin: '0.25rem 0 0', color: '#6b7280', fontSize: '0.9rem' }}>
-            {employer?.company || user?.company_name || 'Công ty'}
+          <h1>Job Portal - Nhà tuyển dụng</h1>
+          <p className="company-name">
+            {employer?.company || user?.company_name || user?.companyName || 'Công ty'}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontWeight: '600', color: '#1f2937' }}>{user?.name}</div>
-            <div style={{ fontSize: '0.85rem', color: '#6b7280' }}>{user?.email}</div>
+        <div className="header-right">
+          <div className="user-info">
+            <div className="user-name">
+              {user?.name || user?.contact_person || user?.contactPerson || 'Employer'}
+            </div>
+            <div className="user-email">{user?.email}</div>
           </div>
-          <button
-            onClick={handleLogout}
-            style={{
-              padding: '0.5rem 1rem',
-              background: '#dc2626',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: '600'
-            }}
-          >
-            Đăng xuất
-          </button>
         </div>
       </header>
 
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem' }}>
+      <div className="dashboard-container">
         {/* Stats Cards */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '1.5rem',
-          marginBottom: '2rem'
-        }}>
+        <div className="stats-grid">
           <StatCard
-            
             title="Tổng số tin tuyển dụng"
             value={stats.totalJobs}
             color="#2563eb"
+            subtitle={`Đang tuyển: ${stats.activeJobs}`}
           />
           <StatCard
-            
             title="Tin đang tuyển"
             value={stats.activeJobs}
             color="#10b981"
+            subtitle={`${stats.totalJobs > 0 ? Math.round((stats.activeJobs / stats.totalJobs) * 100) : 0}% tổng số`}
           />
           <StatCard
-            
             title="Tổng ứng viên"
             value={stats.totalApplications}
             color="#f59e0b"
+            subtitle={`TB: ${stats.totalJobs > 0 ? (stats.totalApplications / stats.totalJobs).toFixed(1) : 0}/tin`}
           />
           <StatCard
-            
             title="Chờ xét duyệt"
             value={stats.pendingApplications}
             color="#8b5cf6"
+            subtitle={`${stats.totalApplications > 0 ? Math.round((stats.pendingApplications / stats.totalApplications) * 100) : 0}% tổng số`}
           />
         </div>
 
         {/* Tabs */}
-        <div style={{
-          background: 'white',
-          borderRadius: '12px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-        }}>
-          <div style={{
-            display: 'flex',
-            borderBottom: '2px solid #e5e7eb',
-            padding: '0 1rem'
-          }}>
+        <div className="dashboard-tabs">
+          <div className="tabs-header">
             <TabButton
               active={activeTab === 'overview'}
               onClick={() => setActiveTab('overview')}
             >
                Tổng quan
+            </TabButton>
+            <TabButton
+              active={activeTab === 'statistics'}
+              onClick={() => setActiveTab('statistics')}
+            >
+               Thống kê
             </TabButton>
             <TabButton
               active={activeTab === 'jobs'}
@@ -190,12 +249,15 @@ export default function EmployerDashboard() {
             </TabButton>
           </div>
 
-          <div style={{ padding: '2rem' }}>
+          <div className="tabs-content">
             {activeTab === 'overview' && (
-              <OverviewTab jobs={jobs} stats={stats} />
+              <OverviewTab jobs={jobs} stats={stats} navigate={navigate} />
+            )}
+            {activeTab === 'statistics' && (
+              <StatisticsTab jobs={jobs} applications={applications} stats={stats} />
             )}
             {activeTab === 'jobs' && (
-              <JobsTab jobs={jobs} onRefresh={fetchDashboardData} />
+              <JobsTab jobs={jobs} onRefresh={fetchDashboardData} navigate={navigate} />
             )}
             {activeTab === 'company' && (
               <CompanyTab user={user} employer={employer} />
@@ -207,93 +269,52 @@ export default function EmployerDashboard() {
   );
 }
 
-function StatCard({ icon, title, value, color }) {
-  return (
-    <div style={{
-      background: 'white',
-      padding: '1.5rem',
-      borderRadius: '12px',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-      borderLeft: `4px solid ${color}`
-    }}>
-      <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{icon}</div>
-      <div style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '0.5rem' }}>{title}</div>
-      <div style={{ fontSize: '2rem', fontWeight: '800', color }}>{value}</div>
-    </div>
-  );
-}
+// ... (các component khác giữ nguyên)
 
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        padding: '1rem 1.5rem',
-        background: 'none',
-        border: 'none',
-        borderBottom: active ? '3px solid #2563eb' : '3px solid transparent',
-        color: active ? '#2563eb' : '#6b7280',
-        fontWeight: active ? '700' : '500',
-        cursor: 'pointer',
-        fontSize: '1rem',
-        transition: '0.2s'
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function OverviewTab({ jobs, stats }) {
+function OverviewTab({ jobs, stats, navigate }) {
   const recentJobs = jobs.slice(0, 5);
 
+  //   Dùng navigate với state để báo refresh
+  const handleCreateJob = () => {
+    navigate('/employer/jobs/create', { state: { from: 'dashboard' } });
+  };
+
   return (
-    <div>
-      <h2 style={{ marginBottom: '1.5rem', color: '#1f2937' }}>Tổng quan hoạt động</h2>
+    <div className="overview-tab">
+      <h2>Tổng quan hoạt động</h2>
       
-      <div style={{
-        background: '#f9fafb',
-        padding: '1.5rem',
-        borderRadius: '10px',
-        marginBottom: '2rem'
-      }}>
-        <h3 style={{ marginBottom: '1rem' }}> Thống kê nhanh</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
-          <div>
-            <span style={{ color: '#6b7280' }}>Tỷ lệ tin đang tuyển:</span>
-            <strong style={{ marginLeft: '0.5rem', color: '#10b981' }}>
+      <div className="quick-stats">
+        <h3> Thống kê nhanh</h3>
+        <div className="quick-stats-grid">
+          <div className="quick-stat-item">
+            <span className="label">Tỷ lệ tin đang tuyển:</span>
+            <strong className="value green">
               {stats.totalJobs > 0 ? Math.round((stats.activeJobs / stats.totalJobs) * 100) : 0}%
             </strong>
           </div>
-          <div>
-            <span style={{ color: '#6b7280' }}>TB ứng viên/tin:</span>
-            <strong style={{ marginLeft: '0.5rem', color: '#f59e0b' }}>
-              {stats.totalJobs > 0 ? Math.round(stats.totalApplications / stats.totalJobs) : 0}
+          <div className="quick-stat-item">
+            <span className="label">TB ứng viên/tin:</span>
+            <strong className="value orange">
+              {stats.totalJobs > 0 ? (stats.totalApplications / stats.totalJobs).toFixed(1) : 0}
             </strong>
           </div>
         </div>
       </div>
 
-      <h3 style={{ marginBottom: '1rem' }}> Tin tuyển dụng gần đây</h3>
+      <h3> Tin tuyển dụng gần đây</h3>
       {recentJobs.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📝</div>
+        <div className="empty-state">
+          <div className="empty-icon">📝</div>
           <p>Chưa có tin tuyển dụng nào</p>
-          <button style={{
-            marginTop: '1rem',
-            padding: '0.75rem 1.5rem',
-            background: '#2563eb',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontWeight: '600'
-          }}>
+          <button 
+            className="btn-primary"
+            onClick={handleCreateJob}
+          >
             Đăng tin ngay
           </button>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="jobs-list">
           {recentJobs.map(job => (
             <JobCard key={job.id} job={job} compact />
           ))}
@@ -303,37 +324,38 @@ function OverviewTab({ jobs, stats }) {
   );
 }
 
-function JobsTab({ jobs, onRefresh }) {
+function JobsTab({ jobs, onRefresh, navigate }) {
   const [filter, setFilter] = useState('all');
+
+  //  FIXED: Dùng navigate thay vì window.location.href
+  const handleCreateJob = () => {
+    navigate('/employer/jobs/create', { state: { from: 'dashboard' } });
+  };
 
   const filteredJobs = jobs.filter(job => {
     if (filter === 'all') return true;
+    if (filter === 'open') return job.status === 'open' || job.status === 'active';
     return job.status === filter;
   });
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
-        <h2 style={{ margin: 0, color: '#1f2937' }}>Quản lý tin tuyển dụng</h2>
-        <button style={{
-          padding: '0.75rem 1.5rem',
-          background: '#2563eb',
-          color: 'white',
-          border: 'none',
-          borderRadius: '8px',
-          cursor: 'pointer',
-          fontWeight: '600'
-        }}>
+    <div className="jobs-tab">
+      <div className="jobs-header">
+        <h2>Quản lý tin tuyển dụng</h2>
+        <button 
+          className="btn-primary"
+          onClick={handleCreateJob}
+        >
           + Đăng tin mới
         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+      <div className="filter-buttons">
         <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>
           Tất cả ({jobs.length})
         </FilterButton>
         <FilterButton active={filter === 'open'} onClick={() => setFilter('open')}>
-          Đang tuyển ({jobs.filter(j => j.status === 'open').length})
+          Đang tuyển ({jobs.filter(j => j.status === 'open' || j.status === 'active').length})
         </FilterButton>
         <FilterButton active={filter === 'closed'} onClick={() => setFilter('closed')}>
           Đã đóng ({jobs.filter(j => j.status === 'closed').length})
@@ -341,11 +363,9 @@ function JobsTab({ jobs, onRefresh }) {
       </div>
 
       {filteredJobs.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
-          Không có tin tuyển dụng nào
-        </div>
+        <div className="empty-state">Không có tin tuyển dụng nào</div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="jobs-list">
           {filteredJobs.map(job => (
             <JobCard key={job.id} job={job} onRefresh={onRefresh} />
           ))}
@@ -355,73 +375,166 @@ function JobsTab({ jobs, onRefresh }) {
   );
 }
 
-function JobCard({ job, compact, onRefresh }) {
+// Các component còn lại giữ nguyên...
+function StatCard({ icon, title, value, color, subtitle }) {
   return (
-    <div style={{
-      background: '#f9fafb',
-      padding: '1.5rem',
-      borderRadius: '10px',
-      border: '1px solid #e5e7eb'
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-        <div style={{ flex: 1 }}>
-          <h3 style={{ margin: '0 0 0.5rem', color: '#1f2937' }}>{job.title}</h3>
-          <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', color: '#6b7280', marginBottom: '0.75rem' }}>
+    <div className="stat-card" style={{ borderLeftColor: color }}>
+      <div className="stat-icon">{icon}</div>
+      <div className="stat-content">
+        <div className="stat-title">{title}</div>
+        <div className="stat-value" style={{ color }}>{value}</div>
+        {subtitle && <div className="stat-subtitle">{subtitle}</div>}
+      </div>
+    </div>
+  );
+}
+
+function TabButton({ active, onClick, children }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`tab-button ${active ? 'active' : ''}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function JobCard({ job, compact, onRefresh }) {
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleViewApplications = () => {
+    window.location.href = `/employer/applications/${job.id}`;
+  };
+
+  const handleEditJob = () => {
+    window.location.href = `/employer/jobs/${job.id}/edit`;
+  };
+
+  const handleCloseJob = async () => {
+  if (!window.confirm('Bạn có chắc muốn đóng tin tuyển dụng này?')) {
+    return;
+  }
+
+  setIsClosing(true);
+  try {
+    const token = localStorage.getItem('token');
+    //  THÊM /me vào URL
+    const response = await fetch(`http://localhost:5000/api/employers/me/jobs/${job.id}/close`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      alert(' Đã đóng tin tuyển dụng thành công!');
+      if (onRefresh) {
+        onRefresh();
+      }
+    } else {
+      const error = await response.json();
+      alert(` Lỗi: ${error.message || 'Không thể đóng tin tuyển dụng'}`);
+    }
+  } catch (error) {
+    console.error('Error closing job:', error);
+    alert(' Có lỗi xảy ra khi đóng tin tuyển dụng');
+  } finally {
+    setIsClosing(false);
+  }
+};
+
+const handleReopenJob = async () => {
+  if (!window.confirm('Bạn có chắc muốn mở lại tin tuyển dụng này?')) {
+    return;
+  }
+
+  setIsClosing(true);
+  try {
+    const token = localStorage.getItem('token');
+    //  THÊM /me vào URL
+    const response = await fetch(`http://localhost:5000/api/employers/me/jobs/${job.id}/reopen`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      alert(' Đã mở lại tin tuyển dụng thành công!');
+      if (onRefresh) {
+        onRefresh();
+      }
+    } else {
+      const error = await response.json();
+      alert(` Lỗi: ${error.message || 'Không thể mở lại tin tuyển dụng'}`);
+    }
+  } catch (error) {
+    console.error('Error reopening job:', error);
+    alert(' Có lỗi xảy ra khi mở lại tin tuyển dụng');
+  } finally {
+    setIsClosing(false);
+  }
+};
+  const isOpen = job.status === 'open' || job.status === 'active';
+
+  return (
+    <div className="job-card">
+      <div className="job-card-content">
+        <div className="job-details">
+          <h3>{job.title}</h3>
+          <div className="job-meta">
             <span>📍 {job.location}</span>
-            <span> {job.min_salary && job.max_salary ? `${job.min_salary}-${job.max_salary} ${job.currency}` : 'Thỏa thuận'}</span>
-            <span> {job.application_count || 0} ứng viên</span>
+            <span> {job.min_salary && job.max_salary ? `${job.min_salary}-${job.max_salary} ${job.currency || 'VND'}` : 'Thỏa thuận'}</span>
+            <span> {job.applicationCount || job.application_count || 0} ứng viên</span>
           </div>
           {!compact && job.category && (
-            <span style={{
-              display: 'inline-block',
-              padding: '0.25rem 0.75rem',
-              background: '#e0e7ff',
-              color: '#3730a3',
-              borderRadius: '6px',
-              fontSize: '0.85rem',
-              fontWeight: '500'
-            }}>
-              {job.category}
-            </span>
+            <span className="job-category">{job.category}</span>
           )}
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <span style={{
-            padding: '0.5rem 1rem',
-            background: job.status === 'open' ? '#d1fae5' : '#fee2e2',
-            color: job.status === 'open' ? '#065f46' : '#991b1b',
-            borderRadius: '20px',
-            fontSize: '0.85rem',
-            fontWeight: '600'
-          }}>
-            {job.status === 'open' ? ' Đang tuyển' : ' Đã đóng'}
+        <div className="job-status">
+          <span className={`status-badge ${isOpen ? 'active' : 'closed'}`}>
+            {isOpen ? ' Đang tuyển' : ' Đã đóng'}
           </span>
         </div>
       </div>
       {!compact && (
-        <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
-          <button style={{
-            padding: '0.5rem 1rem',
-            background: '#2563eb',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '0.9rem'
-          }}>
-            Xem ứng viên
+        <div className="job-actions">
+          <button 
+            className="btn-primary-outline"
+            onClick={handleViewApplications}
+            title="Xem danh sách ứng viên"
+          >
+             Xem ứng viên ({job.applicationCount || job.application_count || 0})
           </button>
-          <button style={{
-            padding: '0.5rem 1rem',
-            background: 'white',
-            color: '#2563eb',
-            border: '1px solid #2563eb',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '0.9rem'
-          }}>
-            Chỉnh sửa
+          <button 
+            className="btn-secondary-outline"
+            onClick={handleEditJob}
+            title="Chỉnh sửa tin tuyển dụng"
+          >
+             Chỉnh sửa
           </button>
+          {isOpen ? (
+            <button 
+              className="btn-danger-outline"
+              onClick={handleCloseJob}
+              disabled={isClosing}
+              title="Đóng tin tuyển dụng"
+            >
+              {isClosing ? '⏳ Đang xử lý...' : ' Đóng tin'}
+            </button>
+          ) : (
+            <button 
+              className="btn-success-outline"
+              onClick={handleReopenJob}
+              disabled={isClosing}
+              title="Mở lại tin tuyển dụng"
+            >
+              {isClosing ? '⏳ Đang xử lý...' : ' Mở lại'}
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -432,86 +545,227 @@ function FilterButton({ active, onClick, children }) {
   return (
     <button
       onClick={onClick}
-      style={{
-        padding: '0.5rem 1rem',
-        background: active ? '#2563eb' : 'white',
-        color: active ? 'white' : '#6b7280',
-        border: `1px solid ${active ? '#2563eb' : '#e5e7eb'}`,
-        borderRadius: '8px',
-        cursor: 'pointer',
-        fontSize: '0.9rem',
-        fontWeight: active ? '600' : '500',
-        transition: '0.2s'
-      }}
+      className={`filter-button ${active ? 'active' : ''}`}
     >
       {children}
     </button>
   );
 }
 
+function StatisticsTab({ jobs, applications, stats }) {
+  // Thống kê theo trạng thái ứng viên
+  const applicationsByStatus = {
+    pending: applications.filter(a => a.status === 'pending').length,
+    approved: applications.filter(a => a.status === 'approved' || a.status === 'accepted').length,
+    rejected: applications.filter(a => a.status === 'rejected').length
+  };
+
+  // Thống kê top 5 công việc có nhiều ứng viên nhất
+  const jobsWithAppCount = jobs.map(job => ({
+    ...job,
+    appCount: applications.filter(a => a.job_id === job.id).length
+  })).sort((a, b) => b.appCount - a.appCount).slice(0, 5);
+
+  // Thống kê theo tháng (ví dụ: 6 tháng gần nhất)
+  const monthlyStats = Array.from({ length: 6 }, (_, i) => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - i);
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    
+    return {
+      month: `T${month}/${year}`,
+      jobs: jobs.filter(j => {
+        const jobDate = new Date(j.created_at || j.createdAt);
+        return jobDate.getMonth() + 1 === month && jobDate.getFullYear() === year;
+      }).length,
+      applications: applications.filter(a => {
+        const appDate = new Date(a.created_at || a.createdAt);
+        return appDate.getMonth() + 1 === month && appDate.getFullYear() === year;
+      }).length
+    };
+  }).reverse();
+
+  return (
+    <div className="statistics-tab">
+      <h2>📈 Thống kê chi tiết</h2>
+
+      {/* Tổng quan số liệu */}
+      <div className="stats-section">
+        <h3> Tổng quan</h3>
+        <div className="stats-grid-small">
+          <div className="stat-box">
+            <div className="stat-number">{stats.totalJobs}</div>
+            <div className="stat-label">Tổng tin tuyển dụng</div>
+          </div>
+          <div className="stat-box green">
+            <div className="stat-number">{stats.activeJobs}</div>
+            <div className="stat-label">Đang tuyển</div>
+          </div>
+          <div className="stat-box orange">
+            <div className="stat-number">{stats.totalApplications}</div>
+            <div className="stat-label">Tổng ứng viên</div>
+          </div>
+          <div className="stat-box purple">
+            <div className="stat-number">{stats.totalViews}</div>
+            <div className="stat-label">Lượt xem</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Thống kê ứng viên theo trạng thái */}
+      <div className="stats-section">
+        <h3> Trạng thái ứng viên</h3>
+        <div className="progress-bars">
+          <div className="progress-item">
+            <div className="progress-header">
+              <span>⏳ Chờ xét duyệt</span>
+              <strong>{applicationsByStatus.pending} ứng viên</strong>
+            </div>
+            <div className="progress-bar">
+              <div 
+                className="progress-fill purple"
+                style={{ 
+                  width: `${stats.totalApplications > 0 ? (applicationsByStatus.pending / stats.totalApplications * 100) : 0}%` 
+                }}
+              ></div>
+            </div>
+          </div>
+          
+          <div className="progress-item">
+            <div className="progress-header">
+              <span> Đã chấp nhận</span>
+              <strong>{applicationsByStatus.approved} ứng viên</strong>
+            </div>
+            <div className="progress-bar">
+              <div 
+                className="progress-fill green"
+                style={{ 
+                  width: `${stats.totalApplications > 0 ? (applicationsByStatus.approved / stats.totalApplications * 100) : 0}%` 
+                }}
+              ></div>
+            </div>
+          </div>
+          
+          <div className="progress-item">
+            <div className="progress-header">
+              <span> Đã từ chối</span>
+              <strong>{applicationsByStatus.rejected} ứng viên</strong>
+            </div>
+            <div className="progress-bar">
+              <div 
+                className="progress-fill red"
+                style={{ 
+                  width: `${stats.totalApplications > 0 ? (applicationsByStatus.rejected / stats.totalApplications * 100) : 0}%` 
+                }}
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Top công việc hot */}
+      <div className="stats-section">
+        <h3> Top công việc được quan tâm</h3>
+        {jobsWithAppCount.length === 0 ? (
+          <div className="empty-state-small">Chưa có dữ liệu</div>
+        ) : (
+          <div className="top-jobs-list">
+            {jobsWithAppCount.map((job, index) => (
+              <div key={job.id} className="top-job-item">
+                <div className="rank">#{index + 1}</div>
+                <div className="job-info">
+                  <div className="job-title">{job.title}</div>
+                  <div className="job-location">📍 {job.location}</div>
+                </div>
+                <div className="job-stats">
+                  <div className="stat">
+                    <span className="stat-icon">👥</span>
+                    <span className="stat-value">{job.appCount}</span>
+                  </div>
+                  <div className="stat">
+                    <span className="stat-icon">👁️</span>
+                    <span className="stat-value">{job.views || 0}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Biểu đồ theo tháng */}
+      <div className="stats-section">
+        <h3>📅 Xu hướng 6 tháng gần đây</h3>
+        <div className="monthly-chart">
+          {monthlyStats.map((month, index) => (
+            <div key={index} className="month-column">
+              <div className="bars">
+                <div 
+                  className="bar blue"
+                  style={{ height: `${month.jobs * 20}px` }}
+                  title={`${month.jobs} tin tuyển dụng`}
+                >
+                  {month.jobs > 0 && <span>{month.jobs}</span>}
+                </div>
+                <div 
+                  className="bar orange"
+                  style={{ height: `${month.applications * 10}px` }}
+                  title={`${month.applications} ứng viên`}
+                >
+                  {month.applications > 0 && <span>{month.applications}</span>}
+                </div>
+              </div>
+              <div className="month-label">{month.month}</div>
+            </div>
+          ))}
+        </div>
+        <div className="chart-legend">
+          <span className="legend-item">
+            <span className="legend-color blue"></span> Tin tuyển dụng
+          </span>
+          <span className="legend-item">
+            <span className="legend-color orange"></span> Ứng viên
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CompanyTab({ user, employer }) {
   return (
-    <div>
-      <h2 style={{ marginBottom: '1.5rem', color: '#1f2937' }}>Thông tin công ty</h2>
+    <div className="company-tab">
+      <h2>Thông tin công ty</h2>
       
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '1.5rem'
-      }}>
-        <InfoField label="Tên công ty" value={employer?.company || user?.company_name} />
-        <InfoField label="Người liên hệ" value={user?.contact_person} />
+      <div className="info-grid">
+        <InfoField label="Tên công ty" value={employer?.company || user?.company_name || user?.companyName} />
+        <InfoField label="Người liên hệ" value={user?.contact_person || user?.contactPerson} />
         <InfoField label="Email" value={user?.email} />
         <InfoField label="Số điện thoại" value={user?.phone} />
-        <InfoField label="Quy mô" value={user?.company_size} />
+        <InfoField label="Quy mô" value={user?.company_size || user?.companySize} />
         <InfoField label="Ngành nghề" value={user?.industry} />
       </div>
 
       {employer?.description && (
-        <div style={{ marginTop: '1.5rem' }}>
-          <h3 style={{ marginBottom: '0.75rem', color: '#1f2937' }}>Mô tả công ty</h3>
-          <div style={{
-            background: '#f9fafb',
-            padding: '1rem',
-            borderRadius: '8px',
-            color: '#4b5563'
-          }}>
+        <div className="company-description">
+          <h3>Mô tả công ty</h3>
+          <div className="description-box">
             {employer.description}
           </div>
         </div>
       )}
 
-      <button style={{
-        marginTop: '2rem',
-        padding: '0.75rem 1.5rem',
-        background: '#2563eb',
-        color: 'white',
-        border: 'none',
-        borderRadius: '8px',
-        cursor: 'pointer',
-        fontWeight: '600'
-      }}>
-        Chỉnh sửa thông tin
-      </button>
+      <button className="btn-primary"> Chỉnh sửa thông tin</button>
     </div>
   );
 }
 
 function InfoField({ label, value }) {
   return (
-    <div>
-      <div style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '0.25rem' }}>
-        {label}
-      </div>
-      <div style={{
-        padding: '0.75rem',
-        background: '#f9fafb',
-        borderRadius: '6px',
-        fontWeight: '500',
-        color: '#1f2937'
-      }}>
-        {value || '-'}
-      </div>
+    <div className="info-field">
+      <div className="info-label">{label}</div>
+      <div className="info-value">{value || '-'}</div>
     </div>
   );
 }

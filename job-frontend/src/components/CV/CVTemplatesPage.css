@@ -1,0 +1,757 @@
+/* CV Templates Page Styles */
+.cv-templates-page {
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.hero-section h1 {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.hero-section p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+/* Main Container */
+.main-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.content-wrapper {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+/* Sidebar */
+.sidebar {
+  position: sticky;
+  top: 20px;
+}
+
+.categories-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+}
+
+.categories-card h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: #1f2937;
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.category-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #333;
+  font-size: 14px;
+  text-align: left;
+}
+
+.category-btn:hover {
+  background: #f3f4f6;
+}
+
+.category-btn.active {
+  background: #667eea;
+  color: white;
+  font-weight: 600;
+}
+
+.count-badge {
+  background: #f0f0f0;
+  color: #666;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.category-btn.active .count-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* Premium Banner */
+.premium-banner {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  color: white;
+}
+
+.premium-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.premium-banner h4 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.premium-banner p {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-bottom: 16px;
+}
+
+.premium-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: white;
+  color: #f5576c;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.premium-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Templates Section */
+.templates-section {
+  margin-bottom: 24px;
+}
+
+.section-header h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #1f2937;
+}
+
+.section-header p {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+/* Templates Grid */
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+.cv-template-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.cv-template-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* CV Preview Container */
+.cv-preview-container {
+  position: relative;
+  background: #f5f5f5;
+  padding: 30px 20px;
+  height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.premium-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: bold;
+  z-index: 10;
+}
+
+/* Template Info */
+.template-info {
+  padding: 20px;
+}
+
+.template-info h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #1f2937;
+}
+
+.template-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.template-tag {
+  background: #f0f0f0;
+  color: #666;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.template-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-view {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-view:hover {
+  background: #f9fafb;
+  border-color: #999;
+}
+
+.btn-use {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-use:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* CV Preview Templates Styles */
+.cv-preview-wrapper {
+  width: 100%;
+  max-width: 300px;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+/* Template 1 - Lê Quang Dũng */
+.cv-template-1 {
+  font-size: 8px;
+}
+
+.cv-template-1 .header {
+  background: #e8e8e8;
+  padding: 20px 16px;
+  display: flex;
+  gap: 12px;
+}
+
+.cv-template-1 .avatar {
+  width: 50px;
+  height: 50px;
+  background: #d0d0d0;
+  border: 2px solid #999;
+  flex-shrink: 0;
+}
+
+.cv-template-1 .header-info {
+  flex: 1;
+}
+
+.cv-template-1 .name {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.cv-template-1 .title {
+  font-size: 7px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.cv-template-1 .contact {
+  font-size: 6px;
+  color: #555;
+  line-height: 1.4;
+}
+
+.cv-template-1 .content {
+  padding: 16px;
+}
+
+.cv-template-1 .section {
+  margin-bottom: 12px;
+}
+
+.cv-template-1 .section-title {
+  font-size: 8px;
+  font-weight: bold;
+  border-bottom: 1.5px solid #333;
+  padding-bottom: 3px;
+  margin-bottom: 6px;
+}
+
+.cv-template-1 .placeholder-line {
+  height: 6px;
+  background: #e0e0e0;
+  margin-bottom: 2px;
+}
+
+/* Template 2 - Nguyễn Minh Trang */
+.cv-template-2 {
+  font-size: 8px;
+  position: relative;
+}
+
+.cv-template-2 .new-badge {
+  position: absolute;
+  top: 10px;
+  left: 16px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 8px;
+  font-weight: bold;
+  z-index: 10;
+  color: white;
+}
+
+.cv-template-2 .header {
+  background: white;
+  padding: 30px 16px 16px;
+  display: flex;
+  gap: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.cv-template-2 .avatar {
+  width: 50px;
+  height: 50px;
+  background: #f5f5f5;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.cv-template-2 .name {
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.cv-template-2 .title {
+  font-size: 7px;
+  color: #7f8c8d;
+  margin-bottom: 6px;
+}
+
+.cv-template-2 .contact-grid {
+  font-size: 6px;
+  color: #555;
+  line-height: 1.3;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+.cv-template-2 .content {
+  padding: 16px;
+}
+
+.cv-template-2 .section-title {
+  font-size: 8px;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 1.5px solid #34495e;
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+}
+
+/* Template 3 - Nguyễn Quỳnh Như */
+.cv-template-3 {
+  font-size: 7px;
+}
+
+.cv-template-3 .header {
+  background: #f8f9fa;
+  padding: 16px;
+  display: flex;
+  gap: 10px;
+}
+
+.cv-template-3 .avatar {
+  width: 45px;
+  height: 55px;
+  background: #d0d5dd;
+  flex-shrink: 0;
+}
+
+.cv-template-3 .name {
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.cv-template-3 .title {
+  font-size: 7px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  padding-bottom: 3px;
+  border-bottom: 1.5px solid #333;
+}
+
+.cv-template-3 .info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1.5px solid #e0e0e0;
+}
+
+.cv-template-3 .info-section-title {
+  font-size: 7px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  padding-bottom: 2px;
+  border-bottom: 1.5px solid #333;
+}
+
+/* Template 4 - Mai Anh Designer */
+.cv-template-4 {
+  display: grid;
+  grid-template-columns: 95px 1fr;
+  font-size: 7px;
+}
+
+.cv-template-4 .sidebar {
+  background: #f8f9fa;
+  padding: 16px 10px;
+}
+
+.cv-template-4 .avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #d0d5dd;
+  border: 3px solid white;
+  margin: 0 auto 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cv-template-4 .name {
+  font-size: 10px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 3px;
+}
+
+.cv-template-4 .title {
+  font-size: 6px;
+  color: #666;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.cv-template-4 .sidebar-section {
+  margin-bottom: 12px;
+}
+
+.cv-template-4 .sidebar-section-title {
+  font-size: 7px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  padding-bottom: 3px;
+  border-bottom: 2px solid;
+}
+
+.cv-template-4 .main-content {
+  padding: 16px 12px;
+}
+
+/* Preview Modal */
+.preview-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.preview-modal-container {
+  background: white;
+  border-radius: 16px;
+  max-width: 1200px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  position: relative;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: white;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+  background: #f3f4f6;
+  transform: scale(1.1);
+}
+
+.modal-left {
+  background: #f5f5f5;
+  padding: 40px;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-preview-wrapper {
+  transform: scale(1.5);
+  transform-origin: center;
+}
+
+.modal-right {
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.modal-title-section {
+  margin-bottom: 12px;
+}
+
+.modal-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #1f2937;
+}
+
+.modal-premium-badge {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.modal-section {
+  margin-bottom: 24px;
+}
+
+.modal-section h4 {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #1f2937;
+}
+
+.modal-section p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.modal-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.modal-tag {
+  background: #f0f0f0;
+  color: #666;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-btn-primary {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modal-btn-secondary {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid;
+  border-radius: 12px;
+  background: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-btn-secondary:hover {
+  filter: brightness(0.95);
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .content-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+  }
+
+  .preview-modal-container {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-left {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 28px;
+  }
+
+  .hero-section p {
+    font-size: 16px;
+  }
+
+  .templates-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-right {
+    padding: 24px;
+  }
+}
+
+/* Utility Classes */
+.placeholder-line {
+  background: #e0e0e0;
+  height: 5px;
+  margin-bottom: 2px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.gap-8 {
+  gap: 8px;
+}
+
+.mb-4 {
+  margin-bottom: 4px;
+}
+
+.mb-8 {
+  margin-bottom: 8px;
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+.text-sm {
+  font-size: 12px;
+}
+
+.text-xs {
+  font-size: 10px;
+}

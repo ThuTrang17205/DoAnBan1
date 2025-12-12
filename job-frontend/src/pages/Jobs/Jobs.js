@@ -35,13 +35,13 @@ setFilteredJobs(result);
 }, [selectedCategory, searchTerm, jobs]);
 return (
 <div className="job-container">
-<h1 className="job-title">💼 Danh sách việc làm</h1>
+<h1 className="job-title"> Danh sách việc làm</h1>
 {/* Bộ lọc */}
   <div className="filter-section">
     {/* Tìm kiếm */}
     <input
       type="text"
-      placeholder="🔍 Tìm theo tên công việc, công ty, địa điểm..."
+      placeholder=" Tìm theo tên công việc, công ty, địa điểm..."
       className="search-input"
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
@@ -63,12 +63,12 @@ return (
     </div>
   </div>
 
-  {/* Hiển thị số lượng kết quả */}
+  {}
   <p className="result-count">
     Tìm thấy <strong>{filteredJobs.length}</strong> công việc
   </p>
 
-  {/* Danh sách jobs */}
+  {}
   {filteredJobs.length === 0 ? (
     <p className="job-empty">⏳ Không tìm thấy công việc phù hợp</p>
   ) : (
@@ -78,7 +78,7 @@ return (
           <h3>{job.title}</h3>
           <p className="company">{job.company}</p>
           <p className="info">
-            📍 {job.location} {job.salary ? `| 💰 ${job.salary}` : ""}
+            📍 {job.location} {job.salary ? `|  ${job.salary}` : ""}
           </p>
 
           {job.category && <span className="category">{job.category}</span>}
@@ -89,7 +89,7 @@ return (
               target="_blank"
               rel="noopener noreferrer"
             >
-              🔗 Xem chi tiết
+               Xem chi tiết
             </a>
           )}
         </div>

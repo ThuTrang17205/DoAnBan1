@@ -1,4 +1,4 @@
-console.log("🔥 File crawler.js đang chạy...");
+console.log(" File crawler.js đang chạy...");
 
 const { Builder, By, until } = require("selenium-webdriver");
 const { Pool } = require("pg");
@@ -7,7 +7,7 @@ const fs = require("fs").promises;
 const path = require("path");
 require("dotenv").config();
 
-// ⚙️ CẤU HÌNH
+//  CẤU HÌNH
 const CONFIG = {
   MAX_JOBS: 100,
   SCROLL_TIMES: 5,
@@ -18,35 +18,35 @@ const CONFIG = {
   WAIT_AFTER_SCROLL: 3000,
 };
 
-// 📁 Tạo thư mục debug
+// Tạo thư mục debug
 async function ensureDebugDir() {
   try {
     await fs.mkdir(CONFIG.DEBUG_DIR, { recursive: true });
   } catch (err) {
-    console.error("⚠️ Không tạo được thư mục debug:", err.message);
+    console.error(" Không tạo được thư mục debug:", err.message);
   }
 }
 
-// 🔄 Delay random
+//  Delay random
 function randomDelay(min = 1000, max = 3000) {
   const delay = Math.floor(Math.random() * (max - min + 1)) + min;
   return new Promise(resolve => setTimeout(resolve, delay));
 }
 
-// 📸 Screenshot
+//  Screenshot
 async function takeScreenshot(driver, filename) {
   try {
     const screenshot = await driver.takeScreenshot();
     const filepath = path.join(CONFIG.DEBUG_DIR, `${filename}.png`);
     await fs.writeFile(filepath, screenshot, 'base64');
-    console.log(`📸 Screenshot: ${filepath}`);
+    console.log(` Screenshot: ${filepath}`);
     return filepath;
   } catch (err) {
-    console.error("⚠️ Lỗi screenshot:", err.message);
+    console.error("Lỗi screenshot:", err.message);
   }
 }
 
-// 🩺 Lưu clean HTML
+//  Lưu clean HTML
 async function saveCleanDebugHTML(driver, filename) {
   try {
     const bodyHTML = await driver.executeScript(`
@@ -74,16 +74,16 @@ ${bodyHTML}
     
     const filepath = path.join(CONFIG.DEBUG_DIR, `${filename}.html`);
     await fs.writeFile(filepath, cleanHTML);
-    console.log(`🩺 Clean HTML: ${filepath}`);
+    console.log(` Clean HTML: ${filepath}`);
     return filepath;
   } catch (err) {
-    console.error("⚠️ Lỗi lưu HTML:", err.message);
+    console.error("Lỗi lưu HTML:", err.message);
   }
 }
 
-// 🔍 TỰ ĐỘNG TÌM JOB SELECTOR
+//  TỰ ĐỘNG TÌM JOB SELECTOR
 async function autoDetectJobSelector(driver) {
-  console.log("\n🤖 Đang tự động phát hiện job selector...");
+  console.log("\n Đang tự động phát hiện job selector...");
   
   try {
     const selectorCandidates = await driver.executeScript(`
@@ -161,7 +161,7 @@ async function autoDetectJobSelector(driver) {
       });
     `);
     
-    console.log(`\n🎯 Tìm thấy ${selectorCandidates.length} selector candidates:`);
+    console.log(`\n Tìm thấy ${selectorCandidates.length} selector candidates:`);
     selectorCandidates.slice(0, 5).forEach((candidate, i) => {
       console.log(`${i + 1}. "${candidate.selector}" - ${candidate.count} items (${candidate.confidence})`);
     });
@@ -172,37 +172,37 @@ async function autoDetectJobSelector(driver) {
     return selectorCandidates;
     
   } catch (err) {
-    console.error("⚠️ Lỗi auto-detect:", err.message);
+    console.error(" Lỗi auto-detect:", err.message);
     return [];
   }
 }
 
-// 🌐 Hàm crawl với retry
+//  Hàm crawl với retry
 async function crawlWithRetry(retries = CONFIG.MAX_RETRIES) {
   await ensureDebugDir();
   
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       console.log(`\n${"=".repeat(60)}`);
-      console.log(`🚀 LẦN THỬ ${attempt}/${retries}`);
+      console.log(` LẦN THỬ ${attempt}/${retries}`);
       console.log("=".repeat(60));
       await crawlJobs();
-      console.log("\n✅ CRAWL THÀNH CÔNG!");
+      console.log("\n CRAWL THÀNH CÔNG!");
       return;
     } catch (err) {
-      console.error(`\n❌ Lần thử ${attempt} thất bại:`, err.message);
+      console.error(`\n Lần thử ${attempt} thất bại:`, err.message);
       if (attempt === retries) {
-        console.error("\n💀 Đã thử hết số lần cho phép.");
+        console.error("\n Đã thử hết số lần cho phép.");
         throw err;
       }
-      console.log(`⏳ Đợi 5s rồi thử lại...`);
+      console.log(` Đợi 5s rồi thử lại...`);
       await randomDelay(5000, 7000);
     }
   }
 }
 
 async function crawlJobs() {
-  console.log("🚀 Bắt đầu crawl từ CareerViet...\n");
+  console.log(" Bắt đầu crawl từ CareerViet...\n");
 
   const isLocal = process.env.DB_HOST === "localhost";
   const pool = new Pool({
@@ -218,7 +218,7 @@ async function crawlJobs() {
 
   try {
     await pool.connect();
-    console.log("✅ Kết nối PostgreSQL thành công!");
+    console.log(" Kết nối PostgreSQL thành công!");
 
     const options = new chrome.Options();
     options.addArguments(
@@ -243,20 +243,20 @@ async function crawlJobs() {
 
     await driver.executeScript("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})");
 
-    console.log("🌐 Đang mở trang CareerViet...");
+    console.log(" Đang mở trang CareerViet...");
     await driver.get("https://careerviet.vn/vi/tim-viec-lam");
 
-    console.log("⏳ Đợi trang load...");
+    console.log(" Đợi trang load...");
     await driver.wait(async () => {
       const state = await driver.executeScript("return document.readyState");
       return state === "complete";
     }, CONFIG.PAGE_TIMEOUT);
     
-    console.log("✅ Trang đã load xong!");
+    console.log(" Trang đã load xong!");
     await randomDelay(3000, 5000);
     await takeScreenshot(driver, "01-initial-page");
 
-    console.log(`\n🌀 Bắt đầu scroll ${CONFIG.SCROLL_TIMES} lần...`);
+    console.log(`\n Bắt đầu scroll ${CONFIG.SCROLL_TIMES} lần...`);
     
     for (let i = 0; i < CONFIG.SCROLL_TIMES; i++) {
       await driver.executeScript(`
@@ -266,7 +266,7 @@ async function crawlJobs() {
         });
       `);
       
-      console.log(`   📜 Scroll ${i + 1}/${CONFIG.SCROLL_TIMES}`);
+      console.log(`    Scroll ${i + 1}/${CONFIG.SCROLL_TIMES}`);
       await randomDelay(2000, 3000);
       
       await driver.wait(async () => {
@@ -274,7 +274,7 @@ async function crawlJobs() {
       }, 5000).catch(() => {});
     }
     
-    console.log(`✅ Đã scroll xong, đợi ${CONFIG.WAIT_AFTER_SCROLL}ms cho content load...`);
+    console.log(` Đã scroll xong, đợi ${CONFIG.WAIT_AFTER_SCROLL}ms cho content load...`);
     await randomDelay(CONFIG.WAIT_AFTER_SCROLL, CONFIG.WAIT_AFTER_SCROLL + 1000);
     
     await takeScreenshot(driver, "02-after-scroll");
@@ -289,7 +289,7 @@ async function crawlJobs() {
     let jobCards = [];
     let usedSelector = null;
     
-    console.log("\n🎯 Thử các selector...");
+    console.log("\n Thử các selector...");
     
     for (const candidate of selectorCandidates) {
       try {
@@ -299,28 +299,28 @@ async function crawlJobs() {
         if (elements.length >= 3) {
           jobCards = elements;
           usedSelector = candidate.selector;
-          console.log(`   ✅ THÀNH CÔNG! Tìm thấy ${elements.length} job`);
+          console.log(`    THÀNH CÔNG! Tìm thấy ${elements.length} job`);
           break;
         } else {
-          console.log(`   ⚠️ Chỉ có ${elements.length} items, bỏ qua`);
+          console.log(`   Chỉ có ${elements.length} items, bỏ qua`);
         }
       } catch (err) {
-        console.log(`   ❌ Lỗi: ${err.message}`);
+        console.log(`    Lỗi: ${err.message}`);
       }
     }
 
     if (jobCards.length === 0) {
-      console.error("\n🚫 KHÔNG TÌM THẤY JOB NÀO!");
+      console.error("\n KHÔNG TÌM THẤY JOB NÀO!");
       throw new Error("Không tìm thấy job sau khi thử tất cả selector!");
     }
 
-    console.log(`\n✅ Sử dụng selector: "${usedSelector}"`);
-    console.log(`📦 Tổng số job: ${jobCards.length}\n`);
+    console.log(`\n Sử dụng selector: "${usedSelector}"`);
+    console.log(` Tổng số job: ${jobCards.length}\n`);
 
     const jobLinks = [];
     const maxJobs = Math.min(CONFIG.MAX_JOBS, jobCards.length);
 
-    console.log(`🎯 Bắt đầu extract ${maxJobs} job...\n`);
+    console.log(` Bắt đầu extract ${maxJobs} job...\n`);
 
     for (let i = 0; i < maxJobs; i++) {
       try {
@@ -342,7 +342,7 @@ async function crawlJobs() {
         }
 
         if (!title || !link) {
-          console.log(`⚠️ Job ${i + 1}: Không có title/link, bỏ qua`);
+          console.log(` Job ${i + 1}: Không có title/link, bỏ qua`);
           continue;
         }
 
@@ -358,16 +358,16 @@ async function crawlJobs() {
           By.css(".salary")
         ).getText().catch(() => "N/A");
 
-        console.log(`✅ ${i + 1}/${maxJobs}: ${title.substring(0, 60)}${title.length > 60 ? '...' : ''}`);
+        console.log(` ${i + 1}/${maxJobs}: ${title.substring(0, 60)}${title.length > 60 ? '...' : ''}`);
         
         jobLinks.push({ title, company, location, salary, link });
         
       } catch (err) {
-        console.warn(`⚠️ Lỗi job ${i + 1}: ${err.message}`);
+        console.warn(` Lỗi job ${i + 1}: ${err.message}`);
       }
     }
 
-    console.log(`\n✅ Extract thành công ${jobLinks.length} job`);
+    console.log(`\n Extract thành công ${jobLinks.length} job`);
 
     if (jobLinks.length === 0) {
       throw new Error("Không extract được job nào!");
@@ -375,10 +375,10 @@ async function crawlJobs() {
 
     const jobListPath = path.join(CONFIG.DEBUG_DIR, 'job-list.json');
     await fs.writeFile(jobListPath, JSON.stringify(jobLinks, null, 2));
-    console.log(`💾 Đã lưu: ${jobListPath}\n`);
+    console.log(` Đã lưu: ${jobListPath}\n`);
 
     // === CRAWL CHI TIẾT VÀ LƯU VÀO raw_jobs ===
-    console.log("🚀 Bắt đầu crawl chi tiết và lưu vào raw_jobs...\n");
+    console.log(" Bắt đầu crawl chi tiết và lưu vào raw_jobs...\n");
     
     let successCount = 0;
     let skipCount = 0;
@@ -388,7 +388,7 @@ async function crawlJobs() {
       const { title, company, location, salary, link } = jobLinks[i];
       
       try {
-        console.log(`📍 [${i + 1}/${jobLinks.length}] ${title.substring(0, 50)}...`);
+        console.log(` [${i + 1}/${jobLinks.length}] ${title.substring(0, 50)}...`);
 
         await driver.get(link);
         await driver.wait(async () => {
@@ -426,17 +426,17 @@ async function crawlJobs() {
 
         if (result.rowCount > 0) {
           successCount++;
-          console.log(`   ✅ Lưu thành công (ID: ${result.rows[0].id})`);
+          console.log(`    Lưu thành công (ID: ${result.rows[0].id})`);
         } else {
           skipCount++;
-          console.log(`   ⏭️ Đã tồn tại`);
+          console.log(`    Đã tồn tại`);
         }
 
         await randomDelay(CONFIG.DELAY_BETWEEN_JOBS, CONFIG.DELAY_BETWEEN_JOBS + 1000);
 
       } catch (err) {
         errorCount++;
-        console.error(`   ❌ Lỗi: ${err.message}`);
+        console.error(`    Lỗi: ${err.message}`);
         
         if (errorCount <= 2) {
           await takeScreenshot(driver, `error-detail-${i + 1}`);
@@ -447,17 +447,17 @@ async function crawlJobs() {
 
     // === TỔNG KẾT ===
     console.log("\n" + "=".repeat(60));
-    console.log("🎯 TỔNG KẾT CRAWL");
+    console.log(" TỔNG KẾT CRAWL");
     console.log("=".repeat(60));
     console.log(`Selector sử dụng: ${usedSelector}`);
-    console.log(`✅ Lưu thành công:  ${successCount} job`);
-    console.log(`⏭️  Đã tồn tại:     ${skipCount} job`);
-    console.log(`❌ Lỗi:             ${errorCount} job`);
-    console.log(`📊 Tổng cộng:       ${jobLinks.length} job`);
+    console.log(` Lưu thành công:  ${successCount} job`);
+    console.log(` Đã tồn tại:     ${skipCount} job`);
+    console.log(` Lỗi:             ${errorCount} job`);
+    console.log(` Tổng cộng:       ${jobLinks.length} job`);
     console.log("=".repeat(60));
 
   } catch (err) {
-    console.error("\n❌ LỖI NGHIÊM TRỌNG:", err.message);
+    console.error("\n LỖI :", err.message);
     
     if (driver) {
       await saveCleanDebugHTML(driver, "fatal-error");
@@ -467,20 +467,19 @@ async function crawlJobs() {
     throw err;
     
   } finally {
-    console.log("\n🧹 Dọn dẹp...");
     if (driver) {
       await driver.quit();
-      console.log("✅ Đã đóng browser");
+      console.log(" Đã đóng browser");
     }
     await pool.end();
-    console.log("✅ Đã đóng DB");
+    console.log(" Đã đóng DB");
   }
 }
 
-// 🚀 RUN
+
 if (require.main === module) {
   crawlWithRetry().catch(err => {
-    console.error("\n💀 CRAWLER DỪNG:", err.message);
+    console.error("\n CRAWLER DỪNG:", err.message);
     process.exit(1);
   });
 }

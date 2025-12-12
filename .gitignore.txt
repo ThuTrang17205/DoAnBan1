@@ -1,0 +1,7 @@
+job-backend/node_modules/
+job-frontend/node_modules/
+*.env
+*.log
+job-backend/uploads/
+job-frontend/build/
+job-frontend/dist/

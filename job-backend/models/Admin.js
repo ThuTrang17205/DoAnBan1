@@ -276,7 +276,7 @@ class Admin {
          LEFT JOIN employers e ON j.employer_id = e.id
          LEFT JOIN users u ON e.user_id = u.id
          ORDER BY j.posted_at DESC
-         LIMIT 10`
+         `
       );
       
       return {

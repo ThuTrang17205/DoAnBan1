@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './EmployerRegisterForm.css';
 
-function EmployerRegisterForm() {
+function EmployerRegisterForm({ redirectToCheckout = false }) {
   const [formData, setFormData] = useState({
     companyName: '',
     contactPerson: '',
@@ -51,38 +51,66 @@ function EmployerRegisterForm() {
     }
 
     try {
-      // ✅ FIX: Gửi đúng format cho backend
-      const response = await axios.post('http://localhost:5000/api/users/register', {
-        name: formData.contactPerson || formData.companyName, // Tên người liên hệ hoặc tên công ty
-        email: formData.email,
-        password: formData.password,
-        role: 'employer',
-        companyName: formData.companyName, // Tên công ty
-        contactPerson: formData.contactPerson, // Người liên hệ
-        phone: formData.phone,
-        companySize: formData.companySize,
-        industry: formData.industry
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.contactPerson || formData.companyName,
+          email: formData.email,
+          password: formData.password,
+          role: 'employer',
+          companyName: formData.companyName,
+          contactPerson: formData.contactPerson,
+          phone: formData.phone,
+          companySize: formData.companySize,
+          industry: formData.industry
+        })
       });
 
-      console.log(' Đăng ký thành công:', response.data);
-      
-      // Lưu token nếu backend trả về
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+     
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Đăng ký thất bại');
       }
+
+      const data = await response.json();
+      console.log(' Đăng ký thành công:', data);
+
       
-      alert(' Đăng ký thành công! Chuyển đến trang đăng nhập...');
-      navigate('/employer-login');
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userRole', 'employer');
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
+
+      alert(' Đăng ký thành công!');
+
+      
+      setTimeout(() => {
+        const redirectTarget = localStorage.getItem("redirectAfterLogin");
+
+       
+        if (redirectTarget === "payment") {
+          console.log("🚀 Redirecting to PAYMENT PAGE...");
+          localStorage.removeItem("redirectAfterLogin");
+          navigate('/payment');
+        } 
+        else if (redirectTarget === "checkout" || redirectToCheckout) {
+          console.log(" Redirecting to CHECKOUT PAGE...");
+          localStorage.removeItem("redirectAfterLogin");
+          navigate('/employer-checkout');
+        } 
+        else {
+          console.log(" Redirecting to LOGIN...");
+          navigate('/employer-login');
+        }
+      }, 300);
+
     } catch (err) {
       console.error(' Lỗi đăng ký:', err);
-      if (err.response) {
-        setError(err.response.data.message || 'Email đã được sử dụng');
-      } else if (err.request) {
-        setError('Không thể kết nối đến server');
-      } else {
-        setError('Có lỗi xảy ra: ' + err.message);
-      }
+      setError(err.message || 'Có lỗi xảy ra khi đăng ký');
     } finally {
       setLoading(false);
     }
