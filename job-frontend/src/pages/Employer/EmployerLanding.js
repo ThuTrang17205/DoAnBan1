@@ -33,67 +33,81 @@ function EmployerLanding() {
     }
   ];
 
-  const packages = [
-    {
-      name: 'Gói Cơ bản',
-      price: 'Miễn phí',
-      priceValue: 0,
-      features: [
-        '1 tin tuyển dụng',
-        'Hiển thị 30 ngày',
-        'Xem CV ứng viên',
-        'Hỗ trợ email'
-      ],
-      color: '#667eea'
-    },
-    {
-      name: 'Gói Chuyên nghiệp',
-      price: '2.990.000đ/tháng',
-      priceValue: 2990000,
-      features: [
-        '10 tin tuyển dụng',
-        'Hiển thị ưu tiên',
-        'Tìm kiếm CV không giới hạn',
-        'Hỗ trợ 24/7',
-        'Báo cáo chi tiết'
-      ],
-      color: '#00b14f',
-      popular: true
-    },
-    {
-      name: 'Gói Doanh nghiệp',
-      price: 'Liên hệ',
-      priceValue: 0,
-      features: [
-        'Tin tuyển dụng không giới hạn',
-        'Trang thương hiệu riêng',
-        'Quản lý đa chi nhánh',
-        'Tài khoản phụ',
-        'Đào tạo và hỗ trợ riêng'
-      ],
-      color: '#764ba2'
-    }
-  ];
 
+
+const packages = [
+  {
+    name: 'Gói Cơ bản',
+    price: 'Miễn phí',
+    priceValue: 0,
+    jobLimit: 2,
+    aiMatching: false,
+    features: [
+      '2 tin tuyển dụng',
+      'Hiển thị 30 ngày',
+      'Xem CV ứng viên',
+      'Hỗ trợ email',
+    ],
+    color: '#667eea'
+  },
+  {
+    name: 'Gói Chuyên nghiệp',
+    price: '2.990.000đ/tháng',
+    priceValue: 2990000,
+    jobLimit: 10,
+    aiMatching: true,
+    aiMatchLimit: 50,
+    features: [
+      ' 10 tin tuyển dụng',
+      ' Hiển thị ưu tiên',
+      ' Tìm kiếm CV không giới hạn',
+      ' Hỗ trợ 24/7',
+      ' Báo cáo chi tiết',
+      ' Matching tự động 50 CV/tháng'
+    ],
+    color: '#00b14f',
+    popular: true
+  },
+  {
+    name: 'Gói Doanh nghiệp',
+    price: 'Liên hệ',
+    priceValue: 0,
+    jobLimit: -1, 
+    aiMatching: true,
+    aiMatchLimit: -1,
+    features: [
+      ' Tin tuyển dụng không giới hạn',
+      ' Trang thương hiệu riêng',
+      ' Quản lý đa chi nhánh',
+      ' Tài khoản phụ',
+      ' Đào tạo và hỗ trợ riêng',
+      ' Matching không giới hạn'
+    ],
+    color: '#764ba2'
+  }
+];
+
+
+const handleStartPackage = (pkg) => {
+  localStorage.setItem('selectedPackage', JSON.stringify({
+    name: pkg.name,
+    price: pkg.price,
+    priceValue: pkg.priceValue,
+    features: pkg.features,
+    jobLimit: pkg.jobLimit,
+    aiMatching: pkg.aiMatching,
+    aiMatchLimit: pkg.aiMatchLimit
+  }));
   
-  const handleStartPackage = (pkg) => {
-    localStorage.setItem('selectedPackage', JSON.stringify({
-      name: pkg.name,
-      price: pkg.price,
-      priceValue: pkg.priceValue,
-      features: pkg.features
-    }));
-    
-    localStorage.setItem('redirectAfterLogin', 'payment');
-    
-    const token = localStorage.getItem('token');
-    if (token) {
-      window.location.href = '/payment';
-    } else {
-      setShowLoginForm(true);
-    }
-  };
-
+  localStorage.setItem('redirectAfterLogin', 'payment');
+  
+  const token = localStorage.getItem('token');
+  if (token) {
+    window.location.href = '/payment';
+  } else {
+    setShowLoginForm(true);
+  }
+};
   return (
     <div className="employer-page">
       {}

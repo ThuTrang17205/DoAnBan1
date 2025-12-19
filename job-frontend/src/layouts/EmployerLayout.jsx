@@ -5,20 +5,17 @@ const EmployerLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Kiểm tra xem có phải trang login/register không
+ 
   const isAuthPage = ['/employer-login', '/employer-register', '/employer'].includes(location.pathname);
   
-  // ⭐ SỬA: Dùng 'token' thay vì 'employerToken'
+ 
   const token = localStorage.getItem('token');
   const userRole = localStorage.getItem('userRole');
   const isEmployerLoggedIn = token && userRole === 'employer';
 
-  // ⭐ BỎ LOGIC REDIRECT - Để ProtectedRoute trong App.js xử lý
-  // if (isDashboard && !employerToken) {
-  //   return <Navigate to="/employer-login" replace />;
-  // }
 
-  // Hàm logout
+  
+
   const handleLogout = () => {
     console.log('🚪 Employer logging out...');
     localStorage.removeItem('token');
@@ -29,7 +26,7 @@ const EmployerLayout = () => {
 
   return (
     <>
-      {/* Hiển thị header cho employer (trừ auth pages) */}
+      {}
       {!isAuthPage && (
         <div style={{ 
           padding: '15px 30px', 
@@ -46,7 +43,7 @@ const EmployerLayout = () => {
           }}>
             <h2 style={{ margin: 0 }}>Employer Portal</h2>
             
-            {/* Navigation Menu */}
+            {}
             {isEmployerLoggedIn && (
               <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>     
                 <button 

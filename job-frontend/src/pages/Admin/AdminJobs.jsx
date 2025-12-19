@@ -18,16 +18,16 @@ const AdminJobs = () => {
   const jobsPerPage = 10;
   const navigate = useNavigate();
 
-  // Fetch jobs
+  
   useEffect(() => {
     fetchJobs();
   }, []);
 
-  // Filter jobs
+  
   useEffect(() => {
     let filtered = [...jobs];
 
-    // Search filter
+    
     if (searchTerm) {
       filtered = filtered.filter(job =>
         job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -36,12 +36,12 @@ const AdminJobs = () => {
       );
     }
 
-    // Status filter
+    
     if (filterStatus !== 'all') {
       filtered = filtered.filter(job => job.status === filterStatus);
     }
 
-    // Category filter
+    
     if (filterCategory !== 'all') {
       filtered = filtered.filter(job => job.category === filterCategory);
     }
@@ -61,7 +61,7 @@ const AdminJobs = () => {
     let currentPage = 1;
     let hasMore = true;
     
-    //  FETCH TỪNG TRANG (100 jobs/trang)
+    
     while (hasMore) {
       console.log(` Fetching page ${currentPage}...`);
       
@@ -86,7 +86,7 @@ const AdminJobs = () => {
         allJobs = [...allJobs, ...jobsList];
         currentPage++;
         
-        // Kiểm tra xem còn trang nữa không
+       
         const totalPages = data.pagination?.totalPages || 0;
         hasMore = currentPage <= totalPages;
       } else {
@@ -108,7 +108,7 @@ const AdminJobs = () => {
 };
   const handleDeleteJob = async (jobId) => {
   try {
-    const token = localStorage.getItem('token') || localStorage.getItem('adminToken'); // ✅ FIX
+    const token = localStorage.getItem('token') || localStorage.getItem('adminToken'); 
     
     const response = await fetch(`http://localhost:5000/api/jobs/${jobId}`, {
       method: 'DELETE',
@@ -122,19 +122,19 @@ const AdminJobs = () => {
       throw new Error(errorData.message || 'Failed to delete job');
     }
 
-    alert('✅ Đã xóa công việc thành công!');
+    alert(' Đã xóa công việc thành công!');
     fetchJobs();
     setShowDeleteModal(false);
     setJobToDelete(null);
   } catch (err) {
     console.error('Error deleting job:', err);
-    alert('❌ Không thể xóa công việc: ' + err.message);
+    alert(' Không thể xóa công việc: ' + err.message);
   }
 };
 
 const handleUpdateStatus = async (jobId, newStatus) => {
   try {
-    const token = localStorage.getItem('token') || localStorage.getItem('adminToken'); // ✅ FIX
+    const token = localStorage.getItem('token') || localStorage.getItem('adminToken'); 
     
     const response = await fetch(`http://localhost:5000/api/jobs/${jobId}/status`, {
       method: 'PATCH',
@@ -150,11 +150,11 @@ const handleUpdateStatus = async (jobId, newStatus) => {
       throw new Error(errorData.message || 'Failed to update status');
     }
 
-    alert(`✅ Đã chuyển trạng thái sang "${newStatus}"!`);
+    alert(` Đã chuyển trạng thái sang "${newStatus}"!`);
     fetchJobs();
   } catch (err) {
     console.error('Error updating status:', err);
-    alert('❌ Không thể cập nhật trạng thái: ' + err.message);
+    alert(' Không thể cập nhật trạng thái: ' + err.message);
   }
 };
 
@@ -164,7 +164,7 @@ const handleBulkDelete = async () => {
   }
 
   try {
-    const token = localStorage.getItem('token') || localStorage.getItem('adminToken'); // ✅ FIX
+    const token = localStorage.getItem('token') || localStorage.getItem('adminToken'); 
     
     await Promise.all(
       selectedJobs.map(jobId =>
@@ -177,12 +177,12 @@ const handleBulkDelete = async () => {
       )
     );
 
-    alert(`✅ Đã xóa ${selectedJobs.length} công việc!`);
+    alert(` Đã xóa ${selectedJobs.length} công việc!`);
     setSelectedJobs([]);
     fetchJobs();
   } catch (err) {
     console.error('Error bulk deleting:', err);
-    alert('❌ Có lỗi khi xóa công việc: ' + err.message);
+    alert(' Có lỗi khi xóa công việc: ' + err.message);
   }
 };
 
@@ -202,13 +202,13 @@ const handleBulkDelete = async () => {
     }
   };
 
-  // Pagination
+  
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
   const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
   const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
 
-  // Get unique categories
+  
   const categories = [...new Set(jobs.map(job => job.category).filter(Boolean))];
 
   if (loading) {
@@ -236,7 +236,7 @@ const handleBulkDelete = async () => {
 
   return (
     <div className="admin-jobs-container">
-      {/* Header */}
+      {}
       <div className="page-header">
         <div>
           <h1> Quản lý Công việc</h1>
@@ -250,7 +250,7 @@ const handleBulkDelete = async () => {
         </button>
       </div>
 
-      {/* Filters */}
+      {}
       <div className="filters-section">
         <div className="search-box">
           <input
@@ -295,7 +295,7 @@ const handleBulkDelete = async () => {
         </div>
       </div>
 
-      {/* Jobs Table */}
+      
       <div className="table-container">
         <table className="jobs-table">
           <thead>
@@ -405,7 +405,7 @@ const handleBulkDelete = async () => {
         </table>
       </div>
 
-      {/* Pagination */}
+      
       {totalPages > 1 && (
         <div className="pagination">
           <button
@@ -430,7 +430,7 @@ const handleBulkDelete = async () => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      
       {showDeleteModal && jobToDelete && (
         <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>

@@ -1,14 +1,14 @@
-// ===================== UTILS INDEX - EXPORT ALL UTILITIES =====================
-// Import tất cả utility files
+
+
 
 const tokenUtils = require('./generateToken');
 const passwordUtils = require('./hashPassword');
 const constants = require('./constants');
 const helpers = require('./helpers');
 
-// ==================== EXPORT ALL ====================
+
 module.exports = {
-  // ========== TOKEN UTILITIES (from generateToken.js) ==========
+  
   generateAccessToken: tokenUtils.generateAccessToken,
   generateRefreshToken: tokenUtils.generateRefreshToken,
   generateTokenPair: tokenUtils.generateTokenPair,
@@ -24,7 +24,7 @@ module.exports = {
   generateAdminToken: tokenUtils.generateAdminToken,
   generateEmployerToken: tokenUtils.generateEmployerToken,
   
-  // ========== PASSWORD UTILITIES (from hashPassword.js) ==========
+  
   hashPassword: passwordUtils.hashPassword,
   comparePassword: passwordUtils.comparePassword,
   verifyPasswordStrength: passwordUtils.verifyPasswordStrength,
@@ -35,7 +35,7 @@ module.exports = {
   rehashPasswordIfNeeded: passwordUtils.rehashPasswordIfNeeded,
   DEFAULT_SALT_ROUNDS: passwordUtils.DEFAULT_SALT_ROUNDS,
   
-  // ========== CONSTANTS (from constants.js) ==========
+  
   USER_ROLES: constants.USER_ROLES,
   JOB_STATUS: constants.JOB_STATUS,
   APPLICATION_STATUS: constants.APPLICATION_STATUS,
@@ -59,54 +59,54 @@ module.exports = {
   RATE_LIMITS: constants.RATE_LIMITS,
   REGEX_PATTERNS: constants.REGEX_PATTERNS,
   
-  // ========== HELPERS (from helpers.js) ==========
-  // Date & Time
+  
+  
   formatDate: helpers.formatDate,
   getRelativeTime: helpers.getRelativeTime,
   isExpired: helpers.isExpired,
   getDaysUntil: helpers.getDaysUntil,
   
-  // String
+  
   slugify: helpers.slugify,
   truncate: helpers.truncate,
   capitalize: helpers.capitalize,
   toTitleCase: helpers.toTitleCase,
   
-  // Number
+  
   formatCurrency: helpers.formatCurrency,
   formatSalaryRange: helpers.formatSalaryRange,
   formatCompactNumber: helpers.formatCompactNumber,
   randomNumber: helpers.randomNumber,
   
-  // Validation
+  
   isValidEmail: helpers.isValidEmail,
   isValidPhone: helpers.isValidPhone,
   isValidUrl: helpers.isValidUrl,
   sanitizeHtml: helpers.sanitizeHtml,
   
-  // Array
+  
   removeDuplicates: helpers.removeDuplicates,
   shuffleArray: helpers.shuffleArray,
   chunkArray: helpers.chunkArray,
   groupBy: helpers.groupBy,
   
-  // Object
+  
   removeNullValues: helpers.removeNullValues,
   deepClone: helpers.deepClone,
   isEmptyObject: helpers.isEmptyObject,
   
-  // Pagination
+  
   getPaginationInfo: helpers.getPaginationInfo,
   
-  // Response
+  
   successResponse: helpers.successResponse,
   errorResponse: helpers.errorResponse,
   
-  // File
+  
   getFileExtension: helpers.getFileExtension,
   formatFileSize: helpers.formatFileSize,
   
-  // ========== GROUPED EXPORTS (for easier access) ==========
+  
   token: tokenUtils,
   password: passwordUtils,
   constants: constants,

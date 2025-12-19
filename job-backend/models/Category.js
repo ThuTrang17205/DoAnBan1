@@ -35,7 +35,7 @@ class Category {
       }));
       return categories;
     } catch (error) {
-      console.error('❌ Error in Category.findAll:', error.message);
+      console.error(' Error in Category.findAll:', error.message);
       throw error;
     }
   }
@@ -56,7 +56,7 @@ class Category {
         icon: this.getCategoryIcon(name)
       };
     } catch (error) {
-      console.error('❌ Error in Category.findBySlug:', error.message);
+      console.error(' Error in Category.findBySlug:', error.message);
       throw error;
     }
   }
@@ -140,7 +140,7 @@ class Category {
       );
       return parseInt(result.rows[0].count);
     } catch (error) {
-      console.error('❌ Error in Category.countJobs:', error.message);
+      console.error(' Error in Category.countJobs:', error.message);
       throw error;
     }
   }
@@ -171,7 +171,7 @@ class Category {
       
       return categoriesWithCount;
     } catch (error) {
-      console.error('❌ Error in Category.getAllWithJobCount:', error.message);
+      console.error(' Error in Category.getAllWithJobCount:', error.message);
       throw error;
     }
   }
@@ -201,7 +201,7 @@ class Category {
         };
       });
     } catch (error) {
-      console.error('❌ Error in Category.getTopCategories:', error.message);
+      console.error(' Error in Category.getTopCategories:', error.message);
       throw error;
     }
   }
@@ -255,7 +255,7 @@ class Category {
         };
       });
     } catch (error) {
-      console.error('❌ Error in Category.getStatistics:', error.message);
+      console.error(' Error in Category.getStatistics:', error.message);
       throw error;
     }
   }
@@ -275,7 +275,7 @@ class Category {
         cat.slug.includes(term)
       );
     } catch (error) {
-      console.error('❌ Error in Category.search:', error.message);
+      console.error(' Error in Category.search:', error.message);
       throw error;
     }
   }
@@ -307,7 +307,7 @@ class Category {
         };
       });
     } catch (error) {
-      console.error('❌ Error in Category.getTrendingCategories:', error.message);
+      console.error(' Error in Category.getTrendingCategories:', error.message);
       throw error;
     }
   }

@@ -424,7 +424,7 @@
 }
 
 /* =========================================
-   CTA SECTION
+   CTA SECTION - FIXED BUTTONS
    ========================================= */
 
 .cta-section {
@@ -449,11 +449,91 @@
   margin-right: auto;
 }
 
+/* === FIX: CTA BUTTONS EQUAL SIZE === */
 .cta-buttons {
   display: flex;
   gap: 16px;
   justify-content: center;
+  align-items: stretch; /* Đảm bảo cùng chiều cao */
 }
+
+/* Reset và fix cho tất cả buttons trong CTA */
+.cta-buttons button,
+.cta-buttons .btn-primary,
+.cta-buttons .btn-secondary {
+  /* Reset */
+  all: unset;
+  box-sizing: border-box;
+  
+  /* Size cố định */
+  min-width: 220px;
+  height: 56px;
+  
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Typography */
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  color: white;
+  
+  /* Spacing */
+  padding: 0 32px;
+  
+  /* Style */
+  border-radius: 8px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  
+  /* Transition */
+  transition: all 0.3s ease;
+}
+
+/* Hover effect */
+.cta-buttons button:hover,
+.cta-buttons .btn-primary:hover,
+.cta-buttons .btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Primary button style */
+.cta-buttons .btn-primary {
+  background: white;
+  color: #667eea;
+}
+
+.cta-buttons .btn-primary:hover {
+  background: #f8f9fa;
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Secondary button style */
+.cta-buttons .btn-secondary {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+}
+
+.cta-buttons .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+}
+
+/* Override any .large class */
+.cta-buttons .btn-primary.large,
+.cta-buttons .btn-secondary.large {
+  min-width: 220px;
+  height: 56px;
+  padding: 0 32px;
+  font-size: 18px;
+}
+
 
 /* =========================================
    BUTTONS
@@ -468,27 +548,14 @@
   cursor: pointer;
   transition: all 0.3s;
   border: none;
-}
-
-.btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+.btn-secondary:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-}
-
-.btn-secondary {
-  background: white;
-  color: #667eea;
-  border: 2px solid #667eea;
-}
-
-.btn-secondary:hover {
-  background: #f8f9fa;
-  transform: translateY(-2px);
 }
 
 .btn-primary.large,
@@ -501,79 +568,34 @@
    RESPONSIVE
    ========================================= */
 
-@media (max-width: 1200px) {
-  .hero-container {
-    grid-template-columns: 1fr;
-  }
-
-  .hero-image {
-    display: none;
-  }
-
-  .categories-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .jobs-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 992px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .categories-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 @media (max-width: 768px) {
-  .hero-section {
-    padding: 80px 20px 60px;
-  }
-
-  .hero-title {
-    font-size: 40px;
-  }
-
-  .hero-subtitle {
-    font-size: 16px;
-  }
-
-  .hero-search {
-    flex-direction: column;
-  }
-
-  .search-button {
-    width: 100%;
-  }
-
-  .stats-grid,
-  .categories-grid,
-  .steps-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .jobs-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .section-title {
-    font-size: 32px;
-  }
-
   .cta-title {
     font-size: 36px;
+  }
+  
+  .cta-subtitle {
+    font-size: 16px;
   }
 
   .cta-buttons {
     flex-direction: column;
+    align-items: center;
   }
 
-  .cta-buttons button {
+  .cta-buttons button,
+  .cta-buttons .btn-primary,
+  .cta-buttons .btn-secondary {
     width: 100%;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cta-buttons button,
+  .cta-buttons .btn-primary,
+  .cta-buttons .btn-secondary {
+    min-width: 100%;
+    font-size: 16px;
   }
 }
 
@@ -669,4 +691,27 @@
   .stat-label {
     font-size: 1rem;
   }
+}
+/* === CTA BUTTON HARD RESET === */
+.cta-buttons > * {
+  all: unset;                     /* reset mọi default */
+  box-sizing: border-box;
+
+  min-width: 220px;
+  height: 56px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+
+  border-radius: 8px;
+  cursor: pointer;
+
+  padding: 0 32px;
+  color: white;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }

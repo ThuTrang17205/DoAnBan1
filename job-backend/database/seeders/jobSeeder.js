@@ -1,5 +1,4 @@
-// ===================== JOB SEEDER =====================
-// Tạo sample jobs cho testing
+
 
 require('dotenv').config();
 const pool = require('../../config/db');
@@ -17,7 +16,7 @@ const sampleJobs = [
     requirements: "- 3+ năm kinh nghiệm\n- Thành thạo React, Node.js\n- Kinh nghiệm với PostgreSQL\n- Biết Git, Docker",
     benefits: "- Lương thỏa thuận\n- Bảo hiểm đầy đủ\n- Du lịch hàng năm\n- Môi trường năng động",
     status: "open",
-    deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+    deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) 
   },
   {
     title: "Marketing Manager",
@@ -128,24 +127,24 @@ async function seedJobs() {
   try {
     await client.query('BEGIN');
     
-    console.log('🌱 Starting job seeding...');
+    console.log(' Starting job seeding...');
     
-    // Kiểm tra có employer nào không
+    
     const employerCheck = await client.query(
       'SELECT id FROM employers LIMIT 1'
     );
     
     if (employerCheck.rows.length === 0) {
-      console.log('⚠️ No employers found in database!');
-      console.log('📝 Please create at least one employer first.');
-      console.log('💡 You can create a test employer with:');
+      console.log(' No employers found in database!');
+      console.log(' Please create at least one employer first.');
+      console.log(' You can create a test employer with:');
       console.log('   node userSeeder.js create employer');
       await client.query('ROLLBACK');
       return;
     }
     
     const employerId = employerCheck.rows[0].id;
-    console.log(`📌 Using employer ID: ${employerId}`);
+    console.log(` Using employer ID: ${employerId}`);
     
     let createdCount = 0;
     
@@ -175,20 +174,20 @@ async function seedJobs() {
         ]
       );
       
-      console.log(`✅ Created job: ${result.rows[0].title} (ID: ${result.rows[0].id})`);
+      console.log(` Created job: ${result.rows[0].title} (ID: ${result.rows[0].id})`);
       createdCount++;
     }
     
     await client.query('COMMIT');
     
-    console.log('\n🎉 Job seeding completed!');
-    console.log(`📊 Summary:`);
-    console.log(`   ✅ Created: ${createdCount} jobs`);
-    console.log(`   📌 Employer ID: ${employerId}`);
+    console.log('\n Job seeding completed!');
+    console.log(` Summary:`);
+    console.log(`    Created: ${createdCount} jobs`);
+    console.log(`    Employer ID: ${employerId}`);
     
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('❌ Error seeding jobs:', error.message);
+    console.error(' Error seeding jobs:', error.message);
     throw error;
   } finally {
     client.release();
@@ -204,7 +203,7 @@ async function clearJobs() {
   try {
     await client.query('BEGIN');
     
-    console.log('🗑️ Clearing all jobs...');
+    console.log(' Clearing all jobs...');
     
     // Delete applications first (foreign key constraint)
     const deletedApplications = await client.query('DELETE FROM applications RETURNING *');
@@ -216,11 +215,11 @@ async function clearJobs() {
     
     await client.query('COMMIT');
     
-    console.log('✅ All jobs cleared successfully!');
+    console.log(' All jobs cleared successfully!');
     
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('❌ Error clearing jobs:', error.message);
+    console.error(' Error clearing jobs:', error.message);
     throw error;
   } finally {
     client.release();
@@ -242,7 +241,7 @@ async function countJobs() {
     
     const stats = result.rows[0];
     
-    console.log('\n📊 ==================== JOB STATISTICS ====================');
+    console.log('\n ==================== JOB STATISTICS ====================');
     console.log(`   Total jobs: ${stats.total}`);
     console.log(`   Open jobs: ${stats.open}`);
     console.log(`   Closed jobs: ${stats.closed}`);
@@ -250,7 +249,7 @@ async function countJobs() {
     
     return stats;
   } catch (error) {
-    console.error('❌ Error counting jobs:', error.message);
+    console.error(' Error counting jobs:', error.message);
     throw error;
   }
 }
@@ -271,7 +270,7 @@ async function listJobs(limit = 10) {
       [limit]
     );
     
-    console.log(`\n💼 ==================== RECENT JOBS (Top ${limit}) ====================`);
+    console.log(`\n ==================== RECENT JOBS (Top ${limit}) ====================`);
     if (result.rows.length === 0) {
       console.log('   No jobs found.');
     } else {
@@ -287,12 +286,12 @@ async function listJobs(limit = 10) {
     
     return result.rows;
   } catch (error) {
-    console.error('❌ Error listing jobs:', error.message);
+    console.error(' Error listing jobs:', error.message);
     throw error;
   }
 }
 
-// Export
+
 module.exports = {
   seedJobs,
   clearJobs,
@@ -301,7 +300,7 @@ module.exports = {
   sampleJobs
 };
 
-// Run directly
+
 if (require.main === module) {
   const args = process.argv.slice(2);
   const command = args[0];
@@ -345,7 +344,7 @@ if (require.main === module) {
       break;
       
     default:
-      console.log('📝 Job Seeder Commands:');
+      console.log(' Job Seeder Commands:');
       console.log('   node jobSeeder.js seed        - Seed sample jobs');
       console.log('   node jobSeeder.js clear       - Clear all jobs');
       console.log('   node jobSeeder.js count       - Count jobs');

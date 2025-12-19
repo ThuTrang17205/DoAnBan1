@@ -1,321 +1,345 @@
-/* CVBuilder.css */
+/* CVBuilder.css - Inline Editing Format */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f5f5;
+}
 
 @media print {
-  body * {
-    visibility: hidden;
+  /* Hide everything first */
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
   }
-  .cv-print-area,
-  .cv-print-area * {
-    visibility: visible;
+  
+  * {
+    visibility: hidden !important;
   }
-  .cv-print-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 210mm;
-    height: 297mm;
+  
+  /* Only show CV wrapper and its children */
+  .cv-inline-wrapper,
+  .cv-inline-wrapper * {
+    visibility: visible !important;
   }
+  
+  /* Hide the container */
+  .cv-inline-container {
+    background: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  /* Position CV to fill entire page */
+  .cv-inline-wrapper {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    overflow: hidden !important;
+  }
+  
+  /* Left sidebar - fixed width */
+  .cv-inline-left {
+    width: 75mm !important;
+    min-width: 75mm !important;
+    max-width: 75mm !important;
+    height: 297mm !important;
+    padding: 12mm 8mm !important;
+    flex-shrink: 0 !important;
+    overflow: hidden !important;
+    background: #2c3e50 !important;
+  }
+  
+  /* Right content - fill remaining space */
+  .cv-inline-right {
+    flex: 1 !important;
+    height: 297mm !important;
+    padding: 12mm 10mm !important;
+    overflow: hidden !important;
+    background: #f9f9f9 !important;
+  }
+  
+  /* Avatar sizing */
+  .cv-avatar-img,
+  .cv-avatar-placeholder {
+    width: 70px !important;
+    height: 70px !important;
+  }
+  
+  /* Name section */
+  .cv-name-input {
+    font-size: 16px !important;
+    padding: 6px !important;
+  }
+  
+  .cv-position-input {
+    font-size: 12px !important;
+    padding: 4px !important;
+  }
+  
+  /* Section titles */
+  .cv-section-title-left {
+    font-size: 11px !important;
+    margin-bottom: 8px !important;
+    padding-bottom: 5px !important;
+  }
+  
+  .cv-section-title-right {
+    font-size: 12px !important;
+    margin-bottom: 8px !important;
+    padding-bottom: 5px !important;
+  }
+  
+  /* All sections - reduce spacing */
+  .cv-section-left {
+    margin-bottom: 12px !important;
+  }
+  
+  .cv-section-right {
+    margin-bottom: 12px !important;
+  }
+  
+  .cv-name-section {
+    margin-bottom: 12px !important;
+    padding-bottom: 10px !important;
+  }
+  
+  .cv-avatar-section {
+    margin-bottom: 12px !important;
+  }
+  
+  /* Hide all interactive elements */
+  .btn-remove-inline,
+  .btn-remove-mini,
+  .btn-add-left,
+  .btn-add-inline,
+  .avatar-overlay,
+  .cv-bottom-actions,
+  button {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  /* Make inputs look like text */
+  input, textarea {
+    border: none !important;
+    background: transparent !important;
+    padding: 1px !important;
+    margin: 0 !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    font-size: 10px !important;
+    line-height: 1.4 !important;
+  }
+  
+  .cv-input-left {
+    font-size: 9px !important;
+  }
+  
+  .cv-textarea-left,
+  .cv-textarea-right {
+    font-size: 9px !important;
+    line-height: 1.5 !important;
+  }
+  
+  .cv-textarea-desc {
+    font-size: 9px !important;
+    line-height: 1.5 !important;
+  }
+  
+  /* Experience blocks */
+  .cv-exp-block {
+    box-shadow: none !important;
+    border: none !important;
+    border-left: 2px solid #667eea !important;
+    padding: 6px 8px !important;
+    margin-bottom: 8px !important;
+    background: white !important;
+    page-break-inside: avoid !important;
+  }
+  
+  .cv-input-exp-position,
+  .cv-input-exp-period,
+  .cv-input-company {
+    font-size: 10px !important;
+  }
+  
+  /* Prevent page breaks */
+  .cv-inline-wrapper,
+  .cv-inline-left,
+  .cv-inline-right {
+    page-break-inside: avoid !important;
+    page-break-before: avoid !important;
+    page-break-after: avoid !important;
+  }
+  
+  /* Page setup */
   @page {
-    size: A4;
+    size: A4 portrait;
     margin: 0;
   }
+  
+  html, body {
+    height: 297mm !important;
+    width: 210mm !important;
+  }
 }
 
-.cv-builder-container {
+.cv-inline-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 100px 20px 20px 20px;
+}
+
+.cv-bottom-actions {
+  max-width: 1000px;
+  margin: 20px auto 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
   padding: 20px;
-  font-family: system-ui, sans-serif;
-}
-
-.cv-header {
-  text-align: center;
-  margin-bottom: 30px;
-  color: white;
-}
-
-.cv-title {
-  font-size: 36px;
-  font-weight: 700;
-  margin: 0 0 10px 0;
-}
-
-.cv-subtitle {
-  font-size: 16px;
-  margin: 0 0 10px 0;
-  opacity: 0.9;
+  flex-wrap: wrap;
 }
 
 .save-status {
-  margin-top: 10px;
-  padding: 8px 20px;
-  background: white;
-  color: #00B14F;
-  border-radius: 20px;
+  padding: 10px 20px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  display: inline-block;
+  box-shadow: 0 2px 8px rgba(46, 125, 50, 0.2);
+  animation: slideIn 0.3s ease;
 }
 
-.cv-main-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-  align-items: start;
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.cv-column {
-  display: flex;
-  flex-direction: column;
-}
-
-.cv-card {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.section-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #667eea;
-  margin-bottom: 20px;
-}
-
-.avatar-section {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #f0f0f0;
-}
-
-.avatar-preview {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 3px solid #667eea;
-}
-
-.avatar-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  background: #f0f0f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
-}
-
-.upload-btn {
-  display: inline-block;
-  background: #667eea;
+/* Nút Lưu CV */
+.btn-save-cv {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  margin-right: 10px;
-}
-
-.file-input {
-  display: none;
-}
-
-.remove-avatar-btn {
-  background: #ffebee;
-  color: #d32f2f;
-  border: 1px solid #d32f2f;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.form-group {
-  margin-bottom: 16px;
-  flex: 1;
-}
-
-.form-row {
-  display: flex;
-  gap: 16px;
-}
-
-.form-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.form-input {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  box-sizing: border-box;
-}
-
-.form-input:focus {
-  border-color: #667eea;
-}
-
-.form-textarea {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  resize: vertical;
-  font-family: inherit;
-  box-sizing: border-box;
-}
-
-.form-textarea:focus {
-  border-color: #667eea;
-}
-
-.experience-item {
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 2px dashed #e0e0e0;
-}
-
-.item-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.item-number {
-  font-size: 14px;
-  font-weight: 600;
-  color: #667eea;
-}
-
-.remove-btn-circle {
-  background: #ffebee;
-  color: #d32f2f;
   border: none;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 14px;
-}
-
-.skill-item {
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
   display: flex;
+  align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
 }
 
-.remove-btn-square {
-  background: #ffebee;
-  color: #d32f2f;
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  flex-shrink: 0;
+.btn-save-cv:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
-.add-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.btn-save-cv:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+}
+
+/* Nút Tải xuống */
+.btn-download {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
   border: none;
-  padding: 12px;
   border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  width: 100%;
-}
-
-.action-buttons {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 8px;
 }
 
-.clear-btn {
-  flex: 1;
-  background: #ffebee;
-  color: #d32f2f;
-  border: 2px solid #d32f2f;
-  padding: 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 700;
+.btn-download:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
-.print-btn {
-  flex: 1;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 700;
+.btn-download:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
 }
 
-.preview-header {
+/* Nút Xóa toàn bộ */
+.btn-clear {
+  padding: 12px 24px;
   background: white;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  color: #ef4444;
+  border: 2px solid #ef4444;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(239, 68, 68, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.preview-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 20px;
+.btn-clear:hover {
+  background: #ef4444;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
 }
 
-.cv-print-area {
+.btn-clear:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(239, 68, 68, 0.2);
+}
+
+.cv-inline-wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+  margin-top: 80px;
   display: flex;
   background: white;
   border-radius: 8px;
   overflow: hidden;
-  min-height: 1100px;
-  font-size: 11px;
-  border: 1px solid #e0e0e0;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  min-height: 1123px;
 }
 
-.cv-left {
-  width: 200px;
+/* Left Sidebar */
+.cv-inline-left {
+  width: 280px;
   background: #2c3e50;
-  padding: 25px 15px;
+  padding: 25px 18px;
   color: white;
-}
-
-.cv-right {
-  flex: 1;
-  background: #f8f9fa;
-  padding: 25px;
 }
 
 .cv-avatar-section {
@@ -323,111 +347,471 @@
   text-align: center;
 }
 
+.avatar-upload {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
 .cv-avatar-img {
-  width: 90px;
-  height: 90px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid white;
+  border: 4px solid white;
+  display: block;
 }
 
 .cv-avatar-placeholder {
-  width: 90px;
-  height: 90px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 4px solid white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36px;
-  margin: 0 auto;
-  border: 3px solid white;
+  font-size: 40px;
 }
 
-.cv-section {
-  margin-bottom: 20px;
+.file-input {
+  display: none;
 }
 
-.cv-section-title {
-  font-size: 12px;
-  font-weight: 700;
-  margin-bottom: 10px;
-  padding-bottom: 6px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+.avatar-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px;
+  font-size: 11px;
+  border-radius: 0 0 60px 60px;
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
-.cv-section-title-right {
-  font-size: 13px;
-  font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 10px;
-  padding-bottom: 6px;
-  border-bottom: 2px solid #667eea;
-}
-
-.cv-info-item {
-  font-size: 10px;
-  margin-bottom: 8px;
-  line-height: 1.5;
-}
-
-.cv-skill-item {
-  font-size: 10px;
-  margin-bottom: 6px;
-}
-
-.cv-text {
-  font-size: 10px;
-  line-height: 1.6;
-  margin: 0;
+.avatar-upload:hover .avatar-overlay {
+  opacity: 1;
 }
 
 .cv-name-section {
+  text-align: center;
   margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-.cv-name {
-  font-size: 22px;
+.cv-name-input {
+  width: 100%;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 10px;
+  font-size: 20px;
   font-weight: 700;
-  color: #2c3e50;
-  margin: 0 0 8px 0;
+  text-align: center;
+  border-radius: 6px;
+  margin-bottom: 10px;
   text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.cv-position {
+.cv-name-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.cv-name-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cv-position-input {
+  width: 100%;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px;
   font-size: 14px;
-  color: #667eea;
-  margin: 0;
-  font-weight: 600;
+  font-weight: 500;
+  text-align: center;
+  border-radius: 6px;
 }
 
-.cv-exp-item {
+.cv-position-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.cv-position-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cv-section-left {
+  margin-bottom: 18px;
+}
+
+.cv-section-title-left {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cv-section-title-left span {
+  outline: none;
+}
+
+.cv-section-title-left span:focus {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.cv-info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cv-input-left {
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 10px;
+  font-size: 11px;
+  border-radius: 4px;
+  line-height: 1.5;
+}
+
+.cv-input-left::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.cv-input-left:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cv-skills-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cv-skill-item-inline {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-remove-mini {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.btn-remove-mini:hover {
+  background: #c0392b;
+  transform: scale(1.1);
+}
+
+.btn-add-left {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 4px;
+  transition: all 0.3s;
+}
+
+.btn-add-left:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.cv-textarea-left {
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px;
+  font-size: 11px;
+  border-radius: 4px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.cv-textarea-left::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.cv-textarea-left:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Right Main Content */
+.cv-inline-right {
+  flex: 1;
+  background: #f9f9f9;
+  padding: 25px;
+}
+
+.cv-section-right {
+  margin-bottom: 18px;
+}
+
+.section-header-with-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 15px;
 }
 
-.cv-exp-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
-  font-size: 11px;
+.cv-section-title-right {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 3px solid #667eea;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.cv-exp-period {
-  font-size: 10px;
-  color: #666;
-  font-style: italic;
+.cv-section-title-right span {
+  outline: none;
 }
 
-.cv-exp-company {
-  font-size: 10px;
-  color: #667eea;
-  margin-bottom: 6px;
+.cv-section-title-right span:focus {
+  background: #fff3cd;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.btn-add-inline {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
   font-weight: 600;
+  transition: all 0.3s;
 }
 
-.cv-exp-desc {
-  font-size: 10px;
-  line-height: 1.5;
-  margin: 0;
+.btn-add-inline:hover {
+  background: #5568d3;
+  transform: translateY(-2px);
+}
+
+.cv-textarea-right {
+  width: 100%;
+  background: white;
+  border: 2px solid #e0e0e0;
+  color: #2c3e50;
+  padding: 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.7;
+}
+
+.cv-textarea-right::placeholder {
+  color: #999;
+}
+
+.cv-textarea-right:focus {
+  outline: none;
+  border-color: #667eea;
+  background: #fafafa;
+}
+
+.cv-exp-block {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border-left: 4px solid #667eea;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.exp-header-inline {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: flex-start;
+}
+
+.cv-input-exp-position {
+  flex: 2;
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  color: #2c3e50;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 6px;
+}
+
+.cv-input-exp-position::placeholder {
+  color: #999;
+}
+
+.cv-input-exp-position:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+}
+
+.cv-input-exp-period {
+  flex: 1;
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  color: #666;
+  padding: 8px 10px;
+  font-size: 11px;
+  font-style: italic;
+  border-radius: 6px;
+  text-align: right;
+}
+
+.cv-input-exp-period::placeholder {
+  color: #999;
+}
+
+.cv-input-exp-period:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+}
+
+.btn-remove-inline {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.btn-remove-inline:hover {
+  background: #c0392b;
+  transform: scale(1.1);
+}
+
+.cv-input-company {
+  width: 100%;
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  color: #667eea;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.cv-input-company::placeholder {
+  color: #999;
+}
+
+.cv-input-company:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+}
+
+.cv-textarea-desc {
+  width: 100%;
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
   color: #555;
+  padding: 10px;
+  font-size: 11px;
+  border-radius: 6px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.cv-textarea-desc::placeholder {
+  color: #999;
+}
+
+.cv-textarea-desc:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .cv-inline-wrapper {
+    flex-direction: column;
+  }
+  
+  .cv-inline-left {
+    width: 100%;
+  }
+  
+  .cv-bottom-actions {
+    flex-direction: column;
+  }
+  
+  .btn-save-cv,
+  .btn-download,
+  .btn-clear {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Print optimizations */
+@media print {
+  .cv-inline-wrapper {
+    box-shadow: none;
+    border-radius: 0;
+  }
+  
+  input, textarea {
+    border: none !important;
+    background: transparent !important;
+    padding: 2px !important;
+  }
+  
+  .cv-exp-block {
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
 }

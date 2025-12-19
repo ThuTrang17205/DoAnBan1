@@ -1,12 +1,8 @@
 import api from './api';
 
-/**
- * Job API Services
- */
+
 const jobService = {
-  /**
-   * Get latest jobs
-   */
+ 
   getLatestJobs: async () => {
     try {
       const response = await api.get('/jobs/latest');
@@ -16,9 +12,7 @@ const jobService = {
     }
   },
 
-  /**
-   * Get all jobs with filters
-   */
+  
   getAllJobs: async (params = {}) => {
     try {
       const response = await api.get('/jobs', { params });
@@ -28,9 +22,7 @@ const jobService = {
     }
   },
 
-  /**
-   * Get job by ID
-   */
+  
   getJobById: async (id) => {
     try {
       const response = await api.get(`/jobs/${id}`);
@@ -40,9 +32,7 @@ const jobService = {
     }
   },
 
-  /**
-   * Search jobs
-   */
+  
   searchJobs: async (searchParams) => {
     try {
       const response = await api.get('/jobs/search', { params: searchParams });
@@ -52,9 +42,7 @@ const jobService = {
     }
   },
 
-  /**
-   * Get jobs by category
-   */
+  
   getJobsByCategory: async (categoryId) => {
     try {
       const response = await api.get(`/jobs/category/${categoryId}`);

@@ -217,7 +217,7 @@ const CVGuide = () => {
         </div>
       </header>
 
-      {/* Sidebar Overlay */}
+      {}
       {sidebarOpen && (
         <div 
           onClick={() => setSidebarOpen(false)}
@@ -225,7 +225,7 @@ const CVGuide = () => {
         />
       )}
 
-      {/* Sidebar */}
+      {}
       <aside style={{
         position: 'fixed',
         left: 0,
@@ -293,14 +293,14 @@ const CVGuide = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
+      {}
       <main style={{ padding: '2rem 1.5rem', maxWidth: '1000px', margin: '0 auto' }}>
         <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', padding: '2rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
           <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '2rem', borderBottom: '2px solid #e5e7eb', paddingBottom: '1rem' }}>
             {currentContent.title}
           </h2>
 
-          {/* General Content */}
+          {}
           {selectedCategory === 'general' && (
             <div>
               {currentContent.sections.map((section, idx) => (
@@ -327,10 +327,10 @@ const CVGuide = () => {
             </div>
           )}
 
-          {/* Specific Industry Content */}
+          {}
           {selectedCategory !== 'general' && (
             <div>
-              {/* Positions */}
+              {}
               {currentContent.positions && (
                 <div style={{ marginBottom: '2rem' }}>
                   <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#1f2937', marginBottom: '0.75rem' }}>
@@ -342,7 +342,7 @@ const CVGuide = () => {
                 </div>
               )}
 
-              {/* Skills */}
+              {}
               {currentContent.skills && (
                 <div style={{ marginBottom: '2rem' }}>
                   <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#1f2937', marginBottom: '0.75rem' }}>
@@ -356,7 +356,7 @@ const CVGuide = () => {
                 </div>
               )}
 
-              {/* Certificates */}
+              {}
               {currentContent.certificates && (
                 <div style={{ marginBottom: '2rem' }}>
                   <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#1f2937', marginBottom: '0.75rem' }}>
@@ -368,7 +368,7 @@ const CVGuide = () => {
                 </div>
               )}
 
-              {/* Objective */}
+              {}
               {currentContent.objective && (
                 <div style={{ marginBottom: '2rem' }}>
                   <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#1f2937', marginBottom: '0.75rem' }}>
@@ -380,7 +380,7 @@ const CVGuide = () => {
                 </div>
               )}
 
-              {/* Project Example */}
+              {}
               {currentContent.projectExample && (
                 <div style={{ marginBottom: '2rem' }}>
                   <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#1f2937', marginBottom: '0.75rem' }}>
@@ -395,7 +395,7 @@ const CVGuide = () => {
                 </div>
               )}
 
-              {/* Highlights */}
+              {}
               {currentContent.highlights && (
                 <div style={{ marginBottom: '2rem' }}>
                   <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#1f2937', marginBottom: '0.75rem' }}>
@@ -412,7 +412,7 @@ const CVGuide = () => {
           )}
         </div>
 
-        {/* Checklist */}
+        {}
         <div style={{ marginTop: '2rem', backgroundColor: 'white', borderRadius: '0.5rem', padding: '2rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
           <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1f2937', marginBottom: '1rem' }}>
             Checklist Hoàn Thiện CV
@@ -436,7 +436,7 @@ const CVGuide = () => {
         </div>
       </main>
 
-      {/* Footer */}
+      {}
       <footer style={{ backgroundColor: '#1f2937', color: 'white', padding: '2rem', textAlign: 'center', marginTop: '3rem' }}>
         <p style={{ fontSize: '0.875rem', margin: 0 }}>Tài liệu tham khảo: JobPortal | Cập nhật: Tháng 12/2025</p>
         <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.5rem' }}>Chúc bạn thành công trong hành trình tìm kiếm công việc!</p>

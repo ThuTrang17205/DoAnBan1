@@ -2,22 +2,6 @@ import React from 'react';
 import './Footer.css';
 
 function Footer() {
-  const quickLinks = [
-    'tìm việc làm', 'tuyển dụng', 'thần số học', 'cv xin việc', 'mẫu cv',
-    'việc làm bắc giang', 'việc làm hưng yên', 'việc làm bà rịa vũng tàu', 'việc làm quảng ngãi', 'việc làm nam định',
-    'việc làm huế', 'việc làm thái bình', 'việc làm ninh bình', 'việc làm hà tĩnh', 'việc làm tphcm',
-    'việc làm đà nẵng', 'việc làm hải phòng', 'việc làm cần thơ', 'việc làm bình dương', 'tìm việc làm tại hà nội'
-  ];
-
-  const jobCategories = [
-    'việc làm nhân viên kinh doanh', 'tuyển dụng kế toán trưởng', 'việc làm sales', 'tuyển dụng marketing',
-    'tuyển dụng content marketing', 'tuyển dụng nhân sự', 'tuyển dụng kế toán tổng hợp', 'tuyển dụng kiểm toán',
-    'tuyển dụng truyền thông', 'việc làm qa qc', 'tuyển dụng brand marketing', 'tuyển dụng hr manager',
-    'việc làm ngành may', 'tuyển dụng marketing manager', 'việc làm giáo dục', 'việc làm partime',
-    'tuyển dụng nhân viên thiết kế', 'tuyển dụng tài chính', 'việc làm tư động hóa', 'việc làm báo chí',
-    'tuyển dụng kiểm toán ngân hàng', 'việc làm in ấn', 'data analyst'
-  ];
-
   const locations = [
     'Hồ Chí Minh',
     'Hà Nội',
@@ -37,25 +21,9 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="footer-content">
-        {/* Quick Links Section */}
-        <div className="footer-section footer-links">
-          <div className="quick-links">
-            {quickLinks.map((link, index) => (
-              <a key={index} href="#" className="footer-link">
-                {link}
-              </a>
-            ))}
-          </div>
-          <div className="quick-links">
-            {jobCategories.map((link, index) => (
-              <a key={index} href="#" className="footer-link">
-                {link}
-              </a>
-            ))}
-          </div>
-        </div>
-
-        {/* Main Footer Sections */}
+        {/* ✅ Đã xóa phần Quick Links - chỉ giữ 4 cột ngang */}
+        
+        {/* Main Footer Grid - 4 Columns */}
         <div className="footer-main">
           <div className="footer-column">
             <h3 className="footer-heading">Job Portal</h3>
@@ -112,7 +80,7 @@ function Footer() {
           </div>
         </div>
 
-        {/* Company Info */}
+        {/* Footer Bottom */}
         <div className="footer-bottom">
           <div className="company-info">
             <p>

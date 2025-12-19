@@ -1,7 +1,4 @@
-// =============================================
-// FILE 6: userController.js
-// USER PROFILE MANAGEMENT
-// =============================================
+
 
 const User = require('../models/User');
 const Application = require('../models/Application');
@@ -13,7 +10,7 @@ const Job = require('../models/Job');
 exports.getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
-      .select('-password -email'); // Hide sensitive info for public view
+      .select('-password -email'); 
 
     if (!user) {
       return res.status(404).json({
@@ -435,7 +432,7 @@ exports.saveJob = async (req, res) => {
     const jobId = req.params.jobId;
     const user = await User.findById(req.user.id);
 
-    // Check if job exists
+    
     const job = await Job.findById(jobId);
     if (!job) {
       return res.status(404).json({
@@ -444,7 +441,7 @@ exports.saveJob = async (req, res) => {
       });
     }
 
-    // Check if already saved
+   
     if (user.savedJobs.includes(jobId)) {
       return res.status(400).json({
         success: false,

@@ -1,21 +1,21 @@
 /**
  * Category Routes
- * Job category management routes
+ * Job category management routes1111
  */
 
 const express = require('express');
 const router = express.Router();
 
-// Middleware
+
 const { authMiddleware } = require('../middleware/auth');
 const { isAdmin } = require('../middleware/roleCheck');
 const { validateIdParam, validatePagination } = require('../middleware/validateInput');
 const { generalLimiter } = require('../middleware/rateLimiter');
 
-// Controllers (uncomment when created)
-// const categoryController = require('../controllers/categoryController');
 
-// ==================== PUBLIC ROUTES ====================
+
+
+
 
 /**
  * @route   GET /api/categories
@@ -23,7 +23,7 @@ const { generalLimiter } = require('../middleware/rateLimiter');
  * @access  Public
  */
 router.get('/', generalLimiter, (req, res) => {
-  // categoryController.getAllCategories
+  
   res.json({
     success: true,
     message: 'Get all categories',
@@ -118,7 +118,7 @@ router.get('/', generalLimiter, (req, res) => {
  * @access  Public
  */
 router.get('/popular', (req, res) => {
-  // categoryController.getPopularCategories
+  
   res.json({
     success: true,
     message: 'Get popular categories',
@@ -132,7 +132,7 @@ router.get('/popular', (req, res) => {
  * @access  Public
  */
 router.get('/:id', validateIdParam(), (req, res) => {
-  // categoryController.getCategoryById
+  
   res.json({
     success: true,
     message: 'Get category by ID',
@@ -152,7 +152,7 @@ router.get('/:id', validateIdParam(), (req, res) => {
  * @access  Public
  */
 router.get('/slug/:slug', (req, res) => {
-  // categoryController.getCategoryBySlug
+  
   res.json({
     success: true,
     message: 'Get category by slug',
@@ -170,7 +170,7 @@ router.get('/slug/:slug', (req, res) => {
  * @access  Public
  */
 router.get('/:id/jobs', validateIdParam(), validatePagination, (req, res) => {
-  // categoryController.getJobsByCategory
+  
   res.json({
     success: true,
     message: 'Get jobs by category',
@@ -186,7 +186,7 @@ router.get('/:id/jobs', validateIdParam(), validatePagination, (req, res) => {
  * @access  Public
  */
 router.get('/:id/statistics', validateIdParam(), (req, res) => {
-  // categoryController.getCategoryStatistics
+  
   res.json({
     success: true,
     message: 'Get category statistics',
@@ -199,8 +199,8 @@ router.get('/:id/statistics', validateIdParam(), (req, res) => {
   });
 });
 
-// ==================== ADMIN ROUTES ====================
-// Apply authentication and admin check
+
+
 router.use(authMiddleware);
 router.use(isAdmin);
 
@@ -210,7 +210,7 @@ router.use(isAdmin);
  * @access  Private (Admin)
  */
 router.post('/', (req, res) => {
-  // categoryController.createCategory
+  
   res.json({
     success: true,
     message: 'Category created successfully',
@@ -228,7 +228,7 @@ router.post('/', (req, res) => {
  * @access  Private (Admin)
  */
 router.put('/:id', validateIdParam(), (req, res) => {
-  // categoryController.updateCategory
+  
   res.json({
     success: true,
     message: 'Category updated successfully'
@@ -241,7 +241,7 @@ router.put('/:id', validateIdParam(), (req, res) => {
  * @access  Private (Admin)
  */
 router.delete('/:id', validateIdParam(), (req, res) => {
-  // categoryController.deleteCategory
+  
   res.json({
     success: true,
     message: 'Category deleted successfully'
@@ -254,7 +254,7 @@ router.delete('/:id', validateIdParam(), (req, res) => {
  * @access  Private (Admin)
  */
 router.put('/:id/icon', validateIdParam(), (req, res) => {
-  // categoryController.updateCategoryIcon
+  
   res.json({
     success: true,
     message: 'Category icon updated successfully',
@@ -270,7 +270,7 @@ router.put('/:id/icon', validateIdParam(), (req, res) => {
  * @access  Private (Admin)
  */
 router.post('/reorder', (req, res) => {
-  // categoryController.reorderCategories
+  
   res.json({
     success: true,
     message: 'Categories reordered successfully'
@@ -283,7 +283,7 @@ router.post('/reorder', (req, res) => {
  * @access  Private (Admin)
  */
 router.post('/:id/merge', validateIdParam(), (req, res) => {
-  // categoryController.mergeCategories
+  
   res.json({
     success: true,
     message: 'Categories merged successfully'

@@ -57,7 +57,7 @@ const verifyToken = (token) => {
 const registerUser = async (userData) => {
   const { email, password, fullName, phone, role = 'user' } = userData;
 
-  // Check if email already exists
+  
   const existingUser = await pool.query(
     'SELECT id FROM users WHERE email = $1',
     [email]
@@ -67,10 +67,10 @@ const registerUser = async (userData) => {
     throw new AppError('Email đã được đăng ký', 409);
   }
 
-  // Hash password
+  
   const hashedPassword = await hashPassword(password);
 
-  // Insert user
+  
   const query = `
     INSERT INTO users (email, password, full_name, phone, role, is_active, created_at)
     VALUES ($1, $2, $3, $4, $5, true, NOW())
@@ -81,13 +81,13 @@ const registerUser = async (userData) => {
   const result = await pool.query(query, values);
   const user = result.rows[0];
 
-  // Create user profile
+  
   await pool.query(
     `INSERT INTO user_profiles (user_id, created_at) VALUES ($1, NOW())`,
     [user.id]
   );
 
-  // Generate tokens
+  
   const token = generateToken({ 
     id: user.id, 
     email: user.email, 
@@ -116,7 +116,7 @@ const registerUser = async (userData) => {
  * Login user
  */
 const loginUser = async (email, password) => {
-  // Find user by email
+  
   const query = `
     SELECT id, email, password, full_name, phone, role, is_active 
     FROM users 
@@ -131,25 +131,25 @@ const loginUser = async (email, password) => {
 
   const user = result.rows[0];
 
-  // Check if user is active
+  
   if (!user.is_active) {
     throw new AppError('Tài khoản đã bị vô hiệu hóa', 403);
   }
 
-  // Compare password
+  
   const isPasswordValid = await comparePassword(password, user.password);
 
   if (!isPasswordValid) {
     throw new AppError('Email hoặc mật khẩu không đúng', 401);
   }
 
-  // Update last login
+  
   await pool.query(
     'UPDATE users SET last_login = NOW() WHERE id = $1',
     [user.id]
   );
 
-  // Generate tokens
+  
   const token = generateToken({ 
     id: user.id, 
     email: user.email, 
@@ -188,7 +188,7 @@ const registerEmployer = async (employerData) => {
     description
   } = employerData;
 
-  // Check if email already exists
+  
   const existingUser = await pool.query(
     'SELECT id FROM users WHERE email = $1',
     [email]
@@ -198,7 +198,7 @@ const registerEmployer = async (employerData) => {
     throw new AppError('Email đã được đăng ký', 409);
   }
 
-  // Check if tax code already exists
+  
   const existingTaxCode = await pool.query(
     'SELECT id FROM employers WHERE tax_code = $1',
     [taxCode]
@@ -213,10 +213,10 @@ const registerEmployer = async (employerData) => {
   try {
     await client.query('BEGIN');
 
-    // Hash password
+    
     const hashedPassword = await hashPassword(password);
 
-    // Insert user
+    
     const userQuery = `
       INSERT INTO users (email, password, full_name, phone, role, is_active, created_at)
       VALUES ($1, $2, $3, $4, 'employer', true, NOW())
@@ -232,7 +232,7 @@ const registerEmployer = async (employerData) => {
 
     const user = userResult.rows[0];
 
-    // Insert employer
+    
     const employerQuery = `
       INSERT INTO employers (
         user_id, 
@@ -261,7 +261,7 @@ const registerEmployer = async (employerData) => {
 
     await client.query('COMMIT');
 
-    // Generate tokens
+    
     const token = generateToken({ 
       id: user.id, 
       email: user.email, 
@@ -298,7 +298,7 @@ const registerEmployer = async (employerData) => {
  * Login employer
  */
 const loginEmployer = async (email, password) => {
-  // Find employer user
+  
   const query = `
     SELECT 
       u.id, u.email, u.password, u.full_name, u.phone, u.role, u.is_active,
@@ -316,25 +316,25 @@ const loginEmployer = async (email, password) => {
 
   const user = result.rows[0];
 
-  // Check if user is active
+  
   if (!user.is_active) {
     throw new AppError('Tài khoản đã bị vô hiệu hóa', 403);
   }
 
-  // Compare password
+  
   const isPasswordValid = await comparePassword(password, user.password);
 
   if (!isPasswordValid) {
     throw new AppError('Email hoặc mật khẩu không đúng', 401);
   }
 
-  // Update last login
+  
   await pool.query(
     'UPDATE users SET last_login = NOW() WHERE id = $1',
     [user.id]
   );
 
-  // Generate tokens
+  
   const token = generateToken({ 
     id: user.id, 
     email: user.email, 
@@ -365,7 +365,7 @@ const loginEmployer = async (email, password) => {
  * Login admin
  */
 const loginAdmin = async (username, password) => {
-  // Find admin
+  
   const query = `
     SELECT id, username, email, password, full_name, role, is_active
     FROM admin
@@ -380,25 +380,25 @@ const loginAdmin = async (username, password) => {
 
   const admin = result.rows[0];
 
-  // Check if admin is active
+  
   if (!admin.is_active) {
     throw new AppError('Tài khoản đã bị vô hiệu hóa', 403);
   }
 
-  // Compare password
+  
   const isPasswordValid = await comparePassword(password, admin.password);
 
   if (!isPasswordValid) {
     throw new AppError('Tài khoản hoặc mật khẩu không đúng', 401);
   }
 
-  // Update last login
+  
   await pool.query(
     'UPDATE admin SET last_login = NOW() WHERE id = $1',
     [admin.id]
   );
 
-  // Generate token
+  
   const token = generateToken({ 
     id: admin.id, 
     username: admin.username,
@@ -424,7 +424,7 @@ const loginAdmin = async (username, password) => {
 const refreshAccessToken = async (refreshToken) => {
   const decoded = verifyToken(refreshToken);
 
-  // Get user
+  
   const result = await pool.query(
     'SELECT id, email, role FROM users WHERE id = $1 AND is_active = true',
     [decoded.id]
@@ -436,7 +436,7 @@ const refreshAccessToken = async (refreshToken) => {
 
   const user = result.rows[0];
 
-  // Generate new access token
+  
   const newToken = generateToken({ 
     id: user.id, 
     email: user.email, 
@@ -450,7 +450,7 @@ const refreshAccessToken = async (refreshToken) => {
  * Change password
  */
 const changePassword = async (userId, oldPassword, newPassword) => {
-  // Get user
+  
   const result = await pool.query(
     'SELECT password FROM users WHERE id = $1',
     [userId]
@@ -462,17 +462,17 @@ const changePassword = async (userId, oldPassword, newPassword) => {
 
   const user = result.rows[0];
 
-  // Verify old password
+  
   const isPasswordValid = await comparePassword(oldPassword, user.password);
 
   if (!isPasswordValid) {
     throw new AppError('Mật khẩu cũ không đúng', 401);
   }
 
-  // Hash new password
+  
   const hashedPassword = await hashPassword(newPassword);
 
-  // Update password
+  
   await pool.query(
     'UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2',
     [hashedPassword, userId]
@@ -485,34 +485,34 @@ const changePassword = async (userId, oldPassword, newPassword) => {
  * Request password reset
  */
 const requestPasswordReset = async (email) => {
-  // Find user
+  
   const result = await pool.query(
     'SELECT id, email, full_name FROM users WHERE email = $1',
     [email]
   );
 
   if (result.rows.length === 0) {
-    // Don't reveal if email exists
+    
     return { message: 'Nếu email tồn tại, link reset đã được gửi' };
   }
 
   const user = result.rows[0];
 
-  // Generate reset token (expires in 1 hour)
+  
   const resetToken = jwt.sign(
     { id: user.id, email: user.email, type: 'reset' },
     JWT_SECRET,
     { expiresIn: '1h' }
   );
 
-  // TODO: Send email with reset link
-  // await emailService.sendPasswordResetEmail(user.email, resetToken);
+  
+  
 
   console.log(`Password reset token for ${user.email}: ${resetToken}`);
 
   return { 
     message: 'Link reset mật khẩu đã được gửi đến email',
-    resetToken // Remove this in production
+    resetToken 
   };
 };
 
@@ -520,7 +520,7 @@ const requestPasswordReset = async (email) => {
  * Reset password with token
  */
 const resetPassword = async (token, newPassword) => {
-  // Verify reset token
+  
   let decoded;
   try {
     decoded = jwt.verify(token, JWT_SECRET);
@@ -532,10 +532,10 @@ const resetPassword = async (token, newPassword) => {
     throw new AppError('Token không hợp lệ hoặc đã hết hạn', 401);
   }
 
-  // Hash new password
+  
   const hashedPassword = await hashPassword(newPassword);
 
-  // Update password
+  
   const result = await pool.query(
     'UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2 RETURNING id',
     [hashedPassword, decoded.id]
@@ -582,37 +582,37 @@ const getUserById = async (userId) => {
 };
 
 module.exports = {
-  // Password helpers
+  
   hashPassword,
   comparePassword,
 
-  // Token helpers
+  
   generateToken,
   generateRefreshToken,
   verifyToken,
 
-  // User auth
+  
   registerUser,
   loginUser,
 
-  // Employer auth
+  
   registerEmployer,
   loginEmployer,
 
-  // Admin auth
+  
   loginAdmin,
 
-  // Token management
+  
   refreshAccessToken,
 
-  // Password management
+  
   changePassword,
   requestPasswordReset,
   resetPassword,
 
-  // Email verification
+  
   verifyEmail,
 
-  // User management
+  
   getUserById
 };

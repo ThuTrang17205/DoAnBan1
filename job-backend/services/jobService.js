@@ -21,7 +21,7 @@ const createJob = async (jobData) => {
     max_salary,
     currency,
     category,
-    job_type, // 👈 thêm dòng này
+    job_type,
     description,
     requirements,
     benefits,
@@ -86,55 +86,55 @@ const getAllJobs = async (filters = {}, pagination = {}) => {
   let values = [];
   let valueIndex = 1;
 
-  // Status filter
+  
   if (status) {
     whereConditions.push(`status = $${valueIndex}`);
     values.push(status);
     valueIndex++;
   }
 
-  // Category filter
+  
   if (category) {
     whereConditions.push(`category = $${valueIndex}`);
     values.push(category);
     valueIndex++;
   }
 
-  // Location filter
+  
   if (location) {
     whereConditions.push(`location ILIKE $${valueIndex}`);
     values.push(`%${location}%`);
     valueIndex++;
   }
 
-  // Job type filter
+  
   if (jobType) {
     whereConditions.push(`job_type = $${valueIndex}`);
     values.push(jobType);
     valueIndex++;
   }
 
-  // Salary filter
+  
   if (salaryMin) {
-    whereConditions.push(`(salary_min >= $${valueIndex} OR salary >= $${valueIndex})`);
+    whereConditions.push(`(min_salary >= $${valueIndex} OR salary >= $${valueIndex})`);
     values.push(salaryMin);
     valueIndex++;
   }
 
   if (salaryMax) {
-    whereConditions.push(`(salary_max <= $${valueIndex} OR salary <= $${valueIndex})`);
+    whereConditions.push(`(max_salary <= $${valueIndex} OR salary <= $${valueIndex})`);
     values.push(salaryMax);
     valueIndex++;
   }
 
-  // Featured filter
+  
   if (isFeatured !== undefined) {
     whereConditions.push(`is_featured = $${valueIndex}`);
     values.push(isFeatured);
     valueIndex++;
   }
 
-  // Search filter (title, description, company)
+  
   if (search) {
     whereConditions.push(
       `(title ILIKE $${valueIndex} OR description ILIKE $${valueIndex} OR company ILIKE $${valueIndex})`
@@ -143,17 +143,17 @@ const getAllJobs = async (filters = {}, pagination = {}) => {
     valueIndex++;
   }
 
-  // Not expired
+  
   whereConditions.push(`expires_at > NOW()`);
 
   const whereClause = whereConditions.join(' AND ');
 
-  // Count total
+  
   const countQuery = `SELECT COUNT(*) FROM jobs WHERE ${whereClause}`;
   const countResult = await pool.query(countQuery, values);
   const total = parseInt(countResult.rows[0].count);
 
-  // Get jobs
+  
   const query = `
     SELECT 
       j.*,
@@ -208,7 +208,7 @@ const getJobById = async (jobId) => {
     throw new AppError('Công việc không tồn tại', 404);
   }
 
-  // Increment view count
+  
   await pool.query(
     'UPDATE jobs SET view_count = view_count + 1 WHERE id = $1',
     [jobId]
@@ -221,7 +221,7 @@ const getJobById = async (jobId) => {
  * Update job
  */
 const updateJob = async (jobId, jobData, employerId) => {
-  // Check if job belongs to employer
+  
   const checkQuery = 'SELECT employer_id FROM jobs WHERE id = $1';
   const checkResult = await pool.query(checkQuery, [jobId]);
 
@@ -233,13 +233,13 @@ const updateJob = async (jobId, jobData, employerId) => {
     throw new AppError('Bạn không có quyền chỉnh sửa công việc này', 403);
   }
 
-  // Build update query dynamically
+  
   const fields = [];
   const values = [];
   let valueIndex = 1;
 
   const allowedFields = [
-    'title', 'company', 'location', 'salary', 'salary_min', 'salary_max',
+    'title', 'company', 'location', 'salary', 'min_salary', 'max_salary',
     'job_type', 'category', 'description', 'requirements', 'benefits',
     'skills', 'experience_level', 'education_level', 'number_of_positions',
     'expires_at'
@@ -275,7 +275,7 @@ const updateJob = async (jobId, jobData, employerId) => {
  * Delete job
  */
 const deleteJob = async (jobId, employerId, isAdmin = false) => {
-  // Check if job exists and belongs to employer
+  
   const checkQuery = 'SELECT employer_id FROM jobs WHERE id = $1';
   const checkResult = await pool.query(checkQuery, [jobId]);
 
@@ -287,7 +287,7 @@ const deleteJob = async (jobId, employerId, isAdmin = false) => {
     throw new AppError('Bạn không có quyền xóa công việc này', 403);
   }
 
-  // Soft delete (set status to deleted)
+  
   const query = `
     UPDATE jobs 
     SET status = 'deleted', updated_at = NOW()
@@ -315,12 +315,12 @@ const getJobsByEmployer = async (employerId, filters = {}, pagination = {}) => {
     values.push(status);
   }
 
-  // Count total
+  
   const countQuery = `SELECT COUNT(*) FROM jobs WHERE ${whereClause}`;
   const countResult = await pool.query(countQuery, values);
   const total = parseInt(countResult.rows[0].count);
 
-  // Get jobs
+  
   const query = `
     SELECT 
       j.*,
@@ -388,13 +388,33 @@ const getTrendingJobs = async (limit = 10) => {
 };
 
 /**
+ * Get latest jobs
+ */
+const getLatestJobs = async (limit = 10) => {
+  const query = `
+    SELECT 
+      j.*,
+      e.company_name,
+      (SELECT COUNT(*) FROM applications WHERE job_id = j.id) as application_count
+    FROM jobs j
+    LEFT JOIN employers e ON j.employer_id = e.id
+    WHERE j.status = 'active' AND j.expires_at > NOW()
+    ORDER BY j.created_at DESC
+    LIMIT $1
+  `;
+
+  const result = await pool.query(query, [limit]);
+  return result.rows;
+};
+
+/**
  * Get jobs by category
  */
 const getJobsByCategory = async (category, pagination = {}) => {
   const { page = 1, limit = 10 } = pagination;
   const offset = (page - 1) * limit;
 
-  // Count total
+  
   const countQuery = `
     SELECT COUNT(*) FROM jobs 
     WHERE category = $1 AND status = 'active' AND expires_at > NOW()
@@ -402,7 +422,7 @@ const getJobsByCategory = async (category, pagination = {}) => {
   const countResult = await pool.query(countQuery, [category]);
   const total = parseInt(countResult.rows[0].count);
 
-  // Get jobs
+  
   const query = `
     SELECT 
       j.*,
@@ -540,22 +560,6 @@ const expireOldJobs = async () => {
     expiredJobs: result.rows
   };
 };
-const getLatestJobs = async (limit = 10) => {
-  const query = `
-    SELECT 
-      j.*,
-      e.company_name,
-      (SELECT COUNT(*) FROM applications WHERE job_id = j.id) as application_count
-    FROM jobs j
-    LEFT JOIN employers e ON j.employer_id = e.id
-    WHERE j.status = 'active' AND j.expires_at > NOW()
-    ORDER BY j.created_at DESC
-    LIMIT $1
-  `;
-
-  const result = await pool.query(query, [limit]);
-  return result.rows;
-};
 
 module.exports = {
   createJob,
@@ -566,6 +570,7 @@ module.exports = {
   getJobsByEmployer,
   getFeaturedJobs,
   getTrendingJobs,
+  getLatestJobs, 
   getJobsByCategory,
   searchJobs,
   toggleFeatured,

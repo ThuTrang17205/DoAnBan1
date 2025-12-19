@@ -1,0 +1,453 @@
+# 🎯 Matching System - Hoàn Chỉnh
+
+## 📋 TỔNG QUAN
+
+Hệ thống matching rule-based cho Job Portal, tận dụng đầy đủ schema database với các bảng quan hệ.
+
+### Kiến trúc:
+```
+Route → Controller → Service → Model → Database
+                  ↓
+             Text Extractors (CV & Job)
+```
+
+---
+
+## 🗄️ DATABASE SCHEMA
+
+### Bảng chính:
+- **users**: User accounts (candidate/employer)
+- **user_profiles**: Extended candidate profiles
+- **user_cvs**: CV file storage
+- **cv_parsed_data**: Parsed CV data (JSONB + relations)
+- **jobs**: Job listings
+- **job_parsed_data**: Parsed job requirements (JSONB + relations)
+- **matching_scores**: Matching results
+
+### Bảng quan hệ (M-N):
+- **skills_master**: Skills dictionary
+- **candidate_skills**: User ↔ Skill (với proficiency_level: 1-5)
+- **job_skills**: Job ↔ Skill (với required_level: 1-5, is_required, weight)
+- **education_levels**: Education levels với rank
+
+### Bảng hỗ trợ:
+- **matching_config**: Scoring weights
+- **matching_logs**: Activity tracking
+- **saved_cvs**: Employer saved candidates
+- **vip_packages** + **subscriptions**: VIP features
+
+---
+
+## 🚀 CÁCH SỬ DỤNG
+
+### 1. Parse CV trước khi matching
+
+```javascript
+const CVParserService = require('./services/cvParser.service');
+
+// Parse 1 CV
+const parsed = await CVParserService.parseByCvId(cvId);
+
+// Kết quả lưu vào: cv_parsed_data
+// - skills (JSONB array)
+// - total_experience_years
+// - education_level
+// - current_position
+// - email, phone
+```
+
+### 2. Parse Job trước khi matching
+
+```javascript
+const JobParserService = require('./services/jobParser.service');
+
+// Parse 1 Job
+const parsed = await JobParserService.parseByJobId(jobId);
+
+// Kết quả lưu vào: job_parsed_data
+// - required_skills (JSONB array)
+// - min_experience_years, max_experience_years
+// - required_education_level
+// - job_level
+```
+
+### 3. Chạy Matching
+
+```javascript
+const matchingService = require('./services/matching.service');
+
+// Match candidates cho 1 job
+const result = await matchingService.matchCandidatesForJob(jobId, {
+  candidateIds: [1, 2, 3], // Optional: match specific candidates
+  limit: 100,              // Limit số candidates
+  useRelations: true       // Dùng candidate_skills/job_skills tables
+});
+
+// Response:
+{
+  job_id: 123,
+  total_candidates: 50,
+  qualified_candidates: 15,
+  matches: [
+    {
+      candidate_id: 5,
+      candidate_name: "John Doe",
+      total_score: 85.5,
+      skills_score: 90,
+      experience_score: 85,
+      education_score: 80,
+      location_score: 100,
+      salary_score: 70,
+      is_qualified: true
+    },
+    ...
+  ]
+}
+```
+
+### 4. Lấy kết quả đã match (từ DB)
+
+```javascript
+// Lấy top candidates cho job
+const candidates = await matchingService.getTopCandidates(jobId, {
+  minScore: 60,
+  limit: 20,
+  qualifiedOnly: true
+});
+
+// Lấy recommended jobs cho candidate
+const jobs = await matchingService.getRecommendedJobs(candidateId, {
+  minScore: 60,
+  limit: 20
+});
+```
+
+---
+
+## 🧮 THUẬT TOÁN MATCHING
+
+### Scoring Components:
+
+#### 1. **Skills Score (50%)** - Quan trọng nhất
+
+Logic:
+- Required skill missing → **0 điểm** (Critical!)
+- Optional skill missing → **50 điểm**
+- Skill có nhưng level không đủ:
+  - Level đủ hoặc cao hơn → **100 điểm**
+  - Kém 1 level → **80 điểm**
+  - Kém >1 level → **60 điểm**
+
+```javascript
+// Ví dụ:
+Job requires:
+  - JavaScript (required, level 4 - Advanced)
+  - React (required, level 3 - Intermediate)
+  - NodeJS (optional, level 3)
+
+Candidate has:
+  - JavaScript (level 5 - Expert) → 100 * 1.0 = 100
+  - Vue (level 4) → Not matched
+  - React missing → 0 * 1.0 = 0
+
+Skills Score = (100 + 0 + 50) / 3 = 50%
+→ NOT QUALIFIED (vì React required bị thiếu)
+```
+
+#### 2. **Experience Score (25%)**
+
+```javascript
+Min Required | Candidate Exp | Score
+-------------|---------------|------
+3 years      | 5 years       | 100 (in range)
+3 years      | 8 years       | 90  (overqualified)
+3 years      | 2.5 years     | 80  (thiếu 20%)
+3 years      | 2 years       | 60  (thiếu 40%)
+```
+
+#### 3. **Education Score (15%)**
+
+Dùng `education_levels.rank` để so sánh:
+
+```javascript
+Job requires: Bachelor (rank 3)
+Candidate has: Master (rank 4)
+→ Score: 100 (cao hơn)
+
+Candidate has: Associate (rank 2)
+→ Score: 80 (kém 1 bậc)
+```
+
+#### 4. **Location Score (5%)**
+
+- Same city → 100
+- Remote/Flexible → 90
+- Different city → 30
+
+#### 5. **Salary Score (5%)**
+
+- Có overlap giữa 2 ranges → 50-100
+- Candidate yêu cầu cao hơn 10% → 40
+- Candidate yêu cầu cao hơn 20% → 0
+
+### Total Score Calculation:
+
+```javascript
+Total = Skills * 0.5 
+      + Experience * 0.25
+      + Education * 0.15
+      + Location * 0.05
+      + Salary * 0.05
+
+is_qualified = Total >= 60
+```
+
+### Weights có thể config trong bảng `matching_config`:
+
+```sql
+SELECT * FROM matching_config;
+
+ criteria   | weight 
+------------|--------
+ skills     | 0.50
+ experience | 0.25
+ education  | 0.15
+ location   | 0.05
+ salary     | 0.05
+```
+
+---
+
+## 🔧 CẤU HÌNH
+
+### 1. Update Matching Weights
+
+```javascript
+const MatchingModel = require('./models/matching.model');
+
+await MatchingModel.updateMatchingWeights({
+  skills: 0.6,      // Tăng từ 0.5 → 0.6
+  experience: 0.2,  // Giảm từ 0.25 → 0.2
+  education: 0.1,
+  location: 0.05,
+  salary: 0.05
+});
+```
+
+### 2. Thay đổi Qualified Threshold
+
+Hiện tại: `is_qualified = total_score >= 60`
+
+Có thể thay đổi trong code:
+
+```javascript
+// services/matching.service.js
+const isQualified = totalScore >= 70; // Tăng từ 60 lên 70
+```
+
+### 3. Clear Skills Cache
+
+```javascript
+const { clearSkillsCache } = require('./utils/textExtractor.improved');
+
+// Sau khi thêm/sửa skills_master
+clearSkillsCache();
+```
+
+---
+
+## 📊 PERFORMANCE
+
+### Optimization Tips:
+
+1. **Index quan trọng (đã có):**
+```sql
+-- GIN index cho JSONB
+CREATE INDEX idx_cv_parsed_skills ON cv_parsed_data USING gin(skills);
+CREATE INDEX idx_job_parsed_required_skills ON job_parsed_data USING gin(required_skills);
+
+-- B-tree index
+CREATE INDEX idx_candidate_skills_user ON candidate_skills(user_id);
+CREATE INDEX idx_job_skills_job ON job_skills(job_id);
+CREATE INDEX idx_matching_scores_total_score ON matching_scores(total_score DESC);
+```
+
+2. **Batch Processing:**
+- Match 100 candidates 1 lần thay vì từng người
+- Use Promise.all() nhưng limit concurrency
+
+3. **Cache:**
+- Skills cache (1 hour)
+- Matching config cache
+- Consider Redis cho large scale
+
+---
+
+## 🐛 DEBUGGING
+
+### Enable Debug Logs:
+
+```javascript
+// services/matching.service.js
+console.log(`🔍 Starting matching for job ${jobId}`);
+console.log(`📋 Job: ${jobData.title}`);
+console.log(`🎯 Job requires ${jobSkills.length} skills`);
+console.log(`👥 Found ${candidates.length} candidates to match`);
+console.log(`✅ Processed ${processed}/${candidates.length} candidates`);
+```
+
+### Check Matching Logs:
+
+```sql
+SELECT * FROM matching_logs 
+WHERE job_id = 123 
+ORDER BY created_at DESC 
+LIMIT 10;
+```
+
+### View Matching Scores:
+
+```sql
+SELECT 
+  ms.*,
+  u.name as candidate_name,
+  j.title as job_title
+FROM matching_scores ms
+JOIN users u ON ms.candidate_id = u.id
+JOIN jobs j ON ms.job_id = j.id
+WHERE ms.job_id = 123
+ORDER BY ms.total_score DESC
+LIMIT 20;
+```
+
+---
+
+## ⚠️ LƯU Ý QUAN TRỌNG
+
+### 1. **Phải parse trước khi match!**
+
+```javascript
+// ❌ SAI
+await matchingService.matchCandidatesForJob(jobId);
+// → Error: Job chưa được parse
+
+// ✅ ĐÚNG
+await JobParserService.parseByJobId(jobId);
+await CVParserService.parseByCvId(cvId);
+await matchingService.matchCandidatesForJob(jobId);
+```
+
+### 2. **Chọn giữa JSONB vs Relations**
+
+Có 2 cách lưu skills:
+
+**Cách 1: JSONB** (hiện tại trong parsed_data)
+```json
+{
+  "skills": ["javascript", "react", "nodejs"]
+}
+```
+
+**Cách 2: Relations** (candidate_skills / job_skills)
+```sql
+candidate_skills:
+  user_id | skill_id | proficiency_level
+  --------|----------|------------------
+  1       | 10       | 5 (Expert)
+  1       | 15       | 4 (Advanced)
+```
+
+**Khuyến nghị:** Dùng Relations (chính xác hơn, có level)
+
+Set `useRelations: true` khi match:
+```javascript
+await matchingService.matchCandidatesForJob(jobId, {
+  useRelations: true // ← BẬT CÁI NÀY
+});
+```
+
+### 3. **Proficiency Level Mapping**
+
+```javascript
+1 = Beginner      (Mới học)
+2 = Basic         (Cơ bản)
+3 = Intermediate  (Trung bình)
+4 = Advanced      (Nâng cao)
+5 = Expert        (Chuyên gia)
+```
+
+### 4. **Education Level Mapping**
+
+```javascript
+'high_school'  → rank 1
+'associate'    → rank 2
+'bachelor'     → rank 3
+'master'       → rank 4
+'phd'          → rank 5
+```
+
+---
+
+## 🧪 TESTING
+
+### Test Matching:
+
+```javascript
+// Test data
+const testJob = {
+  id: 123,
+  required_skills: ['javascript', 'react'],
+  min_experience_years: 3,
+  required_education_level: 'bachelor'
+};
+
+const testCandidate = {
+  user_id: 456,
+  skills: ['javascript', 'vue', 'python'],
+  total_experience_years: 5,
+  education_level: 'master'
+};
+
+// Expected result:
+// - Skills: 50% (javascript match, react missing)
+// - Experience: 100% (5 >= 3)
+// - Education: 100% (master > bachelor)
+// → Total: 50*0.5 + 100*0.25 + 100*0.15 + ... = ~60%
+```
+
+---
+
+## 📞 SUPPORT
+
+Nếu có vấn đề:
+
+1. Check logs trong console
+2. Check bảng `matching_logs`
+3. Verify data trong `cv_parsed_data` và `job_parsed_data`
+4. Test với 1 job + 1 candidate trước khi scale
+
+---
+
+## 🔄 UPDATE HISTORY
+
+### v1.0 - Initial
+- Basic rule-based matching
+- Skills + Experience + Education
+
+### v2.0 - Current
+- Advanced skills matching với levels
+- Sử dụng candidate_skills / job_skills tables
+- Location + Salary scoring
+- Configurable weights
+- Performance optimization
+
+---
+
+Tất cả file code đã được tạo sẵn. Bạn chỉ cần:
+
+1. ✅ Copy các file vào project
+2. ✅ Chạy parse CV & Job
+3. ✅ Chạy matching
+4. ✅ Xem kết quả
+
+Chúc bạn thành công! 🚀

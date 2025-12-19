@@ -1,13 +1,10 @@
-// ===================== APPLICATION CONSTANTS =====================
-
-// ==================== USER ROLES ====================
 const USER_ROLES = {
   USER: 'user',
   EMPLOYER: 'employer',
   ADMIN: 'admin'
 };
 
-// ==================== JOB STATUS ====================
+
 const JOB_STATUS = {
   OPEN: 'open',
   CLOSED: 'closed',
@@ -15,7 +12,7 @@ const JOB_STATUS = {
   EXPIRED: 'expired'
 };
 
-// ==================== APPLICATION STATUS ====================
+
 const APPLICATION_STATUS = {
   PENDING: 'pending',
   REVIEWING: 'reviewing',
@@ -24,7 +21,7 @@ const APPLICATION_STATUS = {
   WITHDRAWN: 'withdrawn'
 };
 
-// ==================== EXPERIENCE LEVELS ====================
+
 const EXPERIENCE_LEVELS = {
   INTERN: 'Thực tập',
   ENTRY: '0-1 năm',
@@ -36,7 +33,7 @@ const EXPERIENCE_LEVELS = {
   MANAGER: 'Quản lý'
 };
 
-// ==================== COMPANY SIZES ====================
+
 const COMPANY_SIZES = {
   STARTUP: '1-10 nhân viên',
   SMALL: '10-50 nhân viên',
@@ -45,7 +42,7 @@ const COMPANY_SIZES = {
   ENTERPRISE: '1000+ nhân viên'
 };
 
-// ==================== JOB CATEGORIES ====================
+
 const JOB_CATEGORIES = {
   IT: 'Công nghệ thông tin',
   FINANCE: 'Kế toán - Tài chính - Ngân hàng',
@@ -63,7 +60,7 @@ const JOB_CATEGORIES = {
   OTHER: 'Khác'
 };
 
-// ==================== CATEGORY SLUGS ====================
+
 const CATEGORY_SLUGS = {
   'cong-nghe-thong-tin': 'Công nghệ thông tin',
   'ke-toan-tai-chinh': 'Kế toán - Tài chính - Ngân hàng',
@@ -81,7 +78,7 @@ const CATEGORY_SLUGS = {
   'khac': 'Khác'
 };
 
-// ==================== VIETNAMESE CITIES ====================
+
 const VIETNAM_CITIES = [
   'Hà Nội',
   'Hồ Chí Minh',
@@ -103,7 +100,7 @@ const VIETNAM_CITIES = [
   'Remote'
 ];
 
-// ==================== SALARY RANGES (VND) ====================
+
 const SALARY_RANGES = {
   UNDER_10M: { min: 0, max: 10000000, label: 'Dưới 10 triệu' },
   FROM_10_TO_15M: { min: 10000000, max: 15000000, label: '10-15 triệu' },
@@ -114,13 +111,13 @@ const SALARY_RANGES = {
   NEGOTIABLE: { min: null, max: null, label: 'Thỏa thuận' }
 };
 
-// ==================== CURRENCY ====================
+
 const CURRENCY = {
   VND: 'VND',
   USD: 'USD'
 };
 
-// ==================== PAGINATION ====================
+
 const PAGINATION = {
   DEFAULT_PAGE: 0,
   DEFAULT_LIMIT: 10,
@@ -128,7 +125,7 @@ const PAGINATION = {
   MIN_LIMIT: 1
 };
 
-// ==================== HTTP STATUS CODES ====================
+
 const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
@@ -143,9 +140,9 @@ const HTTP_STATUS = {
   SERVICE_UNAVAILABLE: 503
 };
 
-// ==================== ERROR MESSAGES ====================
+
 const ERROR_MESSAGES = {
-  // Authentication
+  
   INVALID_CREDENTIALS: 'Email hoặc mật khẩu không đúng',
   EMAIL_ALREADY_EXISTS: 'Email đã tồn tại',
   USERNAME_ALREADY_EXISTS: 'Username đã tồn tại',
@@ -154,63 +151,63 @@ const ERROR_MESSAGES = {
   TOKEN_EXPIRED: 'Token đã hết hạn',
   INVALID_TOKEN: 'Token không hợp lệ',
   
-  // User
+  
   USER_NOT_FOUND: 'Không tìm thấy người dùng',
   INVALID_USER_DATA: 'Dữ liệu người dùng không hợp lệ',
   
-  // Job
+  
   JOB_NOT_FOUND: 'Không tìm thấy công việc',
   JOB_ALREADY_APPLIED: 'Bạn đã ứng tuyển công việc này rồi',
   JOB_EXPIRED: 'Công việc đã hết hạn',
   
-  // Application
+  
   APPLICATION_NOT_FOUND: 'Không tìm thấy đơn ứng tuyển',
   ALREADY_APPLIED: 'Bạn đã ứng tuyển công việc này',
   
-  // Employer
+  
   EMPLOYER_NOT_FOUND: 'Không tìm thấy nhà tuyển dụng',
   NOT_EMPLOYER: 'Chỉ nhà tuyển dụng mới có thể thực hiện thao tác này',
   
-  // Admin
+  
   NOT_ADMIN: 'Chỉ admin mới có thể thực hiện thao tác này',
   
-  // General
+  
   INTERNAL_ERROR: 'Lỗi hệ thống, vui lòng thử lại sau',
   VALIDATION_ERROR: 'Dữ liệu không hợp lệ',
   REQUIRED_FIELDS: 'Vui lòng điền đầy đủ thông tin bắt buộc',
   INVALID_ID: 'ID không hợp lệ'
 };
 
-// ==================== SUCCESS MESSAGES ====================
+
 const SUCCESS_MESSAGES = {
-  // Authentication
+  
   LOGIN_SUCCESS: 'Đăng nhập thành công',
   REGISTER_SUCCESS: 'Đăng ký thành công',
   LOGOUT_SUCCESS: 'Đăng xuất thành công',
   PASSWORD_CHANGED: 'Đổi mật khẩu thành công',
   
-  // User
+  
   PROFILE_UPDATED: 'Cập nhật profile thành công',
   USER_CREATED: 'Tạo người dùng thành công',
   USER_DELETED: 'Xóa người dùng thành công',
   
-  // Job
+  
   JOB_CREATED: 'Đăng tin tuyển dụng thành công',
   JOB_UPDATED: 'Cập nhật tin tuyển dụng thành công',
   JOB_DELETED: 'Xóa tin tuyển dụng thành công',
   JOB_SAVED: 'Lưu công việc thành công',
   JOB_UNSAVED: 'Bỏ lưu công việc thành công',
   
-  // Application
+  
   APPLICATION_SUBMITTED: 'Ứng tuyển thành công',
   APPLICATION_UPDATED: 'Cập nhật đơn ứng tuyển thành công',
   APPLICATION_WITHDRAWN: 'Rút đơn ứng tuyển thành công',
   
-  // General
+  
   OPERATION_SUCCESS: 'Thao tác thành công'
 };
 
-// ==================== VALIDATION RULES ====================
+
 const VALIDATION_RULES = {
   PASSWORD_MIN_LENGTH: 6,
   PASSWORD_MAX_LENGTH: 72,
@@ -223,7 +220,7 @@ const VALIDATION_RULES = {
   TITLE_MAX_LENGTH: 200
 };
 
-// ==================== DATE FORMATS ====================
+
 const DATE_FORMATS = {
   DEFAULT: 'DD/MM/YYYY',
   WITH_TIME: 'DD/MM/YYYY HH:mm',
@@ -232,10 +229,10 @@ const DATE_FORMATS = {
   MONTH_YEAR: 'MM/YYYY'
 };
 
-// ==================== FILE UPLOAD ====================
+
 const FILE_UPLOAD = {
-  MAX_SIZE_CV: 5 * 1024 * 1024, // 5MB
-  MAX_SIZE_IMAGE: 2 * 1024 * 1024, // 2MB
+  MAX_SIZE_CV: 5 * 1024 * 1024, 
+  MAX_SIZE_IMAGE: 2 * 1024 * 1024, 
   ALLOWED_CV_TYPES: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
   ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
   CV_FOLDER: 'job-portal/cvs',
@@ -243,7 +240,7 @@ const FILE_UPLOAD = {
   LOGO_FOLDER: 'job-portal/logos'
 };
 
-// ==================== EMAIL TEMPLATES ====================
+
 const EMAIL_TYPES = {
   WELCOME: 'welcome',
   PASSWORD_RESET: 'password_reset',
@@ -253,7 +250,7 @@ const EMAIL_TYPES = {
   JOB_ALERT: 'job_alert'
 };
 
-// ==================== INDUSTRIES ====================
+
 const INDUSTRIES = [
   'Công nghệ thông tin',
   'Tài chính - Ngân hàng',
@@ -273,7 +270,7 @@ const INDUSTRIES = [
   'Khác'
 ];
 
-// ==================== NOTIFICATION TYPES ====================
+
 const NOTIFICATION_TYPES = {
   APPLICATION_STATUS: 'application_status',
   NEW_JOB: 'new_job',
@@ -282,15 +279,15 @@ const NOTIFICATION_TYPES = {
   SYSTEM: 'system'
 };
 
-// ==================== RATE LIMITING ====================
+
 const RATE_LIMITS = {
-  LOGIN: { windowMs: 15 * 60 * 1000, max: 5 }, // 5 attempts per 15 minutes
-  REGISTER: { windowMs: 60 * 60 * 1000, max: 3 }, // 3 attempts per hour
-  API: { windowMs: 15 * 60 * 1000, max: 100 }, // 100 requests per 15 minutes
-  FILE_UPLOAD: { windowMs: 60 * 60 * 1000, max: 10 } // 10 uploads per hour
+  LOGIN: { windowMs: 15 * 60 * 1000, max: 5 }, 
+  REGISTER: { windowMs: 60 * 60 * 1000, max: 3 }, 
+  API: { windowMs: 15 * 60 * 1000, max: 100 }, 
+  FILE_UPLOAD: { windowMs: 60 * 60 * 1000, max: 10 } 
 };
 
-// ==================== REGEX PATTERNS ====================
+
 const REGEX_PATTERNS = {
   EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   PHONE: /^(0|\+84)[0-9]{9}$/,
@@ -300,7 +297,7 @@ const REGEX_PATTERNS = {
   SLUG: /^[a-z0-9-]+$/
 };
 
-// ==================== EXPORT ALL CONSTANTS ====================
+
 module.exports = {
   USER_ROLES,
   JOB_STATUS,

@@ -1,384 +1,691 @@
-/**
- * Email Service
- * Handles email notifications using Nodemailer
- */
-
+// services/emailService.js
 const nodemailer = require('nodemailer');
 
-// Email configuration from environment variables
-const EMAIL_HOST = process.env.EMAIL_HOST || 'smtp.gmail.com';
-const EMAIL_PORT = process.env.EMAIL_PORT || 587;
-const EMAIL_USER = process.env.EMAIL_USER;
-const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
-const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@jobportal.com';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+// Cấu hình email transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
 
-/**
- * Create transporter
- */
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    host: EMAIL_HOST,
-    port: EMAIL_PORT,
-    secure: EMAIL_PORT === 465, // true for 465, false for other ports
-    auth: {
-      user: EMAIL_USER,
-      pass: EMAIL_PASSWORD
-    },
-    tls: {
-      rejectUnauthorized: false
-    }
-  });
-};
+// ============================================
+// EMAIL SERVICE OBJECT
+// ============================================
 
-/**
- * Send email
- */
-const sendEmail = async (to, subject, html, text = '') => {
-  try {
-    const transporter = createTransporter();
-
+const emailService = {
+  
+  // ============================================
+  // AUTHENTICATION & WELCOME EMAILS
+  // ============================================
+  
+  /**
+   * Gửi email chào mừng khi đăng ký
+   */
+  sendWelcomeEmail: async (userEmail, userName) => {
     const mailOptions = {
-      from: `Job Portal <${EMAIL_FROM}>`,
-      to,
-      subject,
-      html,
-      text: text || html.replace(/<[^>]*>/g, '') // Strip HTML for text version
+      from: `"Job Portal" <${process.env.EMAIL_USER}>`,
+      to: userEmail,
+      subject: ' Chào mừng bạn đến với Job Portal!',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; }
+            .header { background: linear-gradient(135deg, #00B14F 0%, #00913D 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: white; padding: 30px; border-radius: 0 0 10px 10px; }
+            .cta-button { display: inline-block; background: #00B14F; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; margin: 20px 0; font-weight: bold; }
+            .cta-button:hover { background: #00913D; }
+            .footer { text-align: center; color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; }
+            .feature-box { background: #f0f8ff; padding: 15px; border-radius: 8px; margin: 15px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1> Chào Mừng Đến Với Job Portal!</h1>
+            </div>
+            
+            <div class="content">
+              <h2 style="color: #00B14F;">Xin chào ${userName}!</h2>
+              
+              <p>Cảm ơn bạn đã đăng ký tài khoản tại <strong>Job Portal</strong>. Chúng tôi rất vui được đồng hành cùng bạn trong hành trình tìm kiếm công việc mơ ước!</p>
+              
+              <div class="feature-box">
+                <h3 style="margin-top: 0; color: #00B14F;"> Những gì bạn có thể làm:</h3>
+                <ul style="line-height: 2;">
+                  <li> Tìm kiếm hàng nghìn việc làm</li>
+                  <li> Tạo và quản lý CV chuyên nghiệp</li>
+                  <li> AI gợi ý việc làm phù hợp</li>
+                  <li> Nhận thông báo việc làm mới</li>
+                  <li> Ứng tuyển nhanh chóng</li>
+                </ul>
+              </div>
+              
+              <div style="text-align: center;">
+                <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/login" class="cta-button">
+                  Đăng Nhập Ngay
+                </a>
+              </div>
+              
+              <p style="margin-top: 30px;">Nếu bạn cần hỗ trợ, đừng ngại liên hệ với chúng tôi!</p>
+              
+              <p>Chúc bạn thành công!<br>
+              <strong>Job Portal Team</strong></p>
+            </div>
+            
+            <div class="footer">
+              <p>Email này được gửi tự động. Vui lòng không trả lời email này.</p>
+              <p>© ${new Date().getFullYear()} Job Portal. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Email sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(' Welcome email sent to:', userEmail);
+      return true;
+    } catch (error) {
+      console.error(' Error sending welcome email:', error.message);
+      return false;
+    }
+  },
+
+  /**
+   * Gửi email reset password
+   */
+  sendPasswordResetEmail: async (userEmail, resetToken) => {
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
+    
+    const mailOptions = {
+      from: `"Job Portal" <${process.env.EMAIL_USER}>`,
+      to: userEmail,
+      subject: ' Yêu cầu đặt lại mật khẩu',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; }
+            .header { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: white; padding: 30px; border-radius: 0 0 10px 10px; }
+            .warning-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px; }
+            .cta-button { display: inline-block; background: #3498db; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; margin: 20px 0; font-weight: bold; }
+            .footer { text-align: center; color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1> Đặt Lại Mật Khẩu</h1>
+            </div>
+            
+            <div class="content">
+              <p>Xin chào,</p>
+              
+              <p>Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.</p>
+              
+              <div style="text-align: center;">
+                <a href="${resetUrl}" class="cta-button">
+                  Đặt Lại Mật Khẩu
+                </a>
+              </div>
+              
+              <div class="warning-box">
+                <strong> Lưu ý:</strong>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                  <li>Link này chỉ có hiệu lực trong <strong>1 giờ</strong></li>
+                  <li>Nếu bạn không yêu cầu đặt lại mật khẩu, hãy bỏ qua email này</li>
+                  <li>Không chia sẻ link này với bất kỳ ai</li>
+                </ul>
+              </div>
+              
+              <p>Nếu nút bấm không hoạt động, copy link sau vào trình duyệt:</p>
+              <p style="background: #f5f5f5; padding: 10px; border-radius: 5px; word-break: break-all; font-size: 12px;">
+                ${resetUrl}
+              </p>
+              
+              <p>Trân trọng,<br>
+              <strong>Job Portal Team</strong></p>
+            </div>
+            
+            <div class="footer">
+              <p>Email này được gửi tự động. Vui lòng không trả lời email này.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(' Password reset email sent to:', userEmail);
+      return true;
+    } catch (error) {
+      console.error(' Error sending password reset email:', error.message);
+      return false;
+    }
+  },
+
+  // ============================================
+  // JOB APPLICATION EMAILS
+  // ============================================
+
+  /**
+   * Gửi email xác nhận ứng tuyển
+   */
+  sendApplicationConfirmation: async (candidateEmail, candidateName, job) => {
+    const mailOptions = {
+      from: `"Job Portal" <${process.env.EMAIL_USER}>`,
+      to: candidateEmail,
+      subject: ` Xác nhận ứng tuyển: ${job.title}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #27ae60 0%, #229954 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .job-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #27ae60; }
+            .footer { text-align: center; color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1> Ứng Tuyển Thành Công!</h1>
+            </div>
+            
+            <div class="content">
+              <p>Xin chào <strong>${candidateName}</strong>,</p>
+              
+              <p>Cảm ơn bạn đã ứng tuyển vị trí tại Job Portal!</p>
+              
+              <div class="job-box">
+                <h3 style="margin-top: 0; color: #27ae60;">${job.title}</h3>
+                <p><strong> Địa điểm:</strong> ${job.location || 'Chưa cập nhật'}</p>
+                <p><strong> Công ty:</strong> ${job.company_name || 'Chưa cập nhật'}</p>
+                <p><strong> Ngày ứng tuyển:</strong> ${new Date().toLocaleDateString('vi-VN')}</p>
+              </div>
+              
+              <p><strong> Bước tiếp theo:</strong></p>
+              <ul>
+                <li>Nhà tuyển dụng sẽ xem xét hồ sơ của bạn</li>
+                <li>Bạn sẽ nhận được thông báo qua email nếu được chọn</li>
+                <li>Thời gian xử lý thường là 3-7 ngày làm việc</li>
+              </ul>
+              
+              <p>Chúc bạn thành công!</p>
+              
+              <p>Trân trọng,<br>
+              <strong>Job Portal Team</strong></p>
+            </div>
+            
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Job Portal. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(' Application confirmation sent to:', candidateEmail);
+      return true;
+    } catch (error) {
+      console.error(' Error sending application confirmation:', error.message);
+      return false;
+    }
+  },
+
+  /**
+   * Gửi email thông báo cho employer khi có ứng viên mới
+   */
+  sendNewApplicationNotification: async (employerEmail, candidateName, job) => {
+    const mailOptions = {
+      from: `"Job Portal" <${process.env.EMAIL_USER}>`,
+      to: employerEmail,
+      subject: ` Ứng viên mới cho vị trí: ${job.title}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .candidate-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3498db; }
+            .cta-button { display: inline-block; background: #3498db; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; margin: 20px 0; font-weight: bold; }
+            .footer { text-align: center; color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1> Ứng Viên Mới!</h1>
+            </div>
+            
+            <div class="content">
+              <p>Xin chào,</p>
+              
+              <p>Bạn có một ứng viên mới cho vị trí:</p>
+              
+              <div class="candidate-box">
+                <h3 style="margin-top: 0; color: #3498db;">${job.title}</h3>
+                <p><strong> Ứng viên:</strong> ${candidateName}</p>
+                <p><strong> Ngày ứng tuyển:</strong> ${new Date().toLocaleDateString('vi-VN')}</p>
+              </div>
+              
+              <div style="text-align: center;">
+                <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/employer/applications" class="cta-button">
+                  Xem Hồ Sơ Ứng Viên
+                </a>
+              </div>
+              
+              <p>Trân trọng,<br>
+              <strong>Job Portal Team</strong></p>
+            </div>
+            
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Job Portal. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(' New application notification sent to:', employerEmail);
+      return true;
+    } catch (error) {
+      console.error(' Error sending new application notification:', error.message);
+      return false;
+    }
+  },
+
+  // ============================================
+  // VIP PACKAGE EMAILS
+  // ============================================
+
+  /**
+   * Gửi email mời ứng tuyển (VIP feature)
+   */
+  sendJobInvitation: async (candidateEmail, job, customMessage) => {
+    try {
+      const mailOptions = {
+        from: `"Job Portal" <${process.env.EMAIL_USER}>`,
+        to: candidateEmail,
+        subject: ` Lời mời ứng tuyển: ${job.title}`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+              .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+              .job-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea; }
+              .job-details h3 { margin: 0 0 15px 0; color: #667eea; }
+              .job-info { margin: 10px 0; }
+              .message-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px; }
+              .cta-button { display: inline-block; background: #667eea; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; margin: 20px 0; font-weight: bold; }
+              .footer { text-align: center; color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1> Lời Mời Ứng Tuyển</h1>
+                <p>Chúng tôi nghĩ bạn rất phù hợp với vị trí này!</p>
+              </div>
+              
+              <div class="content">
+                <p>Xin chào,</p>
+                
+                <p>Chúng tôi đã xem xét hồ sơ của bạn và rất ấn tượng với kinh nghiệm cũng như kỹ năng của bạn. Chúng tôi muốn mời bạn ứng tuyển cho vị trí sau:</p>
+                
+                <div class="job-details">
+                  <h3>${job.title}</h3>
+                  <div class="job-info"><strong> Địa điểm:</strong> ${job.location || 'Chưa cập nhật'}</div>
+                  <div class="job-info"><strong> Mức lương:</strong> ${job.salary_min?.toLocaleString() || 'Thỏa thuận'} - ${job.salary_max?.toLocaleString() || 'Thỏa thuận'} VNĐ</div>
+                  <div class="job-info"><strong> Kinh nghiệm:</strong> ${job.min_experience || 0}+ năm</div>
+                  <div class="job-info"><strong> Trình độ:</strong> ${job.education_level || 'Đại học'}</div>
+                </div>
+                
+                ${customMessage ? `
+                  <div class="message-box">
+                    <strong> Lời nhắn từ nhà tuyển dụng:</strong>
+                    <p>${customMessage}</p>
+                  </div>
+                ` : ''}
+                
+                <div style="text-align: center;">
+                  <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/jobs/${job.id}" class="cta-button">
+                    Xem Chi Tiết & Ứng Tuyển
+                  </a>
+                </div>
+                
+                <p>Chúng tôi rất mong được làm việc cùng bạn!</p>
+                
+                <p>Trân trọng,<br>
+                <strong>Job Portal Team</strong></p>
+              </div>
+              
+              <div class="footer">
+                <p>© ${new Date().getFullYear()} Job Portal. All rights reserved.</p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `
+      };
+      
+      await transporter.sendMail(mailOptions);
+      console.log(` Job invitation sent to ${candidateEmail}`);
+      return true;
+      
+    } catch (error) {
+      console.error(' Error sending job invitation:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Gửi email nhắc nhở package sắp hết hạn
+   */
+  sendPackageExpiryReminder: async (employer, company, daysLeft) => {
+    try {
+      const mailOptions = {
+        from: `"Job Portal" <${process.env.EMAIL_USER}>`,
+        to: employer.email,
+        subject: ` Gói VIP của bạn sắp hết hạn trong ${daysLeft} ngày`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+              .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+              .warning-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; margin: 20px 0; border-radius: 5px; }
+              .package-info { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+              .cta-button { display: inline-block; background: #f5576c; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; margin: 20px 0; font-weight: bold; }
+              .benefits { background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; }
+              .benefits ul { margin: 10px 0; padding-left: 20px; }
+              .benefits li { margin: 8px 0; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1> Thông Báo Quan Trọng</h1>
+                <p>Gói VIP của bạn sắp hết hạn</p>
+              </div>
+              
+              <div class="content">
+                <p>Kính gửi <strong>${employer.full_name}</strong>,</p>
+                
+                <div class="warning-box">
+                  <h3> Gói VIP của công ty <strong>${company.name}</strong> sẽ hết hạn trong <strong>${daysLeft} ngày</strong></h3>
+                  <p>Ngày hết hạn: <strong>${new Date(company.package_expired_at).toLocaleDateString('vi-VN')}</strong></p>
+                </div>
+                
+                <div class="package-info">
+                  <h3> Thông tin gói hiện tại:</h3>
+                  <p><strong>Gói:</strong> ${company.package_type}</p>
+                  <p><strong>AI Match đã dùng:</strong> ${company.ai_match_used}/${company.ai_match_limit}</p>
+                  <p><strong>Tin đăng hiện tại:</strong> ${company.current_jobs}</p>
+                </div>
+                
+                <div class="benefits">
+                  <h3> Gia hạn ngay để tiếp tục nhận:</h3>
+                  <ul>
+                    <li> Tiếp tục sử dụng AI Matching thông minh</li>
+                    <li> Đăng tin tuyển dụng không giới hạn</li>
+                    <li> Hỗ trợ ưu tiên 24/7</li>
+                    <li> Logo nổi bật trên trang chủ</li>
+                    <li> Tiếp cận hàng nghìn ứng viên chất lượng</li>
+                  </ul>
+                </div>
+                
+                <div style="text-align: center;">
+                  <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/employer/packages" class="cta-button">
+                    Gia Hạn Ngay
+                  </a>
+                </div>
+                
+                <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi!</p>
+                
+                <p>Trân trọng,<br>
+                <strong>Job Portal Team</strong></p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `
+      };
+      
+      await transporter.sendMail(mailOptions);
+      console.log(` Package expiry reminder sent to ${employer.email}`);
+      return true;
+      
+    } catch (error) {
+      console.error(' Error sending package expiry reminder:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Gửi email thông báo package đã hết hạn
+   */
+  sendPackageExpiredNotification: async (employer, company) => {
+    try {
+      const mailOptions = {
+        from: `"Job Portal" <${process.env.EMAIL_USER}>`,
+        to: employer.email,
+        subject: ` Gói VIP của bạn đã hết hạn`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: #e74c3c; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+              .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+              .expired-box { background: #fee; border-left: 4px solid #e74c3c; padding: 20px; margin: 20px 0; border-radius: 5px; }
+              .cta-button { display: inline-block; background: #e74c3c; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; margin: 20px 0; font-weight: bold; }
+              .footer { text-align: center; color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1> Gói VIP Đã Hết Hạn</h1>
+              </div>
+              
+              <div class="content">
+                <p>Kính gửi <strong>${employer.full_name}</strong>,</p>
+                
+                <div class="expired-box">
+                  <h3>Gói VIP của công ty <strong>${company.name}</strong> đã hết hạn</h3>
+                  <p>Các tính năng VIP đã bị tạm ngưng. Vui lòng gia hạn để tiếp tục sử dụng.</p>
+                </div>
+                
+                <div style="text-align: center;">
+                  <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/employer/
+        packages" class="cta-button">
+                  Gia Hạn Ngay
+                </a>
+              </div>
+              
+              <p>Trân trọng,<br>
+              <strong>Job Portal Team</strong></p>
+            </div>
+            
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Job Portal. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+    
+    await transporter.sendMail(mailOptions);
+    console.log(` Package expired notification sent to ${employer.email}`);
+    return true;
+    
   } catch (error) {
-    console.error('❌ Error sending email:', error);
-    return { success: false, error: error.message };
+    console.error(' Error sending package expired notification:', error);
+    throw error;
   }
-};
+},
 
 /**
- * Email Templates
+ * Gửi email xác nhận upgrade package
  */
+sendPackageUpgradeConfirmation: async (employer, company, oldPackage, newPackage) => {
+  try {
+    const mailOptions = {
+      from: `"Job Portal" <${process.env.EMAIL_USER}>`,
+      to: employer.email,
+      subject: ` Nâng cấp VIP thành công!`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .success-box { background: #d4edda; border-left: 4px solid #28a745; padding: 20px; margin: 20px 0; border-radius: 5px; }
+            .comparison { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            .cta-button { display: inline-block; background: #667eea; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; margin: 20px 0; font-weight: bold; }
+            .footer { text-align: center; color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1> Chúc Mừng!</h1>
+              <p>Nâng cấp VIP thành công</p>
+            </div>
+            
+            <div class="content">
+              <p>Kính gửi <strong>${employer.full_name}</strong>,</p>
+              
+              <div class="success-box">
+                <h3> Công ty <strong>${company.name}</strong> đã nâng cấp thành công!</h3>
+                <p>Bạn đã nâng cấp từ <strong>${oldPackage}</strong> lên <strong>${newPackage}</strong></p>
+              </div>
+              
+              <div class="comparison">
+                <h3> Tính năng mới bạn được hưởng:</h3>
+                <ul style="line-height: 2;">
+                  ${newPackage === 'VIP Premium' ? `
+                    <li> AI Matching không giới hạn</li>
+                    <li> Tư vấn riêng 1-1</li>
+                    <li> Hiển thị TOP ưu tiên</li>
+                  ` : newPackage === 'VIP Pro' ? `
+                    <li> AI Matching 200 lượt/tháng</li>
+                    <li> Đăng tin không giới hạn</li>
+                    <li> Logo nổi bật</li>
+                  ` : `
+                    <li> AI Matching 50 lượt/tháng</li>
+                    <li> Đăng 20 tin/tháng</li>
+                  `}
+                </ul>
+              </div>
+              
+              <div style="text-align: center;">
+                <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/employer/dashboard" class="cta-button">
+                  Khám Phá Tính Năng Mới
+                </a>
+              </div>
+              
+              <p>Cảm ơn bạn đã tin tưởng và sử dụng dịch vụ của chúng tôi!</p>
+              
+              <p>Trân trọng,<br>
+              <strong>Job Portal Team</strong></p>
+            </div>
+            
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Job Portal. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+    
+    await transporter.sendMail(mailOptions);
+    console.log(` Package upgrade confirmation sent to ${employer.email}`);
+    return true;
+    
+  } catch (error) {
+    console.error(' Error sending package upgrade confirmation:', error);
+    throw error;
+  }
+},
 
-// Welcome email for new users
-const sendWelcomeEmail = async (userEmail, userName) => {
-  const subject = 'Chào mừng bạn đến với Job Portal! 🎉';
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #007bff; color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; background: #f9f9f9; }
-        .button { display: inline-block; padding: 12px 30px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>Chào mừng đến với Job Portal!</h1>
-        </div>
-        <div class="content">
-          <h2>Xin chào ${userName}!</h2>
-          <p>Cảm ơn bạn đã đăng ký tài khoản tại Job Portal. Chúng tôi rất vui mừng được đồng hành cùng bạn trong hành trình tìm kiếm việc làm.</p>
-          <p>Với Job Portal, bạn có thể:</p>
-          <ul>
-            <li>✅ Tìm kiếm hàng ngàn công việc phù hợp</li>
-            <li>✅ Nộp đơn ứng tuyển trực tuyến</li>
-            <li>✅ Tạo CV chuyên nghiệp</li>
-            <li>✅ Nhận thông báo về công việc mới</li>
-          </ul>
-          <a href="${FRONTEND_URL}" class="button">Khám phá ngay</a>
-          <p>Chúc bạn tìm được công việc mơ ước!</p>
-        </div>
-        <div class="footer">
-          <p>© 2024 Job Portal. All rights reserved.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `;
-  
-  return await sendEmail(userEmail, subject, html);
-};
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
 
-// Email verification
-const sendVerificationEmail = async (userEmail, userName, verificationToken) => {
-  const verificationUrl = `${FRONTEND_URL}/verify-email?token=${verificationToken}`;
-  
-  const subject = 'Xác thực email của bạn';
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>Xin chào ${userName}!</h2>
-        <p>Vui lòng xác thực email của bạn bằng cách click vào nút bên dưới:</p>
-        <a href="${verificationUrl}" style="display: inline-block; padding: 12px 30px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0;">
-          Xác thực Email
-        </a>
-        <p>Hoặc copy link sau vào trình duyệt:</p>
-        <p style="word-break: break-all; background: #f4f4f4; padding: 10px;">${verificationUrl}</p>
-        <p>Link này sẽ hết hạn sau 24 giờ.</p>
-        <p>Nếu bạn không đăng ký tài khoản này, vui lòng bỏ qua email này.</p>
-      </div>
-    </body>
-    </html>
-  `;
-  
-  return await sendEmail(userEmail, subject, html);
-};
+/**
+ * Kiểm tra email service đang hoạt động
+ */
+testConnection: async () => {
+  try {
+    await transporter.verify();
+    console.log(' Email service is ready');
+    return true;
+  } catch (error) {
+    console.error(' Email service error:', error);
+    return false;
+  }
+},
 
-// Password reset email
-const sendPasswordResetEmail = async (userEmail, userName, resetToken) => {
-  const resetUrl = `${FRONTEND_URL}/reset-password?token=${resetToken}`;
-  
-  const subject = 'Đặt lại mật khẩu';
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>Xin chào ${userName}!</h2>
-        <p>Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.</p>
-        <p>Click vào nút bên dưới để đặt lại mật khẩu:</p>
-        <a href="${resetUrl}" style="display: inline-block; padding: 12px 30px; background: #dc3545; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0;">
-          Đặt lại mật khẩu
-        </a>
-        <p>Hoặc copy link sau vào trình duyệt:</p>
-        <p style="word-break: break-all; background: #f4f4f4; padding: 10px;">${resetUrl}</p>
-        <p>Link này sẽ hết hạn sau 1 giờ.</p>
-        <p><strong>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</strong></p>
-      </div>
-    </body>
-    </html>
-  `;
-  
-  return await sendEmail(userEmail, subject, html);
-};
+/**
+ * Gửi email custom (dùng cho admin gửi thông báo)
+ */
+sendCustomEmail: async (to, subject, htmlContent) => {
+  try {
+    const mailOptions = {
+      from: `"Job Portal" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html: htmlContent
+    };
+    
+    await transporter.sendMail(mailOptions);
+    console.log(` Custom email sent to ${to}`);
+    return true;
+  } catch (error) {
+    console.error(' Error sending custom email:', error);
+    return false;
+  }
+}
 
-// Application submitted notification (to user)
-const sendApplicationSubmittedEmail = async (userEmail, userName, jobTitle, companyName) => {
-  const subject = `Đơn ứng tuyển của bạn đã được gửi - ${jobTitle}`;
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>Xin chào ${userName}!</h2>
-        <p>Đơn ứng tuyển của bạn đã được gửi thành công! ✅</p>
-        <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #007bff; margin: 20px 0;">
-          <p><strong>Vị trí:</strong> ${jobTitle}</p>
-          <p><strong>Công ty:</strong> ${companyName}</p>
-          <p><strong>Thời gian:</strong> ${new Date().toLocaleString('vi-VN')}</p>
-        </div>
-        <p>Nhà tuyển dụng sẽ xem xét hồ sơ của bạn và liên hệ nếu phù hợp.</p>
-        <p>Chúc bạn may mắn! 🍀</p>
-        <a href="${FRONTEND_URL}/profile/applications" style="display: inline-block; padding: 12px 30px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0;">
-          Xem đơn ứng tuyển
-        </a>
-      </div>
-    </body>
-    </html>
-  `;
-  
-  return await sendEmail(userEmail, subject, html);
-};
+}; // Đóng object emailService
 
-// Application received notification (to employer)
-const sendApplicationReceivedEmail = async (employerEmail, jobTitle, candidateName) => {
-  const subject = `Nhận được đơn ứng tuyển mới - ${jobTitle}`;
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>Bạn có đơn ứng tuyển mới! 📩</h2>
-        <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #28a745; margin: 20px 0;">
-          <p><strong>Vị trí:</strong> ${jobTitle}</p>
-          <p><strong>Ứng viên:</strong> ${candidateName}</p>
-          <p><strong>Thời gian:</strong> ${new Date().toLocaleString('vi-VN')}</p>
-        </div>
-        <p>Vui lòng đăng nhập vào hệ thống để xem chi tiết hồ sơ ứng viên.</p>
-        <a href="${FRONTEND_URL}/employer/applications" style="display: inline-block; padding: 12px 30px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0;">
-          Xem đơn ứng tuyển
-        </a>
-      </div>
-    </body>
-    </html>
-  `;
-  
-  return await sendEmail(employerEmail, subject, html);
-};
-
-// Application status update (to user)
-const sendApplicationStatusEmail = async (userEmail, userName, jobTitle, status, message = '') => {
-  const statusMessages = {
-    reviewed: { title: 'đang được xem xét', color: '#ffc107', icon: '👀' },
-    interview: { title: 'được mời phỏng vấn', color: '#17a2b8', icon: '📅' },
-    accepted: { title: 'được chấp nhận', color: '#28a745', icon: '🎉' },
-    rejected: { title: 'không được chấp nhận', color: '#dc3545', icon: '😔' }
-  };
-  
-  const statusInfo = statusMessages[status] || statusMessages.reviewed;
-  
-  const subject = `Cập nhật đơn ứng tuyển - ${jobTitle}`;
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>Xin chào ${userName}!</h2>
-        <div style="background: #f9f9f9; padding: 20px; border-left: 4px solid ${statusInfo.color}; margin: 20px 0; text-align: center;">
-          <h3 style="margin: 0; color: ${statusInfo.color};">
-            ${statusInfo.icon} Đơn ứng tuyển của bạn ${statusInfo.title}
-          </h3>
-          <p style="margin: 10px 0;"><strong>${jobTitle}</strong></p>
-        </div>
-        ${message ? `<p>${message}</p>` : ''}
-        <a href="${FRONTEND_URL}/profile/applications" style="display: inline-block; padding: 12px 30px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0;">
-          Xem chi tiết
-        </a>
-      </div>
-    </body>
-    </html>
-  `;
-  
-  return await sendEmail(userEmail, subject, html);
-};
-
-// Interview schedule notification
-const sendInterviewScheduleEmail = async (userEmail, userName, jobTitle, interviewDate, location, notes = '') => {
-  const subject = `Lịch phỏng vấn - ${jobTitle}`;
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>Xin chào ${userName}! 🎉</h2>
-        <p>Chúc mừng! Bạn đã được mời tham gia phỏng vấn.</p>
-        <div style="background: #e7f3ff; padding: 20px; border-left: 4px solid #007bff; margin: 20px 0;">
-          <p><strong>Vị trí:</strong> ${jobTitle}</p>
-          <p><strong>📅 Thời gian:</strong> ${new Date(interviewDate).toLocaleString('vi-VN')}</p>
-          <p><strong>📍 Địa điểm:</strong> ${location}</p>
-          ${notes ? `<p><strong>📝 Ghi chú:</strong> ${notes}</p>` : ''}
-        </div>
-        <p><strong>Lưu ý:</strong></p>
-        <ul>
-          <li>Vui lòng có mặt đúng giờ</li>
-          <li>Mang theo CV và các giấy tờ liên quan</li>
-          <li>Ăn mặc lịch sự, chuyên nghiệp</li>
-        </ul>
-        <p>Chúc bạn phỏng vấn thành công! 🍀</p>
-      </div>
-    </body>
-    </html>
-  `;
-  
-  return await sendEmail(userEmail, subject, html);
-};
-
-// Job alert notification
-const sendJobAlertEmail = async (userEmail, userName, jobs) => {
-  const subject = `Công việc mới phù hợp với bạn! 🔔`;
-  
-  const jobsHtml = jobs.map(job => `
-    <div style="background: #f9f9f9; padding: 15px; margin: 10px 0; border-radius: 5px;">
-      <h3 style="margin: 0 0 10px 0;">${job.title}</h3>
-      <p style="margin: 5px 0; color: #666;">${job.company}</p>
-      <p style="margin: 5px 0; color: #666;">📍 ${job.location}</p>
-      <p style="margin: 5px 0; color: #28a745; font-weight: bold;">💰 ${job.salary || 'Thỏa thuận'}</p>
-      <a href="${FRONTEND_URL}/job/${job.id}" style="display: inline-block; padding: 8px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">
-        Xem chi tiết
-      </a>
-    </div>
-  `).join('');
-  
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>Xin chào ${userName}!</h2>
-        <p>Chúng tôi có ${jobs.length} công việc mới phù hợp với tiêu chí của bạn:</p>
-        ${jobsHtml}
-        <p style="margin-top: 20px;">Đừng bỏ lỡ cơ hội này!</p>
-        <a href="${FRONTEND_URL}/jobs" style="display: inline-block; padding: 12px 30px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0;">
-          Xem tất cả công việc
-        </a>
-      </div>
-    </body>
-    </html>
-  `;
-  
-  return await sendEmail(userEmail, subject, html);
-};
-
-// Employer verification success
-const sendEmployerVerifiedEmail = async (employerEmail, companyName) => {
-  const subject = 'Tài khoản nhà tuyển dụng đã được xác thực ✅';
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>Chúc mừng ${companyName}! 🎉</h2>
-        <p>Tài khoản nhà tuyển dụng của bạn đã được xác thực thành công.</p>
-        <p>Bây giờ bạn có thể:</p>
-        <ul>
-          <li>✅ Đăng tin tuyển dụng</li>
-          <li>✅ Quản lý ứng viên</li>
-          <li>✅ Xem thống kê tuyển dụng</li>
-        </ul>
-        <a href="${FRONTEND_URL}/employer-dashboard" style="display: inline-block; padding: 12px 30px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0;">
-          Bắt đầu tuyển dụng
-        </a>
-      </div>
-    </body>
-    </html>
-  `;
-  
-  return await sendEmail(employerEmail, subject, html);
-};
-
-// Contact form notification (to admin)
-const sendContactFormEmail = async (name, email, subject, message) => {
-  const adminEmail = process.env.ADMIN_EMAIL || EMAIL_USER;
-  
-  const emailSubject = `[Contact Form] ${subject}`;
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>New Contact Form Submission</h2>
-        <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #007bff; margin: 20px 0;">
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Subject:</strong> ${subject}</p>
-          <p><strong>Message:</strong></p>
-          <p style="white-space: pre-wrap;">${message}</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `;
-  
-  return await sendEmail(adminEmail, emailSubject, html);
-};
-
-module.exports = {
-  sendEmail,
-  sendWelcomeEmail,
-  sendVerificationEmail,
-  sendPasswordResetEmail,
-  sendApplicationSubmittedEmail,
-  sendApplicationReceivedEmail,
-  sendApplicationStatusEmail,
-  sendInterviewScheduleEmail,
-  sendJobAlertEmail,
-  sendEmployerVerifiedEmail,
-  sendContactFormEmail
-};
+module.exports = emailService;

@@ -103,7 +103,7 @@ exports.getCategoryBySlug = async (req, res) => {
       });
     }
 
-    // Get jobs in this category
+    
     const jobs = await Job.find({ 
       category: category._id,
       status: 'active'
@@ -186,7 +186,7 @@ exports.updateCategory = async (req, res) => {
       });
     }
 
-    // Check if new slug conflicts with existing
+    
     if (slug && slug !== category.slug) {
       const existingCategory = await Category.findOne({ slug });
       if (existingCategory) {
@@ -232,7 +232,7 @@ exports.deleteCategory = async (req, res) => {
       });
     }
 
-    // Check if category has jobs
+    
     const jobCount = await Job.countDocuments({ category: category._id });
     if (jobCount > 0) {
       return res.status(400).json({
@@ -296,7 +296,7 @@ exports.getPopularCategories = async (req, res) => {
   try {
     const categories = await Category.find({ isActive: true }).lean();
 
-    // Get job count for each category
+    
     const categoriesWithJobCount = await Promise.all(
       categories.map(async (category) => ({
         ...category,
@@ -307,7 +307,7 @@ exports.getPopularCategories = async (req, res) => {
       }))
     );
 
-    // Sort by job count and take top 8
+   
     const popularCategories = categoriesWithJobCount
       .sort((a, b) => b.jobCount - a.jobCount)
       .slice(0, 8);
@@ -333,7 +333,7 @@ exports.getPopularCategories = async (req, res) => {
 exports.reorderCategories = async (req, res) => {
   try {
     const { categoryOrders } = req.body;
-    // categoryOrders = [{ id, order }, { id, order }, ...]
+    
 
     if (!Array.isArray(categoryOrders)) {
       return res.status(400).json({
@@ -342,7 +342,7 @@ exports.reorderCategories = async (req, res) => {
       });
     }
 
-    // Update order for each category
+   
     const updatePromises = categoryOrders.map(({ id, order }) =>
       Category.findByIdAndUpdate(id, { order })
     );

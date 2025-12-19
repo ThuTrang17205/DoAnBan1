@@ -1,17 +1,6 @@
 import React, { useState } from 'react';
 import './JobFilters.css';
 
-/**
- * JobFilters Component
- * Bộ lọc cho danh sách jobs
- * 
- * Usage:
- * <JobFilters
- *   filters={filters}
- *   onFilterChange={handleFilterChange}
- *   onReset={handleReset}
- * />
- */
 
 function JobFilters({ filters, onFilterChange, onReset }) {
   const [isCollapsed, setIsCollapsed] = useState({
@@ -29,7 +18,7 @@ function JobFilters({ filters, onFilterChange, onReset }) {
     }));
   };
 
-  // Filter options
+  
   const locations = [
     { value: 'all', label: 'Tất cả địa điểm' },
     { value: 'hà nội', label: 'Hà Nội' },
@@ -81,12 +70,12 @@ function JobFilters({ filters, onFilterChange, onReset }) {
     onFilterChange({ [filterType]: value });
   };
 
-  // Check if any filter is active
+  
   const hasActiveFilters = Object.values(filters).some(value => value !== 'all');
 
   return (
     <div className="job-filters">
-      {/* Header */}
+      {}
       <div className="filters-header">
         <h3 className="filters-title">🔍 Bộ lọc</h3>
         {hasActiveFilters && (
@@ -96,7 +85,7 @@ function JobFilters({ filters, onFilterChange, onReset }) {
         )}
       </div>
 
-      {/* Location Filter */}
+      {}
       <div className="filter-section">
         <button
           className="filter-section-header"
@@ -125,7 +114,7 @@ function JobFilters({ filters, onFilterChange, onReset }) {
         )}
       </div>
 
-      {/* Salary Filter */}
+      {}
       <div className="filter-section">
         <button
           className="filter-section-header"
@@ -160,7 +149,7 @@ function JobFilters({ filters, onFilterChange, onReset }) {
           className="filter-section-header"
           onClick={() => toggleSection('experience')}
         >
-          <span className="section-title">💼 Kinh nghiệm</span>
+          <span className="section-title"> Kinh nghiệm</span>
           <span className={`collapse-icon ${isCollapsed.experience ? 'collapsed' : ''}`}>
             ▼
           </span>
@@ -183,13 +172,13 @@ function JobFilters({ filters, onFilterChange, onReset }) {
         )}
       </div>
 
-      {/* Job Type Filter */}
+      {}
       <div className="filter-section">
         <button
           className="filter-section-header"
           onClick={() => toggleSection('jobType')}
         >
-          <span className="section-title">⏰ Loại hình công việc</span>
+          <span className="section-title"> Loại hình công việc</span>
           <span className={`collapse-icon ${isCollapsed.jobType ? 'collapsed' : ''}`}>
             ▼
           </span>
@@ -212,7 +201,7 @@ function JobFilters({ filters, onFilterChange, onReset }) {
         )}
       </div>
 
-      {/* Category Filter */}
+      {}
       <div className="filter-section">
         <button
           className="filter-section-header"
@@ -241,7 +230,7 @@ function JobFilters({ filters, onFilterChange, onReset }) {
         )}
       </div>
 
-      {/* Active Filters Summary */}
+      {}
       {hasActiveFilters && (
         <div className="active-filters">
           <div className="active-filters-title">Đang lọc:</div>
@@ -250,7 +239,6 @@ function JobFilters({ filters, onFilterChange, onReset }) {
               if (value === 'all') return null;
 
               let label = value;
-              // Get readable label from options
               const optionMap = {
                 location: locations,
                 salary: salaryRanges,

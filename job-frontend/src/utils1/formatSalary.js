@@ -1,7 +1,3 @@
-/**
- * Format Salary Utilities
- * Các hàm xử lý và format mức lương
- */
 
 // Format số thành dạng có dấu phẩy (1000000 -> 1,000,000)
 export const formatNumber = (number) => {

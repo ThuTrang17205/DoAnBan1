@@ -17,7 +17,7 @@ function Navbar({ isLoggedIn, onLogout }) {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  // Đóng mobile menu khi click bên ngoài
+ 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
@@ -37,7 +37,7 @@ function Navbar({ isLoggedIn, onLogout }) {
     };
   }, []);
 
-  // Đóng mobile menu khi route thay đổi
+ 
   useEffect(() => {
     setMobileMenuOpen(false);
     setJobsDropdownOpen(false);
@@ -52,7 +52,7 @@ function Navbar({ isLoggedIn, onLogout }) {
   return (
     <nav className="navbar-topcv">
       <div className="navbar-container">
-        {/* Logo */}
+        {}
         <div 
           className="navbar-logo" 
           onClick={() => handleNavigation("/")}
@@ -60,9 +60,9 @@ function Navbar({ isLoggedIn, onLogout }) {
           <h1>Job Potal</h1>
         </div>
 
-        {/* Main Navigation Links */}
+        {}
         <div className="navbar-nav">
-          {/* Việc làm Dropdown */}
+          {}
           <div className="nav-dropdown" ref={jobsDropdownRef}>
             <button 
               className={`nav-link-item ${location.pathname === "/" ? "active" : ""}`}
@@ -82,7 +82,7 @@ function Navbar({ isLoggedIn, onLogout }) {
             )}
           </div>
 
-          {/* Tạo CV Dropdown */}
+          {}
           <div className="nav-dropdown" ref={cvDropdownRef}>
             <button 
               className={`nav-link-item ${location.pathname === "/create-cv" ? "active" : ""}`}
@@ -102,10 +102,10 @@ function Navbar({ isLoggedIn, onLogout }) {
           </div>
         </div>
 
-        {/* Spacer để đẩy các nút sang phải */}
+        {}
         <div style={{ flex: 1 }}></div>
 
-        {/* Nút Nhà tuyển dụng */}
+        {}
         <button 
           className="nav-link-item employer-link"
           onClick={() => handleNavigation('/employer')}
@@ -113,7 +113,7 @@ function Navbar({ isLoggedIn, onLogout }) {
           Đăng tuyển & tìm hồ sơ
         </button>
 
-        {/* Right Actions - CHỈ CHO ỨNG VIÊN */}
+        {}
         <div className="navbar-actions">
           {!isLoggedIn ? (
             <>
@@ -160,7 +160,7 @@ function Navbar({ isLoggedIn, onLogout }) {
           )}
         </div>
 
-        {/* Mobile Menu Toggle */}
+        {}
         <button 
           className="mobile-menu-btn"
           onClick={toggleMobileMenu}
@@ -171,7 +171,7 @@ function Navbar({ isLoggedIn, onLogout }) {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {}
       {mobileMenuOpen && (
         <div className="mobile-menu" ref={mobileMenuRef}>
           <button 

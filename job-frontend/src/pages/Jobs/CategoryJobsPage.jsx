@@ -94,7 +94,7 @@ export function CategoriesSection() {
 }
 
 
-// ==================== CATEGORY JOBS PAGE ====================
+
 export function CategoryJobsPage() {
   const { category } = useParams();
   const navigate = useNavigate();
@@ -138,7 +138,7 @@ export function CategoryJobsPage() {
         }
       });
       
-      console.log("📂 Category response:", response.data);
+      console.log(" Category response:", response.data);
       
       const jobsData = response.data.jobs || [];
       const total = response.data.total || 0;
@@ -147,7 +147,7 @@ export function CategoryJobsPage() {
       setTotalJobs(total);
       setError(null);
     } catch (err) {
-      console.error("❌ Error fetching jobs by category:", err);
+      console.error(" Error fetching jobs by category:", err);
       setError("Không thể tải công việc theo ngành nghề");
       setJobs([]);
       setTotalJobs(0);
@@ -191,7 +191,7 @@ export function CategoryJobsPage() {
     return (
       <div className="category-jobs-page">
         <div className="error">
-          <p>❌ {error}</p>
+          <p> {error}</p>
           <button onClick={() => navigate('/')} className="back-btn">
             Quay về trang chủ
           </button>
@@ -202,7 +202,7 @@ export function CategoryJobsPage() {
 
   return (
     <div className="category-jobs-page">
-      {/* Header */}
+     
       <div className="category-header">
         <div className="header-content">
           <h1 className="category-title">{displayCategoryName}</h1>
@@ -212,7 +212,7 @@ export function CategoryJobsPage() {
         </div>
       </div>
 
-      {/* Jobs Container */}
+     
       <div className="category-jobs-container">
         {jobs.length === 0 ? (
           <div className="no-jobs">
@@ -266,7 +266,7 @@ export function CategoryJobsPage() {
           </div>
         )}
 
-        {/* Pagination */}
+        
         {totalPages > 1 && (
           <div className="pagination">
             <button

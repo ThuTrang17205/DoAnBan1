@@ -10,15 +10,15 @@ const redisClient = redis.createClient({
   password: process.env.REDIS_PASSWORD || undefined,
   retry_strategy: (options) => {
     if (options.error && options.error.code === 'ECONNREFUSED') {
-      console.error('❌ Redis connection refused');
+      console.error(' Redis connection refused');
       return new Error('Redis server refused connection');
     }
     if (options.total_retry_time > 1000 * 60 * 60) {
-      console.error('❌ Redis retry time exhausted');
+      console.error('Redis retry time exhausted');
       return new Error('Redis retry time exhausted');
     }
     if (options.attempt > 10) {
-      console.error('❌ Redis max retry attempts reached');
+      console.error(' Redis max retry attempts reached');
       return undefined;
     }
     // Reconnect after
@@ -28,19 +28,19 @@ const redisClient = redis.createClient({
 
 // Event listeners
 redisClient.on('connect', () => {
-  console.log('🔄 Connecting to Redis...');
+  console.log(' Connecting to Redis...');
 });
 
 redisClient.on('ready', () => {
-  console.log('✅ Redis connected successfully');
+  console.log(' Redis connected successfully');
 });
 
 redisClient.on('error', (err) => {
-  console.error('❌ Redis error:', err.message);
+  console.error(' Redis error:', err.message);
 });
 
 redisClient.on('end', () => {
-  console.log('🔌 Redis connection closed');
+  console.log(' Redis connection closed');
 });
 
 // Helper functions
@@ -50,63 +50,63 @@ const redisHelpers = {
     try {
       const stringValue = typeof value === 'object' ? JSON.stringify(value) : value;
       await redisClient.setex(key, expiration, stringValue);
-      console.log(`✅ Cached: ${key} (expires in ${expiration}s)`);
+      console.log(` Cached: ${key} (expires in ${expiration}s)`);
       return true;
     } catch (error) {
-      console.error(`❌ Error caching ${key}:`, error.message);
+      console.error(` Error caching ${key}:`, error.message);
       return false;
     }
   },
 
-  // Get cache
+  
   getCache: async (key) => {
     try {
       const data = await redisClient.get(key);
       if (!data) return null;
       
-      // Try parse JSON, if fails return raw string
+      
       try {
         return JSON.parse(data);
       } catch {
         return data;
       }
     } catch (error) {
-      console.error(`❌ Error getting cache ${key}:`, error.message);
+      console.error(` Error getting cache ${key}:`, error.message);
       return null;
     }
   },
 
-  // Delete cache
+  
   deleteCache: async (key) => {
     try {
       await redisClient.del(key);
-      console.log(`🗑️ Deleted cache: ${key}`);
+      console.log(` Deleted cache: ${key}`);
       return true;
     } catch (error) {
-      console.error(`❌ Error deleting cache ${key}:`, error.message);
+      console.error(` Error deleting cache ${key}:`, error.message);
       return false;
     }
   },
 
-  // Clear all cache
+ 
   clearAll: async () => {
     try {
       await redisClient.flushall();
-      console.log('🧹 All cache cleared');
+      console.log(' All cache cleared');
       return true;
     } catch (error) {
-      console.error('❌ Error clearing cache:', error.message);
+      console.error(' Error clearing cache:', error.message);
       return false;
     }
   },
 
-  // Check if key exists
+  
   exists: async (key) => {
     try {
       const result = await redisClient.exists(key);
       return result === 1;
     } catch (error) {
-      console.error(`❌ Error checking existence of ${key}:`, error.message);
+      console.error(` Error checking existence of ${key}:`, error.message);
       return false;
     }
   }

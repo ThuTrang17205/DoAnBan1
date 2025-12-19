@@ -1,13 +1,7 @@
-// =============================================
-// jobController.js - PostgreSQL Version
-// JOB CRUD OPERATIONS - COMPLETE
-// =============================================
 
-const pool = require('../config/db'); // PostgreSQL connection
 
-// =============================================
-// PUBLIC ROUTES
-// =============================================
+const pool = require('../config/db'); 
+
 
 // @desc    Get all jobs (with filters and pagination)
 // @route   GET /api/jobs
@@ -27,21 +21,21 @@ exports.getAllJobs = async (req, res) => {
     const values = [];
     let paramCount = 1;
 
-    // Filter category
+   
     if (category) {
       whereClause += ` AND category = $${paramCount}`;
       values.push(category);
       paramCount++;
     }
 
-    // Filter location
+ 
     if (location) {
       whereClause += ` AND location ILIKE $${paramCount}`;
       values.push(`%${location}%`);
       paramCount++;
     }
 
-    // Count total jobs
+    
     const totalQuery = `
       SELECT COUNT(*) AS total
       FROM jobs
@@ -52,7 +46,7 @@ exports.getAllJobs = async (req, res) => {
 
     const offset = (page - 1) * limit;
 
-    // Main query
+    
     const jobsQuery = `
       SELECT 
         id,
@@ -287,31 +281,49 @@ exports.searchJobs = async (req, res) => {
 // @desc    Get single job by ID
 // @route   GET /api/jobs/:id
 // @access  Public
+// @desc    Get single job by ID
+// @route   GET /api/jobs/:id
+// @access  Public
+// @desc    Get single job by ID
+// @route   GET /api/jobs/:id
+// @access  Public
 exports.getJobById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    console.log('=== GET JOB BY ID ===');
-    console.log('Requested ID:', id);
+    console.log('\n=== GET JOB BY ID ===');
+    console.log(' Requested ID:', id);
 
+    
     const query = `
       SELECT 
         id,
         title,
         company_id,
-        company,          -- ✅ FIX: Đổi từ company_name sang company
+        company_name,
+        company,
         description,
+        requirements,
+        benefits,
         min_salary,
         max_salary,
         salary,
+        currency,
         job_type,
+        experience,
         location,
         category,
-        experience,
+        deadline,
+        positions_available,
         posted_at,
         status,
-        url,              -- ✅ THÊM: url để ứng tuyển
-        original_url      -- ✅ THÊM: original_url backup
+        url,
+        original_url,
+        is_remote,
+        is_urgent,
+        is_featured,
+        view_count,
+        application_count
       FROM jobs
       WHERE id = $1
     `;
@@ -319,33 +331,82 @@ exports.getJobById = async (req, res) => {
     const result = await pool.query(query, [parseInt(id)]);
 
     if (result.rows.length === 0) {
+      console.log(' Job not found with ID:', id);
       return res.status(404).json({
         success: false,
-        message: `Không tìm thấy công việc với ID ${id}. Vui lòng kiểm tra lại ID.`
+        message: `Không tìm thấy công việc với ID ${id}`
       });
     }
 
     const job = result.rows[0];
-
-    // ✅ Map snake_case sang camelCase
-    const formattedJob = {
+    console.log(' Raw job from database:', {
       id: job.id,
       title: job.title,
+      company_name: job.company_name,
+      company: job.company,
+      requirements: job.requirements ? 'HAS DATA' : 'NULL',
+      benefits: job.benefits ? 'HAS DATA' : 'NULL'
+    });
+
+    
+    const formattedJob = {
+      // Basic info
+      id: job.id,
+      title: job.title,
+      
+      // Company info - ưu tiên company_name, fallback về company
       companyId: job.company_id,
-      companyName: job.company,        // ✅ FIX: Map company sang companyName
+      companyName: job.company_name || job.company || 'Công ty chưa cập nhật',
+      company_name: job.company_name || job.company || 'Công ty chưa cập nhật',
+      
+      // Job details - TÌM THẤY CÁC TRƯỜNG NÀY!
       description: job.description,
+      requirements: job.requirements,  // ✅ Đã có trong DB
+      benefits: job.benefits,          // ✅ Đã có trong DB
+      
+      // Salary info
       minSalary: job.min_salary,
       maxSalary: job.max_salary,
       salary: job.salary,
+      currency: job.currency || 'VND',
+      
+      // Job type & experience
       jobType: job.job_type,
+      job_type: job.job_type,
+      experience: job.experience,
+      experienceLevel: job.experience,
+      
+      // Location
       location: job.location,
       category: job.category,
-      experience: job.experience,
+      
+      // Additional info
+      deadline: job.deadline,
+      positions: job.positions_available || 1,
+      
+      // Dates & status
       postedAt: job.posted_at,
+      created_at: job.posted_at,
       status: job.status,
-      url: job.url,                    
-      originalUrl: job.original_url    
+      
+      // URLs
+      url: job.url,
+      originalUrl: job.original_url,
+      
+      // Flags
+      isRemote: job.is_remote,
+      isUrgent: job.is_urgent,
+      isFeatured: job.is_featured,
+      
+      // Stats
+      viewCount: job.view_count,
+      applicationCount: job.application_count
     };
+
+    console.log('✅ Successfully formatted job:', formattedJob.id);
+    console.log('✅ Has requirements:', !!formattedJob.requirements);
+    console.log('✅ Has benefits:', !!formattedJob.benefits);
+    console.log('✅ Company name:', formattedJob.companyName);
 
     res.json({
       success: true,
@@ -353,11 +414,15 @@ exports.getJobById = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get job by ID error:', error);
+    console.error('\n❌ ERROR in getJobById:');
+    console.error('❌ Message:', error.message);
+    console.error('❌ Stack:', error.stack);
+    
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi lấy thông tin công việc',
-      error: error.message
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 };
@@ -368,7 +433,7 @@ exports.getRelatedJobs = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Lấy job hiện tại
+   
     const currentJob = await pool.query(
       'SELECT category, location FROM jobs WHERE id = $1',
       [id]
@@ -426,41 +491,58 @@ exports.getRelatedJobs = async (req, res) => {
 // @route   GET /api/jobs/stats
 // @access  Private
 exports.getJobStats = async (req, res) => {
+  let client;
+  
   try {
     const userId = req.user.id;
 
-    console.log('📊 Getting job stats for user:', userId);
+    console.log(`\n📊 [getJobStats] User ${userId}`);
 
-    // Count saved jobs
-    const savedResult = await pool.query(
-      'SELECT COUNT(*) FROM saved_jobs WHERE user_id = $1',
-      [userId]
-    );
+    client = await pool.connect();
 
-    // Count applied jobs
-    const appliedResult = await pool.query(
-      'SELECT COUNT(*) FROM applied_jobs WHERE user_id = $1',
-      [userId]
-    );
+    // ✅ Đếm từ CẢ 3 BẢNG
+    const query = `
+      SELECT 
+        (SELECT COUNT(*)::INTEGER FROM saved_jobs WHERE user_id = $1) as saved,
+        (SELECT COUNT(*)::INTEGER FROM applications WHERE user_id = $1) as applied_internal,
+        (SELECT COUNT(*)::INTEGER FROM applied_jobs WHERE user_id = $1) as applied_external
+    `;
 
-    const stats = {
-      saved: parseInt(savedResult.rows[0].count) || 0,
-      applied: parseInt(appliedResult.rows[0].count) || 0
-    };
+    const result = await client.query(query, [userId]);
+    const stats = result.rows[0];
 
-    console.log('✅ Job stats:', stats);
+    const savedCount = stats.saved || 0;
+    const appliedInternalCount = stats.applied_internal || 0;
+    const appliedExternalCount = stats.applied_external || 0;
+    
+    // ✅ TỔNG = internal + external
+    const totalApplied = appliedInternalCount + appliedExternalCount;
 
-    res.json(stats);
+    console.log(`   📊 Saved: ${savedCount}`);
+    console.log(`   📋 Internal: ${appliedInternalCount}`);
+    console.log(`   🌐 External: ${appliedExternalCount}`);
+    console.log(`   ✅ TOTAL APPLIED: ${totalApplied}\n`);
+
+    res.json({
+      success: true,
+      saved: savedCount,
+      applied: totalApplied,  // ← QUAN TRỌNG: Phải là tổng!
+      applied_internal: appliedInternalCount,
+      applied_external: appliedExternalCount
+    });
 
   } catch (error) {
-    console.error('❌ Error getting job stats:', error);
-    res.status(500).json({ 
+    console.error('❌ [getJobStats] Error:', error);
+    res.status(500).json({
       success: false,
-      error: 'Failed to get job stats',
-      message: error.message 
+      error: 'Cannot fetch stats',
+      message: error.message
     });
+  } finally {
+    if (client) client.release();
   }
 };
+
 
 // @desc    Get saved jobs
 // @route   GET /api/jobs/saved
@@ -469,7 +551,7 @@ exports.getSavedJobs = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    console.log('💾 Getting saved jobs for user:', userId);
+    console.log(' Getting saved jobs for user:', userId);
 
     const result = await pool.query(
       `SELECT 
@@ -487,12 +569,12 @@ exports.getSavedJobs = async (req, res) => {
       [userId]
     );
 
-    console.log(`✅ Found ${result.rows.length} saved jobs`);
+    console.log(` Found ${result.rows.length} saved jobs`);
 
     res.json(result.rows);
 
   } catch (error) {
-    console.error('❌ Error getting saved jobs:', error);
+    console.error(' Error getting saved jobs:', error);
     res.status(500).json({ 
       success: false,
       error: 'Failed to get saved jobs',
@@ -508,15 +590,19 @@ exports.getSavedJobs = async (req, res) => {
 // @route   GET /api/jobs/applied
 // @access  Private
 exports.getAppliedJobs = async (req, res) => {
+  let client;
+  
   try {
     const userId = req.user.id;
-    const { limit = 1000 } = req.query; // ✅ Thêm limit từ query
+    const { limit = 1000, offset = 0 } = req.query;
 
-    console.log('📤 Getting applied jobs for user:', userId);
-    console.log('📊 Limit:', limit);
+    console.log(`🌐 [getAppliedJobs] User ${userId}`);
 
-    const result = await pool.query(
-      `SELECT 
+    client = await pool.connect();
+
+    // Query bảng applied_jobs (external/crawled jobs)
+    const query = `
+      SELECT 
         id,
         job_id,
         job_title,
@@ -524,37 +610,48 @@ exports.getAppliedJobs = async (req, res) => {
         company_logo,
         location,
         salary,
-        cv_used,
         applied_date,
         status,
+        cv_used,
         cover_letter,
         created_at
       FROM applied_jobs
       WHERE user_id = $1
-      ORDER BY applied_date DESC
-      LIMIT $2`, // ✅ Thêm LIMIT
-      [userId, limit]
+      ORDER BY applied_date DESC NULLS LAST
+      LIMIT $2 OFFSET $3
+    `;
+
+    const result = await client.query(query, [userId, parseInt(limit), parseInt(offset)]);
+
+    const countResult = await client.query(
+      'SELECT COUNT(*)::INTEGER as total FROM applied_jobs WHERE user_id = $1',
+      [userId]
     );
 
-    console.log(`✅ Found ${result.rows.length} applied jobs`);
+    const total = countResult.rows[0]?.total || 0;
 
-    // ✅ Trả về đúng format mà frontend expect
+    console.log(`   ✅ Found ${result.rows.length}/${total} external jobs\n`);
+
     res.json({
       success: true,
-      total: result.rows.length,
-      data: result.rows,           // ← Frontend dùng data
-      applications: result.rows     // ← Hoặc applications
+      data: result.rows,
+      applications: result.rows,
+      count: result.rows.length,
+      total: total
     });
 
   } catch (error) {
-    console.error('❌ Error getting applied jobs:', error);
-    res.status(500).json({ 
+    console.error('❌ [getAppliedJobs] Error:', error);
+    res.status(500).json({
       success: false,
-      error: 'Failed to get applied jobs',
-      message: error.message 
+      error: 'Cannot fetch applied jobs',
+      message: error.message
     });
+  } finally {
+    if (client) client.release();
   }
 };
+
 
 // @desc    Save a job
 // @route   POST /api/jobs/save/:id
@@ -564,7 +661,7 @@ exports.saveJob = async (req, res) => {
     const userId = req.user.id;
     const jobId = req.params.id;
 
-    console.log(`💾 User ${userId} saving job ${jobId}`);
+    console.log(` User ${userId} saving job ${jobId}`);
 
     // Check if already saved
     const existing = await pool.query(
@@ -579,7 +676,7 @@ exports.saveJob = async (req, res) => {
       });
     }
 
-    // Get job details
+   
     const jobResult = await pool.query(
       'SELECT title, company_name, location, salary FROM jobs WHERE id = $1',
       [jobId]
@@ -594,7 +691,7 @@ exports.saveJob = async (req, res) => {
 
     const job = jobResult.rows[0];
 
-    // Save job with details
+    
     await pool.query(
       `INSERT INTO saved_jobs 
         (user_id, job_id, job_title, company_name, location, salary, saved_date) 
@@ -602,7 +699,7 @@ exports.saveJob = async (req, res) => {
       [userId, jobId, job.title, job.company_name, job.location, job.salary]
     );
 
-    console.log('✅ Job saved successfully');
+    console.log(' Job saved successfully');
 
     res.json({ 
       success: true, 
@@ -610,7 +707,7 @@ exports.saveJob = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error saving job:', error);
+    console.error(' Error saving job:', error);
     res.status(500).json({ 
       success: false,
       error: 'Failed to save job',
@@ -627,14 +724,14 @@ exports.unsaveJob = async (req, res) => {
     const userId = req.user.id;
     const jobId = req.params.id;
 
-    console.log(`🗑️ User ${userId} unsaving job ${jobId}`);
+    console.log(` User ${userId} unsaving job ${jobId}`);
 
     await pool.query(
       'DELETE FROM saved_jobs WHERE user_id = $1 AND job_id = $2',
       [userId, jobId]
     );
 
-    console.log('✅ Job unsaved successfully');
+    console.log(' Job unsaved successfully');
 
     res.json({ 
       success: true, 
@@ -642,7 +739,7 @@ exports.unsaveJob = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error unsaving job:', error);
+    console.error(' Error unsaving job:', error);
     res.status(500).json({ 
       success: false,
       error: 'Failed to unsave job',
@@ -651,9 +748,7 @@ exports.unsaveJob = async (req, res) => {
   }
 };
 
-// @desc    Apply to a job
-// @route   POST /api/jobs/apply
-// @access  Private
+
 // @desc    Apply to a job
 // @route   POST /api/jobs/apply
 // @access  Private
@@ -671,7 +766,7 @@ exports.applyJob = async (req, res) => {
       cover_letter 
     } = req.body;
 
-    console.log(`📤 User ${userId} applying to job ${job_id}`);
+    console.log(` User ${userId} applying to job ${job_id}`);
 
     // Validate required fields
     if (!job_id) {
@@ -694,7 +789,7 @@ exports.applyJob = async (req, res) => {
       });
     }
 
-    // Insert application with all details
+    
     const result = await pool.query(
       `INSERT INTO applied_jobs 
         (user_id, job_id, job_title, company_name, company_logo, location, salary, cv_used, cover_letter, applied_date, status) 
@@ -713,7 +808,7 @@ exports.applyJob = async (req, res) => {
       ]
     );
 
-    console.log('✅ Application submitted successfully, ID:', result.rows[0].id);
+    console.log(' Application submitted successfully, ID:', result.rows[0].id);
 
     res.json({ 
       success: true, 
@@ -726,7 +821,7 @@ exports.applyJob = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error applying to job:', error);
+    console.error('Error applying to job:', error);
     res.status(500).json({ 
       success: false,
       error: 'Failed to apply to job',

@@ -18,10 +18,10 @@ const roleCheck = (allowedRoles) => {
         });
       }
 
-      // Chuyển allowedRoles thành array nếu là string
+      
       const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
 
-      // Kiểm tra role của user
+      
       if (!roles.includes(req.user.role)) {
         return res.status(403).json({
           success: false,
@@ -118,17 +118,17 @@ const isOwnerOrAdmin = (resourceUserIdField = 'userId') => {
       });
     }
 
-    // Admin có thể truy cập mọi resource
+   
     if (req.user.role === 'admin') {
       return next();
     }
 
-    // Lấy ID từ params hoặc body
+    
     const resourceUserId = req.params[resourceUserIdField] || 
                           req.body[resourceUserIdField] ||
                           req.params.id;
 
-    // Kiểm tra user có phải là owner không
+   
     if (req.user.id.toString() !== resourceUserId.toString()) {
       return res.status(403).json({
         success: false,
@@ -153,12 +153,12 @@ const isJobOwnerOrAdmin = async (req, res, next) => {
       });
     }
 
-    // Admin có thể truy cập mọi job
+ 
     if (req.user.role === 'admin') {
       return next();
     }
 
-    // Employer phải sở hữu job
+
     if (req.user.role !== 'employer') {
       return res.status(403).json({
         success: false,
@@ -166,7 +166,7 @@ const isJobOwnerOrAdmin = async (req, res, next) => {
       });
     }
 
-    // Lấy jobId từ params
+    
     const jobId = req.params.id || req.params.jobId;
     
     if (!jobId) {
@@ -176,8 +176,7 @@ const isJobOwnerOrAdmin = async (req, res, next) => {
       });
     }
 
-    // Kiểm tra job có thuộc về employer này không
-    // (Cần import Job model - điều chỉnh theo cấu trúc của bạn)
+  
     const Job = require('../models/Job');
     const job = await Job.findById(jobId);
 
@@ -195,7 +194,7 @@ const isJobOwnerOrAdmin = async (req, res, next) => {
       });
     }
 
-    // Attach job to request for later use
+   
     req.job = job;
     next();
   } catch (error) {

@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 
-console.log('📦 LOADING ROUTES INDEX...');
+console.log(' LOADING ROUTES INDEX...');
 
-// Import all route modules
-const authRoutes = require('./auth');
-console.log('✅ authRoutes type:', typeof authRoutes);
-console.log('✅ authRoutes:', authRoutes);
+
+const authRoutes = require('./auth');  
+console.log(' authRoutes type:', typeof authRoutes);
+console.log(' authRoutes:', authRoutes);
 
 const jobRoutes = require('./jobs');
 const applicationRoutes = require('./applications');
@@ -14,8 +14,9 @@ const userRoutes = require('./users');
 const employerRoutes = require('./employers');
 const adminRoutes = require('./admin');
 const categoryRoutes = require('./categories');
+const paymentRoutes = require('./payment');
 
-// Health check route
+
 router.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
@@ -26,7 +27,7 @@ router.get('/health', (req, res) => {
   });
 });
 
-// API Info route
+
 router.get('/', (req, res) => {
   res.status(200).json({
     success: true,
@@ -39,17 +40,18 @@ router.get('/', (req, res) => {
       users: '/api/users',
       employers: '/api/employers',
       admin: '/api/admin',
-      categories: '/api/categories'
+      categories: '/api/categories',
+      payment: '/api/payment'
     },
     documentation: '/api/docs',
     health: '/api/health'
   });
 });
 
-// Mount routes
-console.log('🔧 Mounting /auth route...');
+
+console.log(' Mounting /auth route...');
 router.use('/auth', authRoutes);
-console.log('✅ /auth mounted!');
+console.log(' /auth mounted!');
 
 router.use('/jobs', jobRoutes);
 router.use('/applications', applicationRoutes);
@@ -57,8 +59,9 @@ router.use('/users', userRoutes);
 router.use('/employers', employerRoutes);
 router.use('/admin', adminRoutes);
 router.use('/categories', categoryRoutes);
+router.use('/payment', paymentRoutes);
 
-console.log('📦 ALL ROUTES MOUNTED!');
+console.log(' ALL ROUTES MOUNTED!');
 
-// Export router
+
 module.exports = router;

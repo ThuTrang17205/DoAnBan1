@@ -208,13 +208,13 @@ export default function EmployerDashboard() {
               active={activeTab === 'overview'}
               onClick={() => setActiveTab('overview')}
             >
-              📋 Tổng quan
+               Tổng quan
             </TabButton>
             <TabButton
               active={activeTab === 'statistics'}
               onClick={() => setActiveTab('statistics')}
             >
-              📊 Thống kê
+               Thống kê
             </TabButton>
             <TabButton
               active={activeTab === 'jobs'}
@@ -303,7 +303,7 @@ function OverviewTab({ jobs, stats, navigate }) {
       <h3> Tin tuyển dụng gần đây</h3>
       {recentJobs.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-icon">📝</div>
+          <div className="empty-icon"></div>
           <p>Chưa có tin tuyển dụng nào</p>
           <button 
             className="btn-primary"
@@ -390,7 +390,7 @@ function StatisticsTab({ jobs, applications, stats }) {
 
       {/* Trend Chart */}
       <div className="chart-section">
-        <h3>📈 Xu hướng ứng tuyển (7 ngày gần nhất)</h3>
+        <h3> Xu hướng ứng tuyển (7 ngày gần nhất)</h3>
         <div className="line-chart">
           {last7Days.map((day, index) => (
             <div key={index} className="chart-bar">

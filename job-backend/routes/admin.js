@@ -1,24 +1,24 @@
 /**
- * Admin Routes - WITH BODY PARSER FIX
+ * Admin Routes - WITH BODY PARSER FIX 1111
  * Protected routes for admin management
  */
 
 const express = require('express');
 const router = express.Router();
 
-// ⭐ CRITICAL FIX: Parse body TRONG admin routes
+
 router.use(express.json({ limit: '10mb' }));
 router.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Controllers
+
 const adminController = require('../controllers/adminController');
 
-// Middleware (import after body parser)
+
 const { authMiddleware } = require('../middleware/auth');
 const { isAdmin } = require('../middleware/roleCheck');
 const { validateIdParam, validatePagination } = require('../middleware/validateInput');
 
-// Debug middleware
+
 router.use((req, res, next) => {
   console.log('\n🔍 ADMIN ROUTE DEBUG:');
   console.log('  Method:', req.method);
@@ -30,7 +30,7 @@ router.use((req, res, next) => {
   next();
 });
 
-// ==================== PUBLIC ROUTES ====================
+
 
 /**
  * @route   POST /api/admin/login
@@ -38,14 +38,14 @@ router.use((req, res, next) => {
  * @access  Public
  */
 router.post('/login', (req, res, next) => {
-  console.log('✅ HIT LOGIN ROUTE');
+  console.log(' HIT LOGIN ROUTE');
   console.log('  Body in route handler:', req.body);
   next();
 }, adminController.login);
 
-// ==================== PROTECTED ROUTES ====================
 
-// Apply authentication and admin role check
+
+
 router.use(authMiddleware);
 router.use(isAdmin);
 
@@ -113,7 +113,7 @@ router.get('/dashboard/stats', adminController.getDashboardStats || ((req, res) 
   });
 }));
 
-// ==================== USER MANAGEMENT ====================
+
 
 /**
  * @route   GET /api/admin/users
@@ -165,7 +165,7 @@ router.put('/users/:id/toggle-status', validateIdParam(), adminController.toggle
   });
 }));
 
-// ==================== EMPLOYER MANAGEMENT ====================
+
 
 /**
  * @route   GET /api/admin/employers
@@ -229,7 +229,7 @@ router.put('/employers/:id/toggle-status', validateIdParam(), adminController.to
   });
 }));
 
-// ==================== JOB MANAGEMENT ====================
+
 
 /**
  * @route   POST /api/admin/jobs
@@ -306,7 +306,7 @@ router.put('/jobs/:id/toggle-featured', validateIdParam(), adminController.toggl
     message: 'Job featured status toggled'
   });
 }));
-// ==================== APPLICATION MANAGEMENT ====================
+
 
 /**
  * @route   GET /api/admin/applications

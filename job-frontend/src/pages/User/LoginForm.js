@@ -1,4 +1,4 @@
-// LoginForm.js
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,7 @@ function LoginForm({ onLogin }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Đăng nhập bằng email + password
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -29,11 +29,11 @@ function LoginForm({ onLogin }) {
         password
       });
 
-      console.log('✅ Đăng nhập thành công:', response.data);
+      console.log(' Đăng nhập thành công:', response.data);
       
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
-        console.log('✅ Token đã được lưu!');
+        console.log('Token đã được lưu!');
       }
 
       if (onLogin) {
@@ -42,7 +42,7 @@ function LoginForm({ onLogin }) {
       
       navigate('/');
     } catch (err) {
-      console.error('❌ Lỗi đăng nhập:', err);
+      console.error(' Lỗi đăng nhập:', err);
       if (err.response) {
         setError(err.response.data.message || 'Email hoặc mật khẩu không đúng');
       } else {
@@ -53,14 +53,14 @@ function LoginForm({ onLogin }) {
     }
   };
 
-  // Đăng nhập bằng Google 
+  
   const handleGoogleLogin = () => {
   console.log('🔵 Redirecting to Google login...');
-  // ✅ Redirect trực tiếp, KHÔNG mở popup
+  
   window.location.href = 'http://localhost:5000/api/auth/google/login';
 };
 
-  // Chuyển sang trang đăng ký
+  
   const handleGoToRegister = () => {
     navigate('/register');
   };
@@ -68,17 +68,17 @@ function LoginForm({ onLogin }) {
   return (
     <div className="login-container">
       <div className="login-box">
-        {/* Header */}
+        
         <div className="login-header">
           <h2>Đăng Nhập</h2>
         </div>
 
-        {/* Error Message */}
-        {error && <div className="error-message">⚠️ {error}</div>}
+       
+        {error && <div className="error-message"> {error}</div>}
 
-        {/* Form */}
+        
         <div className="login-form-wrapper">
-          {/* Email Field */}
+        
           <div className="form-group">
             <label className="form-label">Email</label>
             <input
@@ -93,7 +93,7 @@ function LoginForm({ onLogin }) {
             />
           </div>
 
-          {/* Password Field */}
+          
           <div className="form-group">
             <label className="form-label">Mật khẩu</label>
             <input
@@ -113,7 +113,7 @@ function LoginForm({ onLogin }) {
             />
           </div>
 
-          {/* Submit Button */}
+         
           <button 
             type="button" 
             className="submit-button"
@@ -123,12 +123,12 @@ function LoginForm({ onLogin }) {
             {loading ? 'Đang đăng nhập...' : 'Đăng Nhập'}
           </button>
 
-          {/* Divider */}
+      
           <div className="divider">
             <span className="divider-text">Hoặc</span>
           </div>
 
-          {/* Google Login Button */}
+         
           <button 
             type="button" 
             className="google-button"
@@ -144,7 +144,7 @@ function LoginForm({ onLogin }) {
             Đăng nhập bằng tài khoản Google
           </button>
 
-          {/* Register Link */}
+        
           <div className="register-link">
             <span className="register-text">Chưa có tài khoản?</span>
             <button 

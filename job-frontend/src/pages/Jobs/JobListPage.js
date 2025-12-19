@@ -18,32 +18,30 @@ function JobListPage() {
 
   const [localSearch, setLocalSearch] = useState('');
   const [localLocation, setLocalLocation] = useState('');
+  
+  // ✅ THÊM PAGINATION STATE
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12; // Số job mỗi trang
 
   useEffect(() => {
     const loadAndFilter = async () => {
-   
       const queryParam = searchParams.get('q') || '';
       const locationParam = searchParams.get('location') || '';
       const categoryParam = searchParams.get('category') || '';
 
-      console.log(' URL Params:', { queryParam, locationParam, categoryParam });
+      console.log('🔍 URL Params:', { queryParam, locationParam, categoryParam });
 
-      
       setLocalSearch(queryParam);
       setLocalLocation(locationParam);
 
-      
       await fetchJobs();
 
-      
       const filterUpdate = {
         searchQuery: queryParam,
         location: locationParam || 'all'
       };
 
-      
       if (categoryParam) {
-        
         const categoryMap = {
           'IT - Phần mềm': 'Công nghệ thông tin',
           'Marketing': 'Marketing - Truyền thông',
@@ -64,6 +62,7 @@ function JobListPage() {
       }
 
       updateFilters(filterUpdate);
+      setCurrentPage(1); //  Reset về trang 1 khi filter
     };
 
     loadAndFilter();
@@ -71,7 +70,6 @@ function JobListPage() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    
     
     const params = new URLSearchParams();
     if (localSearch) params.append('q', localSearch);
@@ -82,6 +80,7 @@ function JobListPage() {
 
   const handleFilterChange = (filterType, value) => {
     updateFilters({ [filterType]: value });
+    setCurrentPage(1); //  Reset về trang 1 khi đổi filter
   };
 
   const handleResetFilters = () => {
@@ -89,25 +88,37 @@ function JobListPage() {
     setLocalLocation('');
     navigate('/jobs');
     resetFilters();
+    setCurrentPage(1); //  Reset về trang 1
+  };
+
+  //  TÍNH TOÁN PAGINATION
+  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentJobs = filteredJobs.slice(startIndex, endIndex);
+
+  //  HÀM CHUYỂN TRANG
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 400, behavior: 'smooth' }); // Scroll lên đầu danh sách
   };
 
   return (
     <div className="job-list-page">
-      {}
+      {/* Hero Search */}
       <section className="search-hero" style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        padding: '60px 20px',
+        background: 'linear-gradient(135deg, #4258bbff 0%, #1d0ea4ff 100%)',
+        padding: '150px 30px',
         color: 'white'
       }}>
         <div className="container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <h1 style={{ marginBottom: '10px', fontSize: '36px' }}>
-            Tìm việc làm, Tuyển dụng hiệu quả
+             Tìm việc làm, Tuyển dụng hiệu quả
           </h1>
           <p style={{ marginBottom: '30px', opacity: 0.9 }}>
             {filteredJobs.length} việc làm phù hợp với bạn
           </p>
 
-          {}
           <form onSubmit={handleSearch} style={{
             display: 'flex',
             gap: '10px',
@@ -171,8 +182,8 @@ function JobListPage() {
         </div>
       </section>
 
-      {/* Filters & Results Section */}
-      <section className="jobs-content" style={{ padding: '40px 20px' }}>
+      {/* Jobs Content */}
+      <section className="jobs-content" style={{ padding: '40px 20px', marginTop: '60px' }}>
         <div className="container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
           
           {/* Active Filters */}
@@ -197,7 +208,7 @@ function JobListPage() {
                   borderRadius: '20px',
                   fontSize: '14px'
                 }}>
-                  "{filters.searchQuery}"
+                  🔍 "{filters.searchQuery}"
                 </span>
               )}
               
@@ -221,7 +232,7 @@ function JobListPage() {
                   borderRadius: '20px',
                   fontSize: '14px'
                 }}>
-                   {filters.category}
+                  🏷️ {filters.category}
                 </span>
               )}
               
@@ -238,19 +249,16 @@ function JobListPage() {
                   marginLeft: 'auto'
                 }}
               >
-                Xóa bộ lọc
+                 Xóa bộ lọc
               </button>
             </div>
           )}
 
-          {/* Filter Sidebar & Jobs Grid */}
+          {/* Main Content: Filters + Jobs */}
           <div style={{ display: 'flex', gap: '30px' }}>
             
             {/* Sidebar Filters */}
-            <aside style={{
-              width: '280px',
-              flexShrink: 0
-            }}>
+            <aside style={{ width: '280px', flexShrink: 0 }}>
               <div style={{
                 backgroundColor: 'white',
                 padding: '20px',
@@ -259,12 +267,12 @@ function JobListPage() {
                 position: 'sticky',
                 top: '20px'
               }}>
-                <h3 style={{ marginBottom: '20px' }}>Bộ lọc</h3>
+                <h3 style={{ marginBottom: '20px' }}> Bộ lọc</h3>
 
                 {/* Location Filter */}
                 <div style={{ marginBottom: '25px' }}>
                   <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
-                    Địa điểm
+                    📍 Địa điểm
                   </label>
                   <select
                     value={filters.location}
@@ -287,7 +295,7 @@ function JobListPage() {
                 {/* Category Filter */}
                 <div style={{ marginBottom: '25px' }}>
                   <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
-                    Ngành nghề
+                     Ngành nghề
                   </label>
                   <select
                     value={filters.category}
@@ -314,7 +322,7 @@ function JobListPage() {
                 {/* Salary Filter */}
                 <div style={{ marginBottom: '25px' }}>
                   <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
-                    Mức lương
+                     Mức lương
                   </label>
                   <select
                     value={filters.salary}
@@ -338,7 +346,7 @@ function JobListPage() {
                 {/* Experience Filter */}
                 <div style={{ marginBottom: '25px' }}>
                   <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
-                    Kinh nghiệm
+                     Kinh nghiệm
                   </label>
                   <select
                     value={filters.experience}
@@ -361,7 +369,7 @@ function JobListPage() {
               </div>
             </aside>
 
-            {/* Jobs Grid */}
+            {/* Jobs List */}
             <div style={{ flex: 1 }}>
               {loading ? (
                 <LoadingSpinner text="Đang tải việc làm..." />
@@ -392,19 +400,127 @@ function JobListPage() {
                       fontSize: '16px'
                     }}
                   >
-                    Xóa bộ lọc
+                     Xóa bộ lọc
                   </button>
                 </div>
               ) : (
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                  gap: '20px'
-                }}>
-                  {filteredJobs.map(job => (
-                    <JobCard key={job.id} job={job} />
-                  ))}
-                </div>
+                <>
+                  {/* Jobs Grid */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                    gap: '20px',
+                    marginBottom: '40px'
+                  }}>
+                    {currentJobs.map(job => (
+                      <JobCard key={job.id} job={job} />
+                    ))}
+                  </div>
+
+                  {/*  PAGINATION */}
+                  {totalPages > 1 && (
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: '10px',
+                      marginTop: '40px',
+                      marginBottom: '20px'
+                    }}>
+                      {/* Nút Trước */}
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        style={{
+                          padding: '10px 20px',
+                          backgroundColor: currentPage === 1 ? '#e2e8f0' : '#667eea',
+                          color: currentPage === 1 ? '#a0aec0' : 'white',
+                          border: 'none',
+                          borderRadius: '5px',
+                          cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          transition: 'all 0.3s'
+                        }}
+                      >
+                        ← Trước
+                      </button>
+
+                      {/* Số trang */}
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => {
+                        // Hiển thị: trang đầu, trang cuối, và 2 trang xung quanh current
+                        if (
+                          page === 1 ||
+                          page === totalPages ||
+                          (page >= currentPage - 2 && page <= currentPage + 2)
+                        ) {
+                          return (
+                            <button
+                              key={page}
+                              onClick={() => handlePageChange(page)}
+                              style={{
+                                padding: '10px 15px',
+                                backgroundColor: page === currentPage ? '#667eea' : 'white',
+                                color: page === currentPage ? 'white' : '#4a5568',
+                                border: '1px solid #e2e8f0',
+                                borderRadius: '5px',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                fontWeight: page === currentPage ? 'bold' : 'normal',
+                                minWidth: '45px',
+                                transition: 'all 0.3s'
+                              }}
+                              onMouseOver={(e) => {
+                                if (page !== currentPage) {
+                                  e.target.style.backgroundColor = '#f7fafc';
+                                }
+                              }}
+                              onMouseOut={(e) => {
+                                if (page !== currentPage) {
+                                  e.target.style.backgroundColor = 'white';
+                                }
+                              }}
+                            >
+                              {page}
+                            </button>
+                          );
+                        } else if (page === currentPage - 3 || page === currentPage + 3) {
+                          return <span key={page} style={{ color: '#a0aec0' }}>...</span>;
+                        }
+                        return null;
+                      })}
+
+                      {/* Nút Sau */}
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        style={{
+                          padding: '10px 20px',
+                          backgroundColor: currentPage === totalPages ? '#e2e8f0' : '#667eea',
+                          color: currentPage === totalPages ? '#a0aec0' : 'white',
+                          border: 'none',
+                          borderRadius: '5px',
+                          cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          transition: 'all 0.3s'
+                        }}
+                      >
+                        Sau →
+                      </button>
+                    </div>
+                  )}
+
+                  {/*  RESULTS INFO */}
+                  <div style={{
+                    textAlign: 'center',
+                    color: '#718096',
+                    fontSize: '14px',
+                    marginTop: '20px'
+                  }}>
+                    Hiển thị {startIndex + 1} - {Math.min(endIndex, filteredJobs.length)} / {filteredJobs.length} việc làm
+                  </div>
+                </>
               )}
             </div>
           </div>

@@ -1,9 +1,4 @@
-// =============================================
-// FILE: applicationController.js (PostgreSQL Version)
-// JOB APPLICATIONS MANAGEMENT
-// =============================================
-
-const pool = require('../config/db');
+const { pool } = require('../config/db');
 
 // @desc    Apply for a job
 // @route   POST /api/applications/apply/:jobId
@@ -12,17 +7,32 @@ exports.applyJob = async (req, res) => {
   const client = await pool.connect();
   
   try {
-    const { coverLetter, resume, cover_letter, cv_file, expected_salary, salary_currency, available_from } = req.body;
+    console.log('\n========================================');
+    console.log(' APPLICATION SUBMISSION DEBUG');
+    console.log('========================================');
+    console.log(' req.body:', JSON.stringify(req.body, null, 2));
+    console.log(' req.file:', req.file);
+    console.log(' req.body.cv_id:', req.body.cv_id);
+    console.log('========================================\n');
+
+    const { 
+      coverLetter, 
+      cover_letter, 
+      cv_id,           
+      cv_file,         
+      expected_salary, 
+      salary_currency, 
+      available_from 
+    } = req.body;
+    
     const jobId = req.params.jobId;
     const userId = req.user.id;
 
-    // Support both naming conventions
     const finalCoverLetter = coverLetter || cover_letter;
-    const finalResume = resume || cv_file;
 
     await client.query('BEGIN');
 
-    // Check if job exists and is active
+    
     const jobResult = await client.query(
       'SELECT id, status, title FROM jobs WHERE id = $1',
       [jobId]
@@ -46,7 +56,7 @@ exports.applyJob = async (req, res) => {
       });
     }
 
-    // Check if already applied
+    
     const existingAppResult = await client.query(
       'SELECT id FROM applications WHERE job_id = $1 AND user_id = $2',
       [jobId, userId]
@@ -60,9 +70,108 @@ exports.applyJob = async (req, res) => {
       });
     }
 
-    // Create application
-    const result = await client.query(
-      `INSERT INTO applications (
+    
+    let finalCVPath = null;
+    let savedCvId = null;
+
+    console.log('\n CV RESOLUTION PROCESS:');
+
+   
+    if (req.file) {
+      finalCVPath = req.file.path;
+      console.log('   Case 1: Using uploaded file');
+      console.log('     Path:', finalCVPath);
+      
+      
+      console.log('   Saving new CV to user_cvs table...');
+      
+      try {
+        const saveCvQuery = `
+          INSERT INTO user_cvs (
+            user_id,
+            file_name,
+            file_path,
+            file_url,
+            file_size,
+            upload_date,
+            is_default
+          )
+          VALUES ($1, $2, $3, $4, $5, NOW(), false)
+          RETURNING id
+        `;
+        
+        const saveCvResult = await client.query(saveCvQuery, [
+          userId,
+          req.file.originalname,
+          req.file.path,
+          `/${req.file.path.replace(/\\/g, '/')}`, 
+          req.file.size
+        ]);
+        
+        savedCvId = saveCvResult.rows[0].id;
+        console.log('   CV saved to user_cvs with ID:', savedCvId);
+      } catch (cvError) {
+        console.error('   Error saving CV to user_cvs:', cvError.message);
+        
+      }
+    }
+    
+    else if (cv_id) {
+      const cvIdInt = parseInt(cv_id);
+      console.log('   Case 2: Looking up existing CV');
+      console.log('     cv_id:', cvIdInt);
+      
+      const cvResult = await client.query(
+        'SELECT id, file_path, file_url FROM user_cvs WHERE id = $1 AND user_id = $2',
+        [cvIdInt, userId]
+      );
+
+      if (cvResult.rows.length === 0) {
+        await client.query('ROLLBACK');
+        console.log('      CV not found');
+        return res.status(400).json({
+          success: false,
+          message: 'CV không tồn tại hoặc không thuộc về bạn'
+        });
+      }
+
+      const cv = cvResult.rows[0];
+      finalCVPath = cv.file_path || cv.file_url;
+      savedCvId = cv.id;
+      console.log('      Using CV ID:', savedCvId);
+      console.log('     Path:', finalCVPath);
+    }
+    // Case 3: cv_file string (backward compatibility)
+    else if (cv_file) {
+      finalCVPath = cv_file;
+      console.log('   Case 3: Using cv_file string');
+    }
+    // Case 4: No CV provided
+    else {
+      await client.query('ROLLBACK');
+      console.log('   Case 4: No CV provided');
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng chọn CV hoặc upload CV mới'
+      });
+    }
+
+    console.log('\n FINAL VALUES:');
+    console.log('   CV Path:', finalCVPath);
+    console.log('   CV ID in user_cvs:', savedCvId);
+
+    if (!finalCVPath) {
+      await client.query('ROLLBACK');
+      console.log(' CRITICAL: finalCVPath is null!');
+      return res.status(400).json({
+        success: false,
+        message: 'Lỗi xử lý CV. Vui lòng thử lại.'
+      });
+    }
+
+    // Insert application
+    const insertQuery = `
+      INSERT INTO applications (
         job_id,
         user_id,
         cover_letter,
@@ -75,22 +184,34 @@ exports.applyJob = async (req, res) => {
         ngay_ung_tuyen
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())
-      RETURNING *`,
-      [
-        jobId,
-        userId,
-        finalCoverLetter || null,
-        finalResume || null,
-        expected_salary || null,
-        salary_currency || 'VND',
-        available_from || null,
-        'pending'
-      ]
-    );
+      RETURNING *
+    `;
+    
+    const insertParams = [
+      jobId,
+      userId,
+      finalCoverLetter || null,
+      finalCVPath,
+      expected_salary || null,
+      salary_currency || 'VND',
+      available_from || null,
+      'pending'
+    ];
+
+    console.log('\n INSERT APPLICATION:');
+    console.log('Params:', insertParams);
+
+    const result = await client.query(insertQuery, insertParams);
 
     await client.query('COMMIT');
 
-    // Get application with job and user details
+    console.log('\n APPLICATION CREATED!');
+    console.log('   Application ID:', result.rows[0].id);
+    console.log('   CV File:', result.rows[0].cv_file);
+    console.log('   CV saved to user_cvs ID:', savedCvId);
+    console.log('========================================\n');
+
+    // Get full application details
     const applicationResult = await client.query(
       `SELECT 
         a.*,
@@ -111,14 +232,18 @@ exports.applyJob = async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Ứng tuyển thành công',
-      application: applicationResult.rows[0]
+      application: applicationResult.rows[0],
+      cv_saved_to_user_cvs: !!savedCvId,
+      cv_id: savedCvId
     });
 
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('❌ Apply job error:', error);
+    console.error('\n APPLICATION ERROR:');
+    console.error('   Message:', error.message);
+    console.error('   Stack:', error.stack);
+    console.error('========================================\n');
     
-    // Handle unique constraint violation
     if (error.code === '23505') {
       return res.status(400).json({
         success: false,
@@ -141,99 +266,89 @@ exports.applyJob = async (req, res) => {
 // @access  Private (User)
 exports.getMyApplications = async (req, res) => {
   try {
-    const { page = 1, limit = 1000, status } = req.query;
-    const offset = (page - 1) * limit;
     const userId = req.user.id;
+    const { limit = 1000 } = req.query;
 
-    console.log(`📊 getMyApplications - userId: ${userId}`);
+    console.log(` getMyApplications - userId: ${userId}`);
 
-    // ✅ UNION CẢ 2 BẢNG: applied_jobs + applications
-    let query = `
+    const query = `
       SELECT 
-        'external' as application_type,
-        aj.id,
-        aj.job_id,
-        aj.job_title,
-        aj.company_name,
-        aj.company_logo,
-        aj.location,
-        aj.salary,
-        aj.applied_date as created_at,
-        aj.cv_used,
-        'pending' as status,
-        NULL as cover_letter,
-        NULL as expected_salary
-      FROM applied_jobs aj
-      WHERE aj.user_id = $1
-      
-      UNION ALL
-      
-      SELECT 
-        'internal' as application_type,
         a.id,
         a.job_id,
-        j.title as job_title,
-        j.company_name,
-        j.company_logo,
-        j.location,
-        CONCAT(j.min_salary, ' - ', j.max_salary, ' ', COALESCE(j.currency, 'VND')) as salary,
-        a.created_at,
-        a.cv_file as cv_used,
+        a.user_id,
         a.status,
+        a.ngay_ung_tuyen,
+        a.cv_file,
         a.cover_letter,
-        a.expected_salary
+        a.created_at
       FROM applications a
-      LEFT JOIN jobs j ON a.job_id = j.id
       WHERE a.user_id = $1
+      ORDER BY a.ngay_ung_tuyen DESC NULLS LAST
+      LIMIT $2
     `;
 
-    const params = [userId];
-    let paramIndex = 2;
+    const result = await pool.query(query, [userId, parseInt(limit)]);
 
-    // Filter by status if provided
-    if (status) {
-      query = `
-        SELECT * FROM (${query}) combined_apps
-        WHERE status = $${paramIndex}
-      `;
-      params.push(status);
-      paramIndex++;
-    }
+    const applicationsWithJobs = await Promise.all(
+      result.rows.map(async (app) => {
+        try {
+          const jobResult = await pool.query(
+            `SELECT id, title, company_name, location, min_salary, max_salary, currency
+             FROM jobs WHERE id = $1`,
+            [app.job_id]
+          );
 
-    // Add ordering and pagination
-    query += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
-    params.push(Number(limit), offset);
+          const job = jobResult.rows[0];
 
-    console.log(`📝 Executing UNION query...`);
-    const appsResult = await pool.query(query, params);
-    
-    console.log(`✅ Query returned ${appsResult.rows.length} rows (external + internal)`);
-
-    // Count total from BOTH tables
-    const countQuery = `
-      SELECT COUNT(*) as total FROM (
-        SELECT id FROM applied_jobs WHERE user_id = $1
-        UNION ALL
-        SELECT id FROM applications WHERE user_id = $1
-      ) combined
-    `;
-    
-    const countResult = await pool.query(countQuery, [userId]);
-    const total = parseInt(countResult.rows[0].total);
-    
-    console.log(`📊 Total applications (external + internal): ${total}`);
+          return {
+            application_type: 'internal',
+            id: app.id,
+            job_id: app.job_id,
+            job_title: job ? job.title : 'Không rõ',
+            company_name: job ? job.company_name : 'Không rõ',
+            company_logo: null,
+            location: job ? job.location : 'Không rõ',
+            salary: job 
+              ? `${job.min_salary || ''} - ${job.max_salary || ''} ${job.currency || 'VND'}`
+              : 'Thỏa thuận',
+            ngay_ung_tuyen: app.ngay_ung_tuyen,
+            created_at: app.created_at,
+            cv_file: app.cv_file,
+            status: app.status || 'pending',
+            cover_letter: app.cover_letter
+          };
+        } catch (err) {
+          console.error(` Error loading job ${app.job_id}:`, err);
+          return {
+            application_type: 'internal',
+            id: app.id,
+            job_id: app.job_id,
+            job_title: 'Lỗi tải thông tin',
+            company_name: 'Không rõ',
+            company_logo: null,
+            location: 'Không rõ',
+            salary: 'Thỏa thuận',
+            ngay_ung_tuyen: app.ngay_ung_tuyen,
+            created_at: app.created_at,
+            cv_file: app.cv_file,
+            status: app.status || 'pending',
+            cover_letter: app.cover_letter
+          };
+        }
+      })
+    );
 
     res.json({
       success: true,
-      count: appsResult.rows.length,
-      total,
-      totalPages: Math.ceil(total / limit),
-      currentPage: Number(page),
-      applications: appsResult.rows
+      count: applicationsWithJobs.length,
+      total: applicationsWithJobs.length,
+      applications: applicationsWithJobs,
+      data: applicationsWithJobs
     });
 
   } catch (error) {
-    console.error('❌ Get my applications error:', error);
+    console.error(' Error:', error);
+    
     res.status(500).json({
       success: false,
       message: 'Lỗi server',
@@ -241,7 +356,6 @@ exports.getMyApplications = async (req, res) => {
     });
   }
 };
-
 
 // @desc    Get applications for a job (employer)
 // @route   GET /api/applications/job/:jobId
@@ -253,7 +367,6 @@ exports.getJobApplications = async (req, res) => {
     const jobId = req.params.jobId;
     const employerId = req.user.id;
 
-    // Check if job exists and belongs to employer
     const jobResult = await pool.query(
       'SELECT id, title, posted_by FROM jobs WHERE id = $1',
       [jobId]
@@ -278,6 +391,11 @@ exports.getJobApplications = async (req, res) => {
     let query = `
       SELECT 
         a.*,
+        a.cv_file,
+        a.cover_letter,
+        a.expected_salary,
+        a.salary_currency,
+        a.available_from,
         u.name as user_name,
         u.email as user_email,
         u.phone as user_phone
@@ -300,7 +418,6 @@ exports.getJobApplications = async (req, res) => {
 
     const appsResult = await pool.query(query, params);
 
-    // Count total
     let countQuery = 'SELECT COUNT(*) as total FROM applications WHERE job_id = $1';
     const countParams = [jobId];
 
@@ -322,7 +439,7 @@ exports.getJobApplications = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Get job applications error:', error);
+    console.error(' Get job applications error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server',
@@ -369,7 +486,6 @@ exports.getApplicationById = async (req, res) => {
 
     const application = result.rows[0];
 
-    // Check permission
     const isApplicant = application.user_id === currentUserId;
     const isEmployer = application.job_posted_by === currentUserId;
 
@@ -386,7 +502,7 @@ exports.getApplicationById = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Get application by ID error:', error);
+    console.error(' Get application by ID error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server',
@@ -404,10 +520,8 @@ exports.updateApplicationStatus = async (req, res) => {
     const applicationId = req.params.id;
     const employerId = req.user.id;
 
-    // Support both naming conventions
     const finalNote = note || employer_notes;
 
-    // Get application and check ownership
     const appResult = await pool.query(
       `SELECT a.*, j.posted_by 
        FROM applications a
@@ -425,7 +539,6 @@ exports.updateApplicationStatus = async (req, res) => {
 
     const application = appResult.rows[0];
 
-    // Check if employer owns the job
     if (application.posted_by !== employerId) {
       return res.status(403).json({
         success: false,
@@ -433,7 +546,6 @@ exports.updateApplicationStatus = async (req, res) => {
       });
     }
 
-    // Update application
     const updateResult = await pool.query(
       `UPDATE applications 
        SET status = $1,
@@ -447,7 +559,6 @@ exports.updateApplicationStatus = async (req, res) => {
       [status, finalNote, rejection_reason, employerId, applicationId]
     );
 
-    // Get updated application with user details
     const result = await pool.query(
       `SELECT 
         a.*,
@@ -466,7 +577,7 @@ exports.updateApplicationStatus = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Update application status error:', error);
+    console.error(' Update application status error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server',
@@ -497,7 +608,6 @@ exports.withdrawApplication = async (req, res) => {
 
     const application = result.rows[0];
 
-    // Check ownership
     if (application.user_id !== userId) {
       return res.status(403).json({
         success: false,
@@ -505,7 +615,6 @@ exports.withdrawApplication = async (req, res) => {
       });
     }
 
-    // Cannot withdraw if already accepted/rejected
     if (application.status !== 'pending') {
       return res.status(400).json({
         success: false,
@@ -521,7 +630,7 @@ exports.withdrawApplication = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Withdraw application error:', error);
+    console.error(' Withdraw application error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server',
@@ -562,7 +671,7 @@ exports.getEmployerApplicationStats = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Get employer application stats error:', error);
+    console.error(' Get employer application stats error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server',
@@ -602,7 +711,7 @@ exports.getUserApplicationStats = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Get user application stats error:', error);
+    console.error(' Get user application stats error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server',
@@ -621,7 +730,6 @@ exports.bulkUpdateStatus = async (req, res) => {
     const { applicationIds, status, note, employer_notes } = req.body;
     const employerId = req.user.id;
 
-    // Support both naming conventions
     const finalNote = note || employer_notes;
 
     if (!applicationIds || applicationIds.length === 0) {
@@ -633,7 +741,6 @@ exports.bulkUpdateStatus = async (req, res) => {
 
     await client.query('BEGIN');
 
-    // Check if employer owns all jobs
     const checkResult = await client.query(
       `SELECT DISTINCT j.posted_by
        FROM applications a
@@ -654,7 +761,6 @@ exports.bulkUpdateStatus = async (req, res) => {
       });
     }
 
-    // Update all applications
     await client.query(
       `UPDATE applications 
        SET status = $1,
@@ -675,7 +781,7 @@ exports.bulkUpdateStatus = async (req, res) => {
 
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('❌ Bulk update status error:', error);
+    console.error(' Bulk update status error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server',
@@ -706,7 +812,7 @@ exports.checkApplication = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Check application error:', error);
+    console.error(' Check application error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server',

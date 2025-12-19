@@ -8,13 +8,13 @@ const AdminApplications = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Pagination & filters
+ 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  // Fetch applications
+
   useEffect(() => {
     fetchApplications();
   }, [currentPage, searchTerm, statusFilter]);
@@ -71,7 +71,7 @@ const AdminApplications = () => {
       }
 
       alert('Cập nhật trạng thái thành công!');
-      fetchApplications(); // Refresh list
+      fetchApplications(); 
     } catch (err) {
       console.error('Error updating status:', err);
       alert('Lỗi khi cập nhật trạng thái!');
@@ -98,7 +98,7 @@ const AdminApplications = () => {
       }
 
       alert('Xóa application thành công!');
-      fetchApplications(); // Refresh list
+      fetchApplications(); 
     } catch (err) {
       console.error('Error deleting application:', err);
       alert('Lỗi khi xóa application!');
@@ -135,7 +135,7 @@ const AdminApplications = () => {
 
   return (
     <div className="admin-jobs-container">
-      {/* Header */}
+      
       <div className="page-header">
         <div>
           <h1> Quản lý Applications</h1>
@@ -143,7 +143,7 @@ const AdminApplications = () => {
         </div>
       </div>
 
-      {/* Filters */}
+     
       <div className="filters-section">
         <form onSubmit={handleSearch} className="search-form">
           <input
@@ -172,14 +172,14 @@ const AdminApplications = () => {
         </select>
       </div>
 
-      {/* Error Message */}
+     
       {error && (
         <div className="error-message">
           <p>Lỗi {error}</p>
         </div>
       )}
 
-      {/* Applications Table */}
+     
       <div className="table-container">
         <table className="data-table">
           <thead>
@@ -255,7 +255,7 @@ const AdminApplications = () => {
         </table>
       </div>
 
-      {/* Pagination */}
+      
       {totalPages > 1 && (
         <div className="pagination">
           <button

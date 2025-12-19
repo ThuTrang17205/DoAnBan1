@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import jobService from '../services/jobService';
 
-/**
- * Custom hook for fetching latest jobs
- */
+
 export const useLatestJobs = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,9 +28,7 @@ export const useLatestJobs = () => {
   return { jobs, loading, error, refetch: fetchJobs };
 };
 
-/**
- * Custom hook for fetching all jobs with filters
- */
+
 export const useJobs = (initialParams = {}) => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,9 +74,8 @@ export const useJobs = (initialParams = {}) => {
   };
 };
 
-/**
- * Custom hook for fetching single job
- */
+
+
 export const useJobDetail = (jobId) => {
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);

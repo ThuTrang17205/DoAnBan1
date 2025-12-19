@@ -14,7 +14,7 @@ class Admin {
       );
       return result.rows;
     } catch (error) {
-      console.error('❌ Error in Admin.findAll:', error.message);
+      console.error(' Error in Admin.findAll:', error.message);
       throw error;
     }
   }
@@ -32,7 +32,7 @@ class Admin {
       );
       return result.rows[0] || null;
     } catch (error) {
-      console.error('❌ Error in Admin.findById:', error.message);
+      console.error(' Error in Admin.findById:', error.message);
       throw error;
     }
   }
@@ -50,14 +50,14 @@ class Admin {
       );
       return result.rows[0] || null;
     } catch (error) {
-      console.error('❌ Error in Admin.findByUsername:', error.message);
+      console.error(' Error in Admin.findByUsername:', error.message);
       throw error;
     }
   }
 
   /**
    * Tạo admin mới
-   * @param {Object} adminData - Admin data
+   * @param {Object} adminData 
    * @returns {Promise<Object>}
    */
   static async create(adminData) {
@@ -80,10 +80,10 @@ class Admin {
         [username, hashedPassword, full_name]
       );
 
-      console.log('✅ Admin created:', username);
+      console.log(' Admin created:', username);
       return result.rows[0];
     } catch (error) {
-      console.error('❌ Error in Admin.create:', error.message);
+      console.error(' Error in Admin.create:', error.message);
       throw error;
     }
   }
@@ -110,10 +110,10 @@ class Admin {
         throw new Error('Admin not found');
       }
 
-      console.log('✅ Admin updated, ID:', id);
+      console.log(' Admin updated, ID:', id);
       return result.rows[0];
     } catch (error) {
-      console.error('❌ Error in Admin.update:', error.message);
+      console.error(' Error in Admin.update:', error.message);
       throw error;
     }
   }
@@ -133,10 +133,10 @@ class Admin {
         [hashedPassword, id]
       );
       
-      console.log('✅ Admin password updated, ID:', id);
+      console.log(' Admin password updated, ID:', id);
       return true;
     } catch (error) {
-      console.error('❌ Error in Admin.updatePassword:', error.message);
+      console.error(' Error in Admin.updatePassword:', error.message);
       throw error;
     }
   }
@@ -157,10 +157,10 @@ class Admin {
         throw new Error('Admin not found');
       }
       
-      console.log('✅ Admin deleted, ID:', id);
+      console.log(' Admin deleted, ID:', id);
       return true;
     } catch (error) {
-      console.error('❌ Error in Admin.delete:', error.message);
+      console.error(' Error in Admin.delete:', error.message);
       throw error;
     }
   }
@@ -181,7 +181,7 @@ class Admin {
       // Nếu đã hash
       return await bcrypt.compare(plainPassword, hashedPassword);
     } catch (error) {
-      console.error('❌ Error in Admin.verifyPassword:', error.message);
+      console.error(' Error in Admin.verifyPassword:', error.message);
       throw error;
     }
   }
@@ -210,7 +210,7 @@ class Admin {
       const { password: _, ...adminWithoutPassword } = admin;
       return adminWithoutPassword;
     } catch (error) {
-      console.error('❌ Error in Admin.authenticate:', error.message);
+      console.error(' Error in Admin.authenticate:', error.message);
       throw error;
     }
   }
@@ -290,7 +290,7 @@ class Admin {
         recentJobs: recentJobs.rows
       };
     } catch (error) {
-      console.error('❌ Error in Admin.getDashboardStats:', error.message);
+      console.error(' Error in Admin.getDashboardStats:', error.message);
       throw error;
     }
   }
@@ -351,7 +351,7 @@ class Admin {
         totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit)
       };
     } catch (error) {
-      console.error('❌ Error in Admin.getUsers:', error.message);
+      console.error(' Error in Admin.getUsers:', error.message);
       throw error;
     }
   }
@@ -423,7 +423,7 @@ class Admin {
         totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit)
       };
     } catch (error) {
-      console.error('❌ Error in Admin.getJobs:', error.message);
+      console.error(' Error in Admin.getJobs:', error.message);
       throw error;
     }
   }
@@ -437,7 +437,7 @@ class Admin {
       const result = await pool.query('SELECT COUNT(*) FROM admin');
       return parseInt(result.rows[0].count);
     } catch (error) {
-      console.error('❌ Error in Admin.count:', error.message);
+      console.error(' Error in Admin.count:', error.message);
       throw error;
     }
   }

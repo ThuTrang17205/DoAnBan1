@@ -1,13 +1,13 @@
-// =============================================
-// utils/validator.js
-// CUSTOM VALIDATORS FOR JOB PORTAL
-// =============================================
+
+
+
+
 
 const { body, param, query, validationResult } = require('express-validator');
 
-// ============================================
-// MIDDLEWARE: Check validation errors
-// ============================================
+
+
+
 exports.validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -24,14 +24,10 @@ exports.validate = (req, res, next) => {
   next();
 };
 
-// ============================================
-// AUTH VALIDATORS
-// ============================================
 
-/**
- * Validate user registration
- * POST /api/auth/register
- */
+
+
+
 exports.validateRegister = [
   body('name')
     .trim()
@@ -58,10 +54,6 @@ exports.validateRegister = [
     .withMessage('Số điện thoại không hợp lệ (VD: 0912345678)')
 ];
 
-/**
- * Validate user login
- * POST /api/auth/login
- */
 exports.validateLogin = [
   body('email')
     .trim()
@@ -73,10 +65,6 @@ exports.validateLogin = [
     .notEmpty().withMessage('Mật khẩu không được để trống')
 ];
 
-/**
- * Validate change password
- * PUT /api/auth/change-password
- */
 exports.validateChangePassword = [
   body('currentPassword')
     .notEmpty().withMessage('Mật khẩu hiện tại không được để trống'),
@@ -88,14 +76,10 @@ exports.validateChangePassword = [
     .withMessage('Mật khẩu mới phải có chữ hoa, chữ thường và số')
 ];
 
-// ============================================
-// JOB VALIDATORS
-// ============================================
 
-/**
- * Validate create job
- * POST /api/jobs
- */
+
+
+
 exports.validateCreateJob = [
   body('title')
     .trim()
@@ -160,10 +144,6 @@ exports.validateCreateJob = [
     .isArray().withMessage('Skills phải là array')
 ];
 
-/**
- * Validate update job
- * PUT /api/jobs/:id
- */
 exports.validateUpdateJob = [
   body('title')
     .optional()
@@ -185,14 +165,10 @@ exports.validateUpdateJob = [
     .withMessage('Trạng thái không hợp lệ')
 ];
 
-// ============================================
-// PROFILE VALIDATORS
-// ============================================
 
-/**
- * Validate update user profile
- * PUT /api/users/me/profile
- */
+
+
+
 exports.validateUpdateProfile = [
   body('name')
     .optional()
@@ -226,10 +202,6 @@ exports.validateUpdateProfile = [
     .withMessage('Giới tính không hợp lệ')
 ];
 
-/**
- * Validate add experience
- * POST /api/users/me/experience
- */
 exports.validateAddExperience = [
   body('title')
     .trim()
@@ -256,10 +228,6 @@ exports.validateAddExperience = [
     .isLength({ max: 1000 }).withMessage('Mô tả không được quá 1000 ký tự')
 ];
 
-/**
- * Validate add education
- * POST /api/users/me/education
- */
 exports.validateAddEducation = [
   body('school')
     .trim()
@@ -286,14 +254,10 @@ exports.validateAddEducation = [
     .isBoolean().withMessage('Current phải là boolean')
 ];
 
-// ============================================
-// EMPLOYER VALIDATORS
-// ============================================
 
-/**
- * Validate employer registration
- * POST /api/employer/auth/register
- */
+
+
+
 exports.validateEmployerRegister = [
   body('companyName')
     .trim()
@@ -327,10 +291,6 @@ exports.validateEmployerRegister = [
     .isLength({ max: 200 }).withMessage('Địa chỉ không được quá 200 ký tự')
 ];
 
-/**
- * Validate update employer profile
- * PUT /api/employers/me/profile
- */
 exports.validateUpdateEmployerProfile = [
   body('companyName')
     .optional()
@@ -357,14 +317,10 @@ exports.validateUpdateEmployerProfile = [
     .withMessage('Năm thành lập không hợp lệ')
 ];
 
-// ============================================
-// APPLICATION VALIDATORS
-// ============================================
 
-/**
- * Validate apply for job
- * POST /api/applications/apply/:jobId
- */
+
+
+
 exports.validateApplyJob = [
   body('coverLetter')
     .trim()
@@ -376,10 +332,6 @@ exports.validateApplyJob = [
     .isURL().withMessage('Link CV không hợp lệ')
 ];
 
-/**
- * Validate update application status
- * PUT /api/applications/:id/status
- */
 exports.validateUpdateApplicationStatus = [
   body('status')
     .isIn(['pending', 'accepted', 'rejected', 'interviewing'])
@@ -390,14 +342,10 @@ exports.validateUpdateApplicationStatus = [
     .isLength({ max: 500 }).withMessage('Ghi chú không được quá 500 ký tự')
 ];
 
-// ============================================
-// CATEGORY VALIDATORS
-// ============================================
 
-/**
- * Validate create category
- * POST /api/categories
- */
+
+
+
 exports.validateCreateCategory = [
   body('name')
     .trim()
@@ -422,10 +370,6 @@ exports.validateCreateCategory = [
     .isInt({ min: 0 }).withMessage('Order phải là số nguyên dương')
 ];
 
-/**
- * Validate update category
- * PUT /api/categories/:id
- */
 exports.validateUpdateCategory = [
   body('name')
     .optional()
@@ -442,22 +386,16 @@ exports.validateUpdateCategory = [
     .isBoolean().withMessage('isActive phải là boolean')
 ];
 
-// ============================================
-// COMMON VALIDATORS
-// ============================================
 
-/**
- * Validate PostgreSQL Integer ID
- */
+
+
+
 exports.validatePostgresId = [
   param('id')
     .isInt({ min: 1 }).withMessage('ID không hợp lệ')
-    .toInt() // Convert string to integer
+    .toInt() 
 ];
 
-/**
- * Validate pagination parameters
- */
 exports.validatePagination = [
   query('page')
     .optional()
@@ -468,9 +406,6 @@ exports.validatePagination = [
     .isInt({ min: 1, max: 100 }).withMessage('Limit phải từ 1-100')
 ];
 
-/**
- * Validate search query
- */
 exports.validateSearch = [
   query('search')
     .optional()
@@ -478,22 +413,16 @@ exports.validateSearch = [
     .isLength({ min: 2 }).withMessage('Từ khóa tìm kiếm phải ít nhất 2 ký tự')
 ];
 
-/**
- * Validate status
- */
 exports.validateStatus = [
   body('status')
     .isIn(['active', 'inactive', 'pending', 'accepted', 'rejected', 'closed'])
     .withMessage('Trạng thái không hợp lệ')
 ];
 
-// ============================================
-// CUSTOM VALIDATORS
-// ============================================
 
-/**
- * Check if email already exists
- */
+
+
+
 exports.isEmailExists = async (email, { req }) => {
   const User = require('../models/User');
   const user = await User.findOne({ email });
@@ -503,9 +432,6 @@ exports.isEmailExists = async (email, { req }) => {
   return true;
 };
 
-/**
- * Check if Vietnamese phone number is valid
- */
 exports.isVietnamesePhone = (value) => {
   const vnPhoneRegex = /^(0|\+84)(3|5|7|8|9)[0-9]{8}$/;
   if (!vnPhoneRegex.test(value)) {
@@ -514,9 +440,6 @@ exports.isVietnamesePhone = (value) => {
   return true;
 };
 
-/**
- * Check if password is strong
- */
 exports.isStrongPassword = (value) => {
   const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   if (!strongPasswordRegex.test(value)) {
@@ -525,16 +448,82 @@ exports.isStrongPassword = (value) => {
   return true;
 };
 
-/**
- * Sanitize HTML input
- */
 exports.sanitizeHTML = (value) => {
-  // Remove HTML tags
+  
   return value.replace(/<[^>]*>/g, '');
 };
 
-// ============================================
-// EXPORT ALL
-// ============================================
 
+
+
+
+
+
+
+exports.validateGetMatchedCandidates = [
+  param('jobId')
+    .isInt({ min: 1 }).withMessage('Job ID không hợp lệ')
+    .toInt(),
+  
+  query('minScore')
+    .optional()
+    .isFloat({ min: 0, max: 100 }).withMessage('minScore phải từ 0-100')
+    .toFloat(),
+  
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 100 }).withMessage('limit phải từ 1-100')
+    .toInt(),
+  
+  query('offset')
+    .optional()
+    .isInt({ min: 0 }).withMessage('offset phải >= 0')
+    .toInt(),
+  
+  query('isQualified')
+    .optional()
+    .isIn(['true', 'false']).withMessage('isQualified phải là true hoặc false')
+];
+
+exports.validateGetMatchedJobs = [
+  param('candidateId')
+    .isInt({ min: 1 }).withMessage('Candidate ID không hợp lệ')
+    .toInt(),
+  
+  query('minScore')
+    .optional()
+    .isFloat({ min: 0, max: 100 }).withMessage('minScore phải từ 0-100')
+    .toFloat(),
+  
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 100 }).withMessage('limit phải từ 1-100')
+    .toInt(),
+  
+  query('offset')
+    .optional()
+    .isInt({ min: 0 }).withMessage('offset phải >= 0')
+    .toInt(),
+  
+  query('isQualified')
+    .optional()
+    .isIn(['true', 'false']).withMessage('isQualified phải là true hoặc false'),
+  
+  query('location')
+    .optional()
+    .trim()
+    .isLength({ min: 2 }).withMessage('location phải ít nhất 2 ký tự')
+];
+
+exports.validateRunMatching = [
+  param('jobId')
+    .isInt({ min: 1 }).withMessage('Job ID không hợp lệ')
+    .toInt()
+];
+
+exports.validateGetMatchingStats = [
+  param('jobId')
+    .isInt({ min: 1 }).withMessage('Job ID không hợp lệ')
+    .toInt()
+];
 module.exports = exports;

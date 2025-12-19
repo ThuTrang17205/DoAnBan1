@@ -1,12 +1,12 @@
 /**
  * User Routes
- * User profile and management routes
+ * User profile and management routes 1111
  */
 
 const express = require('express');
 const router = express.Router();
 
-// Middleware
+
 const { authMiddleware } = require('../middleware/auth');
 const { isUser, isOwnerOrAdmin } = require('../middleware/roleCheck');
 const { validateIdParam, validatePagination } = require('../middleware/validateInput');
@@ -17,13 +17,13 @@ const {
   validateUploadedFile
 } = require('../middleware/upload');
 
-// Controllers (uncomment when created)
-// const userController = require('../controllers/userController');
 
-// Apply authentication to all routes
+
+
+
 router.use(authMiddleware);
 
-// ==================== PROFILE ROUTES ====================
+
 
 /**
  * @route   GET /api/users/profile
@@ -31,7 +31,7 @@ router.use(authMiddleware);
  * @access  Private
  */
 router.get('/profile', (req, res) => {
-  // userController.getProfile
+  
   res.json({
     success: true,
     message: 'Get user profile',
@@ -50,7 +50,7 @@ router.get('/profile', (req, res) => {
  * @access  Private
  */
 router.put('/profile', (req, res) => {
-  // userController.updateProfile
+  
   res.json({
     success: true,
     message: 'Profile updated successfully'
@@ -68,7 +68,7 @@ router.post(
   uploadAvatar,
   validateUploadedFile,
   (req, res) => {
-    // userController.uploadAvatar
+    
     res.json({
       success: true,
       message: 'Avatar uploaded successfully',
@@ -85,7 +85,7 @@ router.post(
  * @access  Private
  */
 router.delete('/profile/avatar', (req, res) => {
-  // userController.deleteAvatar
+  
   res.json({
     success: true,
     message: 'Avatar deleted successfully'
@@ -103,7 +103,7 @@ router.post(
   uploadResume,
   validateUploadedFile,
   (req, res) => {
-    // userController.uploadResume
+    
     res.json({
       success: true,
       message: 'Resume uploaded successfully',
@@ -120,14 +120,14 @@ router.post(
  * @access  Private
  */
 router.delete('/profile/resume', (req, res) => {
-  // userController.deleteResume
+  
   res.json({
     success: true,
     message: 'Resume deleted successfully'
   });
 });
 
-// ==================== USER SETTINGS ====================
+
 
 /**
  * @route   GET /api/users/settings
@@ -135,7 +135,7 @@ router.delete('/profile/resume', (req, res) => {
  * @access  Private
  */
 router.get('/settings', (req, res) => {
-  // userController.getSettings
+  
   res.json({
     success: true,
     message: 'Get user settings',
@@ -158,14 +158,14 @@ router.get('/settings', (req, res) => {
  * @access  Private
  */
 router.put('/settings', (req, res) => {
-  // userController.updateSettings
+  
   res.json({
     success: true,
     message: 'Settings updated successfully'
   });
 });
 
-// ==================== JOB APPLICATIONS ====================
+
 
 /**
  * @route   GET /api/users/applications
@@ -173,7 +173,7 @@ router.put('/settings', (req, res) => {
  * @access  Private
  */
 router.get('/applications', isUser, validatePagination, (req, res) => {
-  // userController.getApplications
+  
   res.json({
     success: true,
     message: 'Get user applications',
@@ -188,7 +188,7 @@ router.get('/applications', isUser, validatePagination, (req, res) => {
  * @access  Private
  */
 router.get('/applications/statistics', isUser, (req, res) => {
-  // userController.getApplicationStatistics
+  
   res.json({
     success: true,
     message: 'Get application statistics',
@@ -201,7 +201,7 @@ router.get('/applications/statistics', isUser, (req, res) => {
   });
 });
 
-// ==================== SAVED JOBS ====================
+
 
 /**
  * @route   GET /api/users/saved-jobs
@@ -209,7 +209,7 @@ router.get('/applications/statistics', isUser, (req, res) => {
  * @access  Private
  */
 router.get('/saved-jobs', isUser, validatePagination, (req, res) => {
-  // userController.getSavedJobs
+  
   res.json({
     success: true,
     message: 'Get saved jobs',
@@ -224,7 +224,7 @@ router.get('/saved-jobs', isUser, validatePagination, (req, res) => {
  * @access  Private
  */
 router.post('/saved-jobs/:jobId', isUser, validateIdParam('jobId'), (req, res) => {
-  // userController.saveJob
+  
   res.json({
     success: true,
     message: 'Job saved successfully'
@@ -237,14 +237,14 @@ router.post('/saved-jobs/:jobId', isUser, validateIdParam('jobId'), (req, res) =
  * @access  Private
  */
 router.delete('/saved-jobs/:jobId', isUser, validateIdParam('jobId'), (req, res) => {
-  // userController.unsaveJob
+  
   res.json({
     success: true,
     message: 'Job removed from saved list'
   });
 });
 
-// ==================== NOTIFICATIONS ====================
+
 
 /**
  * @route   GET /api/users/notifications
@@ -252,7 +252,7 @@ router.delete('/saved-jobs/:jobId', isUser, validateIdParam('jobId'), (req, res)
  * @access  Private
  */
 router.get('/notifications', validatePagination, (req, res) => {
-  // userController.getNotifications
+  
   res.json({
     success: true,
     message: 'Get notifications',
@@ -267,7 +267,7 @@ router.get('/notifications', validatePagination, (req, res) => {
  * @access  Private
  */
 router.put('/notifications/:id/read', validateIdParam(), (req, res) => {
-  // userController.markNotificationAsRead
+  
   res.json({
     success: true,
     message: 'Notification marked as read'
@@ -280,7 +280,7 @@ router.put('/notifications/:id/read', validateIdParam(), (req, res) => {
  * @access  Private
  */
 router.put('/notifications/read-all', (req, res) => {
-  // userController.markAllNotificationsAsRead
+  
   res.json({
     success: true,
     message: 'All notifications marked as read'
@@ -293,14 +293,14 @@ router.put('/notifications/read-all', (req, res) => {
  * @access  Private
  */
 router.delete('/notifications/:id', validateIdParam(), (req, res) => {
-  // userController.deleteNotification
+  
   res.json({
     success: true,
     message: 'Notification deleted successfully'
   });
 });
 
-// ==================== JOB ALERTS ====================
+
 
 /**
  * @route   GET /api/users/job-alerts
@@ -308,7 +308,7 @@ router.delete('/notifications/:id', validateIdParam(), (req, res) => {
  * @access  Private
  */
 router.get('/job-alerts', isUser, (req, res) => {
-  // userController.getJobAlerts
+  
   res.json({
     success: true,
     message: 'Get job alerts',
@@ -322,7 +322,7 @@ router.get('/job-alerts', isUser, (req, res) => {
  * @access  Private
  */
 router.post('/job-alerts', isUser, (req, res) => {
-  // userController.createJobAlert
+  
   res.json({
     success: true,
     message: 'Job alert created successfully'
@@ -335,7 +335,7 @@ router.post('/job-alerts', isUser, (req, res) => {
  * @access  Private
  */
 router.put('/job-alerts/:id', isUser, validateIdParam(), (req, res) => {
-  // userController.updateJobAlert
+  
   res.json({
     success: true,
     message: 'Job alert updated successfully'
@@ -348,14 +348,14 @@ router.put('/job-alerts/:id', isUser, validateIdParam(), (req, res) => {
  * @access  Private
  */
 router.delete('/job-alerts/:id', isUser, validateIdParam(), (req, res) => {
-  // userController.deleteJobAlert
+  
   res.json({
     success: true,
     message: 'Job alert deleted successfully'
   });
 });
 
-// ==================== ACTIVITY & HISTORY ====================
+
 
 /**
  * @route   GET /api/users/activity
@@ -363,7 +363,7 @@ router.delete('/job-alerts/:id', isUser, validateIdParam(), (req, res) => {
  * @access  Private
  */
 router.get('/activity', validatePagination, (req, res) => {
-  // userController.getActivity
+  
   res.json({
     success: true,
     message: 'Get user activity',
@@ -378,7 +378,7 @@ router.get('/activity', validatePagination, (req, res) => {
  * @access  Private
  */
 router.get('/job-views', isUser, validatePagination, (req, res) => {
-  // userController.getJobViews
+  
   res.json({
     success: true,
     message: 'Get recently viewed jobs',
@@ -387,7 +387,7 @@ router.get('/job-views', isUser, validatePagination, (req, res) => {
   });
 });
 
-// ==================== ACCOUNT MANAGEMENT ====================
+
 
 /**
  * @route   DELETE /api/users/account
@@ -395,7 +395,7 @@ router.get('/job-views', isUser, validatePagination, (req, res) => {
  * @access  Private
  */
 router.delete('/account', (req, res) => {
-  // userController.deleteAccount
+  
   res.json({
     success: true,
     message: 'Account deleted successfully'
@@ -408,7 +408,7 @@ router.delete('/account', (req, res) => {
  * @access  Private
  */
 router.post('/account/deactivate', (req, res) => {
-  // userController.deactivateAccount
+  
   res.json({
     success: true,
     message: 'Account deactivated successfully'
@@ -421,7 +421,7 @@ router.post('/account/deactivate', (req, res) => {
  * @access  Private
  */
 router.post('/account/reactivate', (req, res) => {
-  // userController.reactivateAccount
+  
   res.json({
     success: true,
     message: 'Account reactivated successfully'

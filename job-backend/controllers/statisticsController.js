@@ -1,4 +1,4 @@
-// controllers/statisticsController.js
+
 const pool = require('../config/db');
 
 /**
@@ -8,20 +8,20 @@ const pool = require('../config/db');
  */
 exports.getStatistics = async (req, res) => {
   try {
-    // Query 1: Count total active jobs
+    
     const jobsResult = await pool.query(
       "SELECT COUNT(*) as total FROM jobs WHERE status = 'open'"
     );
     const totalJobs = parseInt(jobsResult.rows[0].total) || 0;
 
-    // Query 2: Count unique companies
+    
     const companiesResult = await pool.query(`
       SELECT COUNT(DISTINCT id) as total 
       FROM companies
     `);
     const totalCompanies = parseInt(companiesResult.rows[0].total) || 0;
 
-    // Query 3: Count total candidates/users (role = 'candidate', 'user', hoặc không phải 'admin'/'employer')
+    
     const candidatesResult = await pool.query(`
       SELECT COUNT(*) as total 
       FROM users 
@@ -29,11 +29,10 @@ exports.getStatistics = async (req, res) => {
     `);
     const totalCandidates = parseInt(candidatesResult.rows[0].total) || 0;
 
-    // Query 4: Calculate satisfaction rate
-    let satisfactionRate = 95; // Default
+    let satisfactionRate = 95; 
     
     try {
-      // Tính từ applications nếu có
+      
       const satisfactionResult = await pool.query(`
         SELECT 
           COUNT(*) FILTER (WHERE status = 'accepted' OR status = 'hired') as successful,
@@ -47,7 +46,7 @@ exports.getStatistics = async (req, res) => {
         const total = parseInt(satisfactionResult.rows[0].total) || 1;
         satisfactionRate = Math.round((successful / total) * 100);
         
-        // Đảm bảo rate trong khoảng hợp lý (75-100%)
+        
         if (satisfactionRate < 75) satisfactionRate = 75;
         if (satisfactionRate > 100) satisfactionRate = 100;
       }
@@ -64,7 +63,7 @@ exports.getStatistics = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error fetching statistics:', error);
+    console.error(' Error fetching statistics:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy thống kê',
@@ -81,58 +80,57 @@ exports.getStatistics = async (req, res) => {
 exports.getDetailedStatistics = async (req, res) => {
   try {
     const queries = [
-      // Total jobs
+    
       pool.query("SELECT COUNT(*) as total FROM jobs"),
       
-      // Active jobs
       pool.query("SELECT COUNT(*) as total FROM jobs WHERE status = 'open'"),
       
-      // Closed jobs
+      
       pool.query("SELECT COUNT(*) as total FROM jobs WHERE status = 'closed'"),
       
-      // Jobs this month
+     
       pool.query(`
         SELECT COUNT(*) as total FROM jobs 
         WHERE posted_at >= DATE_TRUNC('month', CURRENT_DATE)
       `),
       
-      // Total companies
+    
       pool.query("SELECT COUNT(*) as total FROM companies"),
       
-      // New companies this month
+      
       pool.query(`
         SELECT COUNT(*) as total FROM companies 
         WHERE created_at >= DATE_TRUNC('month', CURRENT_DATE)
       `),
       
-      // Total employers (users with role 'employer')
+     
       pool.query(`
         SELECT COUNT(*) as total FROM users 
         WHERE role = 'employer'
       `),
       
-      // Total candidates (users not admin/employer)
+      
       pool.query(`
         SELECT COUNT(*) as total FROM users 
         WHERE role NOT IN ('admin', 'employer')
       `),
       
-      // New users this month
+      
       pool.query(`
         SELECT COUNT(*) as total FROM users 
         WHERE created_at >= DATE_TRUNC('month', CURRENT_DATE)
       `),
       
-      // Total applications
+    
       pool.query("SELECT COUNT(*) as total FROM applications"),
       
-      // Applications this month
+     
       pool.query(`
         SELECT COUNT(*) as total FROM applications 
         WHERE created_at >= DATE_TRUNC('month', CURRENT_DATE)
       `),
       
-      // Top categories
+      
       pool.query(`
         SELECT category, COUNT(*) as count 
         FROM jobs 
@@ -142,7 +140,7 @@ exports.getDetailedStatistics = async (req, res) => {
         LIMIT 5
       `),
 
-      // Top locations
+     
       pool.query(`
         SELECT location, COUNT(*) as count 
         FROM jobs 
@@ -152,7 +150,7 @@ exports.getDetailedStatistics = async (req, res) => {
         LIMIT 5
       `),
 
-      // Jobs by status breakdown
+      
       pool.query(`
         SELECT status, COUNT(*) as count
         FROM jobs
@@ -210,7 +208,7 @@ exports.getDetailedStatistics = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error fetching detailed statistics:', error);
+    console.error(' Error fetching detailed statistics:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy thống kê chi tiết',

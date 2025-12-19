@@ -2,14 +2,14 @@
   {
     "confidence": "medium",
     "count": 50,
-    "sampleHTML": "<div class=\"job-item \" id=\"job-item-35C620B4\"><div class=\"figure\"><div class=\"asset-wrapper\"><div class=\"image\"><a target=\"_blank\" href=\"https://careerviet.vn/vi/nha-tuyen-dung/cong-ty-tnhh-viet-my-ssu.35A954E6.html\" title=\"Công Ty TNHH Việt Mỹ-SSU\"><img class=\"lazy-img\" data-src=\"https://images.careerviet.vn/employer_folders/lot6/289766/155x155/110823342346175_992446015089116_6805474575961648558_n.jpg\" src=\"../kiemviecv32/images/graphics/blank.gif\" alt=\"Công Ty TNHH Việt Mỹ-SSU\"></a></div><div ",
+    "sampleHTML": "<div class=\"job-item \" id=\"job-item-35C62DBE\"><div class=\"figure\"><div class=\"asset-wrapper\"><div class=\"image\"><a target=\"_blank\" href=\"https://careerviet.vn/vi/nha-tuyen-dung/cong-ty-co-phan-chung-khoan-vps.35AA176E.html\" title=\"công ty cổ phần chứng khoán VPS\"><img class=\"lazy-img\" data-src=\"https://static.careerviet.vn/themes/kiemviecv32/images/graphics/logo-default.png\" src=\"../kiemviecv32/images/graphics/blank.gif\" alt=\"công ty cổ phần chứng khoán VPS\"></a></div><div class=\"icon-robot-ai d",
     "selector": ".job-item",
     "type": "class"
   },
   {
     "confidence": "low",
     "count": 50,
-    "sampleHTML": "<div class=\"job-item \" id=\"job-item-35C620B4\"><div class=\"figure\"><div class=\"asset-wrapper\"><div class=\"image\"><a target=\"_blank\" href=\"https://careerviet.vn/vi/nha-tuyen-dung/cong-ty-tnhh-viet-my-ssu.35A954E6.html\" title=\"Công Ty TNHH Việt Mỹ-SSU\"><img class=\"lazy-img\" data-src=\"https://images.careerviet.vn/employer_folders/lot6/289766/155x155/110823342346175_992446015089116_6805474575961648558_n.jpg\" src=\"../kiemviecv32/images/graphics/blank.gif\" alt=\"Công Ty TNHH Việt Mỹ-SSU\"></a></div><div ",
+    "sampleHTML": "<div class=\"job-item \" id=\"job-item-35C62DBE\"><div class=\"figure\"><div class=\"asset-wrapper\"><div class=\"image\"><a target=\"_blank\" href=\"https://careerviet.vn/vi/nha-tuyen-dung/cong-ty-co-phan-chung-khoan-vps.35AA176E.html\" title=\"công ty cổ phần chứng khoán VPS\"><img class=\"lazy-img\" data-src=\"https://static.careerviet.vn/themes/kiemviecv32/images/graphics/logo-default.png\" src=\"../kiemviecv32/images/graphics/blank.gif\" alt=\"công ty cổ phần chứng khoán VPS\"></a></div><div class=\"icon-robot-ai d",
     "selector": "[class*=\"job-item\"]",
     "type": "attribute"
   },

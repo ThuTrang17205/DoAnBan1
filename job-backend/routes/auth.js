@@ -1,12 +1,12 @@
 /**
  * Authentication Routes
- * Handles user authentication (login, register, password reset)
+ * Handles user authentication (login, register, password reset)1111
  */
 
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-console.log('🔥 AUTH ROUTES LOADED!');
+console.log(' AUTH ROUTES LOADED!');
 
 // Controllers
 const authController = require('../controllers/authController');
@@ -112,27 +112,14 @@ router.post('/refresh-token', (req, res) => {
  * @desc    Request password reset
  * @access  Public
  */
-router.post('/forgot-password', passwordResetLimiter, (req, res) => {
-  // TODO: Implement forgot password logic
-  res.json({
-    success: true,
-    message: 'Link reset mật khẩu đã được gửi đến email'
-  });
-});
+router.post('/forgot-password', passwordResetLimiter, authController.forgotPassword);
 
 /**
  * @route   POST /api/auth/reset-password
  * @desc    Reset password with token
  * @access  Public
  */
-router.post('/reset-password', passwordResetLimiter, (req, res) => {
-  // TODO: Implement reset password logic
-  res.json({
-    success: true,
-    message: 'Đặt lại mật khẩu thành công'
-  });
-});
-
+router.post('/reset-password', passwordResetLimiter, authController.resetPassword);
 /**
  * @route   POST /api/auth/verify-email
  * @desc    Verify email with token
@@ -180,11 +167,11 @@ const passport = require('../config/passport');
 router.post('/set-registration-role', (req, res) => {
   const { role } = req.body;
   
-  console.log('📋 Setting registration role:', role);
+  console.log(' Setting registration role:', role);
   
   if (req.session) {
     req.session.registrationRole = role || 'user';
-    console.log('✅ Role saved to session:', req.session.registrationRole);
+    console.log(' Role saved to session:', req.session.registrationRole);
     
     res.json({ 
       success: true, 
@@ -192,7 +179,7 @@ router.post('/set-registration-role', (req, res) => {
       role: req.session.registrationRole
     });
   } else {
-    console.error('❌ Session not available');
+    console.error(' Session not available');
     res.status(500).json({ 
       success: false, 
       message: 'Session not available' 
@@ -251,13 +238,13 @@ router.get(
         { expiresIn: '7d' }
       );
 
-      console.log('✅ JWT created for:', req.user.email);
-      console.log('🔄 Redirecting to homepage with token...');
+      console.log(' JWT created for:', req.user.email);
+      console.log(' Redirecting to homepage with token...');
       
-      // ✅ REDIRECT VỀ TRANG CHỦ VỚI TOKEN
+      //  REDIRECT VỀ TRANG CHỦ VỚI TOKEN
       res.redirect(`http://localhost:3000/?token=${token}`);
     } catch (error) {
-      console.error('❌ Error creating token:', error);
+      console.error(' Error creating token:', error);
       res.redirect('http://localhost:3000/login?error=token_creation_failed');
     }
   }
@@ -291,13 +278,13 @@ router.get(
         { expiresIn: '7d' }
       );
 
-      console.log('✅ Google register successful:', req.user.email);
-      console.log('🔄 Redirecting to homepage...');
+      console.log(' Google register successful:', req.user.email);
+      console.log(' Redirecting to homepage...');
       
-      // ✅ Redirect về trang chủ với token và flag register=success
+      
       res.redirect(`http://localhost:3000/?token=${token}&register=success`);
     } catch (error) {
-      console.error('❌ Error creating token:', error);
+      console.error('Error creating token:', error);
       res.redirect('http://localhost:3000/register?error=token_creation_failed');
     }
   }

@@ -1,30 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 
-/**
- * Custom Hook để quản lý localStorage với React state
- * 
- * Usage:
- * const [value, setValue, removeValue] = useLocalStorage('key', defaultValue);
- * 
- * Features:
- * - Tự động sync với localStorage
- * - Support JSON objects
- * - Error handling
- * - SSR safe
- */
+
 
 const useLocalStorage = (key, initialValue) => {
-  // State để lưu giá trị
+  
   const [storedValue, setStoredValue] = useState(() => {
     if (typeof window === 'undefined') {
       return initialValue;
     }
 
     try {
-      // Lấy từ localStorage
+      
       const item = window.localStorage.getItem(key);
       
-      // Parse JSON nếu có, không thì trả về initialValue
+      
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       console.error(`Error reading localStorage key "${key}":`, error);
@@ -32,20 +21,20 @@ const useLocalStorage = (key, initialValue) => {
     }
   });
 
-  // Hàm để set giá trị vào state và localStorage
+ 
   const setValue = useCallback((value) => {
     try {
-      // Cho phép value là một function như useState
+     
       const valueToStore = value instanceof Function ? value(storedValue) : value;
       
-      // Lưu vào state
+     
       setStoredValue(valueToStore);
       
-      // Lưu vào localStorage
+     
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
         
-        // Dispatch custom event để sync giữa các tabs
+        
         window.dispatchEvent(new Event('local-storage'));
       }
     } catch (error) {
@@ -53,7 +42,7 @@ const useLocalStorage = (key, initialValue) => {
     }
   }, [key, storedValue]);
 
-  // Hàm để xóa giá trị khỏi localStorage
+ 
   const removeValue = useCallback(() => {
     try {
       setStoredValue(initialValue);
@@ -67,7 +56,7 @@ const useLocalStorage = (key, initialValue) => {
     }
   }, [key, initialValue]);
 
-  // Sync giữa các tabs
+ 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -81,7 +70,7 @@ const useLocalStorage = (key, initialValue) => {
       }
     };
 
-    // Lắng nghe storage event
+   
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('local-storage', handleStorageChange);
 
@@ -94,19 +83,16 @@ const useLocalStorage = (key, initialValue) => {
   return [storedValue, setValue, removeValue];
 };
 
-// ============================================
-// UTILITY HOOKS DỰA TRÊN useLocalStorage
-// ============================================
 
-/**
- * Hook để lưu saved jobs
- */
+
+
+
 export const useSavedJobs = () => {
   const [savedJobs, setSavedJobs, removeSavedJobs] = useLocalStorage('savedJobs', []);
 
   const saveJob = useCallback((job) => {
     setSavedJobs(prev => {
-      // Kiểm tra job đã được lưu chưa
+     
       if (prev.find(j => j.id === job.id)) {
         return prev;
       }
@@ -135,9 +121,7 @@ export const useSavedJobs = () => {
   };
 };
 
-/**
- * Hook để lưu search history
- */
+
 export const useSearchHistory = (maxItems = 10) => {
   const [searchHistory, setSearchHistory, clearHistory] = useLocalStorage('searchHistory', []);
 
@@ -145,13 +129,13 @@ export const useSearchHistory = (maxItems = 10) => {
     if (!searchTerm.trim()) return;
 
     setSearchHistory(prev => {
-      // Xóa term cũ nếu đã tồn tại
+      
       const filtered = prev.filter(term => term !== searchTerm);
       
-      // Thêm term mới vào đầu
+      
       const updated = [searchTerm, ...filtered];
       
-      // Giới hạn số lượng
+     
       return updated.slice(0, maxItems);
     });
   }, [setSearchHistory, maxItems]);
@@ -168,9 +152,10 @@ export const useSearchHistory = (maxItems = 10) => {
   };
 };
 
-/**
- * Hook để lưu user preferences
- */
+
+
+
+
 export const useUserPreferences = () => {
   const [preferences, setPreferences, clearPreferences] = useLocalStorage('userPreferences', {
     theme: 'light',
@@ -202,9 +187,10 @@ export const useUserPreferences = () => {
   };
 };
 
-/**
- * Hook để lưu form draft
- */
+
+
+
+
 export const useFormDraft = (formKey) => {
   const [draft, setDraft, clearDraft] = useLocalStorage(`formDraft_${formKey}`, null);
 
@@ -233,24 +219,25 @@ export const useFormDraft = (formKey) => {
   };
 };
 
-/**
- * Hook để lưu recent views (jobs đã xem gần đây)
- */
+
+
+
+
+
 export const useRecentViews = (maxItems = 5) => {
   const [recentViews, setRecentViews, clearRecentViews] = useLocalStorage('recentViews', []);
 
   const addView = useCallback((job) => {
     setRecentViews(prev => {
-      // Xóa job cũ nếu đã tồn tại
+
       const filtered = prev.filter(j => j.id !== job.id);
-      
-      // Thêm job mới vào đầu
+
       const updated = [{
         ...job,
         viewedAt: new Date().toISOString()
       }, ...filtered];
       
-      // Giới hạn số lượng
+      
       return updated.slice(0, maxItems);
     });
   }, [setRecentViews, maxItems]);

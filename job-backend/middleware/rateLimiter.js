@@ -1,9 +1,7 @@
 const rateLimit = require('express-rate-limit');
 
-// ⭐ Kiểm tra environment
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
-// ⭐ Helper function để skip rate limit cho localhost trong dev
 const skipLocalhost = (req) => {
   if (isDevelopment) {
     const ip = req.ip || req.connection.remoteAddress;
@@ -12,82 +10,130 @@ const skipLocalhost = (req) => {
   return false;
 };
 
-// Rate limiter cho auth endpoints (đăng nhập, đăng ký)
+// ========================================
+// HELPER FUNCTION ĐỂ XỬ LÝ KEY AN TOÀN
+// ========================================
+const getKeyGenerator = () => {
+  return (req) => {
+    // Nếu có user, dùng user ID
+    if (req.user?.id) {
+      return `user:${req.user.id}`;
+    }
+    // Nếu không có user, KHÔNG dùng keyGenerator tự custom
+    // Để express-rate-limit tự động xử lý IP (có hỗ trợ IPv6)
+    return undefined;
+  };
+};
+
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,  // 15 phút
-  max: isDevelopment ? 1000 : 5,  // ⭐ Dev: 1000, Production: 5
+  windowMs: 15 * 60 * 1000,  
+  max: isDevelopment ? 1000 : 5,  
   standardHeaders: true,
   legacyHeaders: false,
-  skip: skipLocalhost,  // ⭐ Skip cho localhost trong dev
+  skip: skipLocalhost,  
   message: 'Too many authentication attempts, please try again after 15 minutes.'
 });
 
-// Rate limiter cho password reset
 const passwordResetLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,  // 1 giờ
-  max: isDevelopment ? 1000 : 3,  // ⭐ Dev: 1000, Production: 3
+  windowMs: 60 * 60 * 1000,  
+  max: isDevelopment ? 1000 : 3,  
   standardHeaders: true,
   legacyHeaders: false,
   skip: skipLocalhost,
   message: 'Too many password reset attempts, please try again after 1 hour.'
 });
 
-// Rate limiter cho search
 const searchLimiter = rateLimit({
-  windowMs: 60 * 1000,       // 1 phút
-  max: isDevelopment ? 1000 : 30,  // ⭐ Dev: 1000, Production: 30
+  windowMs: 60 * 1000,       
+  max: isDevelopment ? 1000 : 30,  
   standardHeaders: true,
   legacyHeaders: false,
   skip: skipLocalhost,
   message: 'Too many search requests, please try again later.'
 });
 
-// Rate limiter cho job application
 const jobApplicationLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,  // 1 giờ
-  max: isDevelopment ? 1000 : 10,  // ⭐ Dev: 1000, Production: 10
+  windowMs: 60 * 60 * 1000,  
+  max: isDevelopment ? 1000 : 10, 
   standardHeaders: true,
   legacyHeaders: false,
   skip: skipLocalhost,
   message: 'Too many job applications, please try again after 1 hour.'
 });
 
-// Rate limiter cho job creation (employer tạo job)
 const jobCreationLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,  // 1 giờ
-  max: isDevelopment ? 1000 : 10,  // ⭐ Dev: 1000, Production: 10
+  windowMs: 60 * 60 * 1000,  
+  max: isDevelopment ? 1000 : 10,  
   standardHeaders: true,
   legacyHeaders: false,
   skip: skipLocalhost,
   message: 'Too many job postings, please try again after 1 hour.'
 });
 
-// Rate limiter cho file upload
 const uploadLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,  // 1 giờ
-  max: isDevelopment ? 1000 : 20,  // ⭐ Dev: 1000, Production: 20
+  windowMs: 60 * 60 * 1000,  
+  max: isDevelopment ? 1000 : 20,  
   standardHeaders: true,
   legacyHeaders: false,
   skip: skipLocalhost,
   message: 'Too many file uploads, please try again after 1 hour.'
 });
 
-// Rate limiter chung cho các API khác
 const generalLimiter = rateLimit({
-  windowMs: 60 * 1000,       // 1 phút
-  max: isDevelopment ? 1000 : 100,  // ⭐ Dev: 1000, Production: 100
+  windowMs: 60 * 1000,       
+  max: isDevelopment ? 1000 : 100,  
   standardHeaders: true,
   legacyHeaders: false,
   skip: skipLocalhost,
   message: 'Too many requests, please try again later.'
 });
 
-// ⭐ Log khi rate limiter được load
 if (isDevelopment) {
-  console.log('🔓 Rate Limiter: Development mode - Limits relaxed for localhost');
+  console.log('⚡ Rate Limiter: Development mode - Limits relaxed for localhost');
 } else {
   console.log('🔒 Rate Limiter: Production mode - Strict limits enabled');
 }
+
+// MATCHING LIMITERS
+const matchingLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: isDevelopment ? 1000 : 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: skipLocalhost,
+  keyGenerator: getKeyGenerator(), // ← Sửa ở đây
+  message: 'Too many matching operations, please try again after 1 hour or upgrade to VIP for unlimited matching.'
+});
+
+const aiMatchingLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: isDevelopment ? 1000 : 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: skipLocalhost,
+  keyGenerator: getKeyGenerator(), // ← Sửa ở đây
+  message: 'Too many AI matching requests, please upgrade to VIP for more matching operations.'
+});
+
+const saveCVLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: isDevelopment ? 1000 : 50,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: skipLocalhost,
+  keyGenerator: getKeyGenerator(), // ← Sửa ở đây
+  message: 'Too many CV save operations, please try again later.'
+});
+
+const matchingStatsLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: isDevelopment ? 1000 : 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: skipLocalhost,
+  keyGenerator: getKeyGenerator(), // ← Sửa ở đây
+  message: 'Too many stats requests, please try again later.'
+});
 
 module.exports = {
   authLimiter,
@@ -96,5 +142,9 @@ module.exports = {
   jobApplicationLimiter,
   jobCreationLimiter,
   uploadLimiter,
-  generalLimiter
+  generalLimiter,
+  matchingLimiter,
+  aiMatchingLimiter,
+  saveCVLimiter,
+  matchingStatsLimiter
 };

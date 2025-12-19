@@ -131,7 +131,7 @@ const handleSubmit = async (e) => {
 
   return (
     <div className="admin-jobs-container">
-      {/* Header */}
+
       <div className="page-header">
         <div>
           <h1> Chỉnh sửa Công việc {id}</h1>

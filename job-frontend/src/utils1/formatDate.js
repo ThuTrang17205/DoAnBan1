@@ -1,7 +1,3 @@
-/**
- * Format Date Utilities
- * Các hàm xử lý và format ngày tháng
- */
 
 // Format date thành dạng "DD/MM/YYYY"
 export const formatDate = (dateString) => {

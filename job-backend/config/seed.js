@@ -149,9 +149,9 @@ async function seedUsers() {
          ON CONFLICT (email) DO NOTHING`,
         [user.username, user.name, user.email, hashedPassword, user.phone, user.role]
       );
-      console.log(`✅ Created user: ${user.email}`);
+      console.log(` Created user: ${user.email}`);
     } catch (err) {
-      console.error(`❌ Error creating user ${user.email}:`, err.message);
+      console.error(` Error creating user ${user.email}:`, err.message);
     }
   }
 }
@@ -189,7 +189,7 @@ async function seedEmployers() {
       if (result.rows.length > 0) {
         const userId = result.rows[0].id;
         
-        // Insert vào bảng employers
+      
         await pool.query(
           `INSERT INTO employers (user_id, company, description)
            VALUES ($1, $2, $3)
@@ -197,16 +197,16 @@ async function seedEmployers() {
           [userId, employer.company_name, `${employer.company_name} - ${employer.industry}`]
         );
         
-        console.log(`✅ Created employer: ${employer.company_name}`);
+        console.log(` Created employer: ${employer.company_name}`);
       }
     } catch (err) {
-      console.error(`❌ Error creating employer ${employer.company_name}:`, err.message);
+      console.error(`Error creating employer ${employer.company_name}:`, err.message);
     }
   }
 }
 
 async function seedCompanies() {
-  console.log("\n🌱 Seeding companies...");
+  console.log("\n Seeding companies...");
   
   for (const company of companies) {
     try {
@@ -215,29 +215,29 @@ async function seedCompanies() {
          VALUES ($1, $2, $3, $4, NOW())
          ON CONFLICT DO NOTHING`,
         [company.name, company.description, company.location, company.website]
-      );
-      console.log(`✅ Created company: ${company.name}`);
+      )
+      console.log(` Created company: ${company.name}`);
     } catch (err) {
-      console.error(`❌ Error creating company ${company.name}:`, err.message);
+      console.error(` Error creating company ${company.name}:`, err.message);
     }
   }
 }
 
 async function seedJobs() {
-  console.log("\n🌱 Seeding jobs...");
+  console.log("\n Seeding jobs...");
   
   // Lấy danh sách companies
   const companiesResult = await pool.query("SELECT id, name FROM companies");
   const companiesList = companiesResult.rows;
   
   if (companiesList.length === 0) {
-    console.log("❌ No companies found. Please seed companies first.");
+    console.log(" No companies found. Please seed companies first.");
     return;
   }
   
   let jobCount = 0;
   
-  // Tạo 25 jobs
+  
   for (let i = 0; i < 25; i++) {
     const category = jobCategories[Math.floor(Math.random() * jobCategories.length)];
     const titlesForCategory = jobTitles[category] || ["Software Developer"];
@@ -305,17 +305,17 @@ Yêu cầu:
         ]
       );
       jobCount++;
-      console.log(`✅ Created job ${jobCount}: ${title} at ${company.name}`);
+      console.log(` Created job ${jobCount}: ${title} at ${company.name}`);
     } catch (err) {
       console.error(`❌ Error creating job:`, err.message);
     }
   }
   
-  console.log(`✅ Total created ${jobCount} jobs`);
+  console.log(` Total created ${jobCount} jobs`);
 }
 
 async function seedApplications() {
-  console.log("\n🌱 Seeding applications...");
+  console.log("\n Seeding applications...");
   
   // Lấy danh sách users (role = 'user') và jobs
   const usersResult = await pool.query("SELECT id FROM users WHERE role = 'user'");
@@ -325,13 +325,13 @@ async function seedApplications() {
   const jobsList = jobsResult.rows;
   
   if (usersList.length === 0 || jobsList.length === 0) {
-    console.log("❌ Need users and jobs to create applications");
+    console.log(" Need users and jobs to create applications");
     return;
   }
   
   const statuses = ["pending", "reviewing", "responded"];
   
-  // Tạo 20-30 applications
+ 
   const numApplications = Math.floor(Math.random() * 10) + 20;
   
   for (let i = 0; i < numApplications; i++) {
@@ -346,10 +346,10 @@ async function seedApplications() {
          ON CONFLICT (user_id, job_id) DO NOTHING`,
         [user.id, job.id, status]
       );
-      console.log(`✅ Created application ${i + 1}`);
+      console.log(` Created application ${i + 1}`);
     } catch (err) {
       if (!err.message.includes("duplicate")) {
-        console.error(`❌ Error creating application:`, err.message);
+        console.error(` Error creating application:`, err.message);
       }
     }
   }
@@ -358,7 +358,7 @@ async function seedApplications() {
 // ==================== MAIN FUNCTION ====================
 
 async function main() {
-  console.log("🚀 Starting seed process...\n");
+  console.log(" Starting seed process...\n");
   
   try {
     await seedUsers();
@@ -367,8 +367,8 @@ async function main() {
     await seedJobs();
     await seedApplications();
     
-    console.log("\n✅ Seed completed successfully!");
-    console.log("\n📊 Summary:");
+    console.log("\n Seed completed successfully!");
+    console.log("\n Summary:");
     
     const userCount = await pool.query("SELECT COUNT(*) FROM users WHERE role = 'user'");
     const employerCount = await pool.query("SELECT COUNT(*) FROM users WHERE role = 'employer'");
@@ -382,19 +382,19 @@ async function main() {
     console.log(`- Jobs: ${jobCount.rows[0].count}`);
     console.log(`- Applications: ${applicationCount.rows[0].count}`);
     
-    console.log("\n🔑 Test Accounts:");
+    console.log("\n Test Accounts:");
     console.log("User: user1@gmail.com / 123456");
     console.log("Employer: hr@fpt.com / 123456");
     console.log("Admin: admin / admin123");
     
   } catch (err) {
-    console.error("❌ Seed error:", err);
+    console.error(" Seed error:", err);
   } finally {
     await pool.end();
-    console.log("\n👋 Database connection closed");
+    console.log("\n Database connection closed");
     process.exit(0);
   }
 }
 
-// Run seed
+
 main();

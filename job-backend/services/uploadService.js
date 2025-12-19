@@ -5,10 +5,10 @@
 
 const fs = require('fs');
 const path = require('path');
-const sharp = require('sharp'); // For image processing
+const sharp = require('sharp'); 
 const { AppError } = require('../middleware/errorHandler');
 
-// Upload directories
+
 const UPLOAD_DIRS = {
   RESUMES: 'uploads/resumes',
   AVATARS: 'uploads/avatars',
@@ -17,12 +17,12 @@ const UPLOAD_DIRS = {
   TEMP: 'uploads/temp'
 };
 
-// File size limits (in bytes)
+
 const SIZE_LIMITS = {
-  AVATAR: 2 * 1024 * 1024, // 2MB
-  RESUME: 5 * 1024 * 1024, // 5MB
-  DOCUMENT: 5 * 1024 * 1024, // 5MB
-  IMAGE: 2 * 1024 * 1024 // 2MB
+  AVATAR: 2 * 1024 * 1024, 
+  RESUME: 5 * 1024 * 1024, 
+  DOCUMENT: 5 * 1024 * 1024, 
+  IMAGE: 2 * 1024 * 1024 
 };
 
 // Allowed file types
@@ -48,7 +48,7 @@ const initializeDirectories = () => {
   Object.values(UPLOAD_DIRS).forEach(dir => {
     ensureDirectoryExists(dir);
   });
-  console.log('✅ Upload directories initialized');
+  console.log(' Upload directories initialized');
 };
 
 /**
@@ -99,13 +99,13 @@ const deleteFile = (filePath) => {
   try {
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
-      console.log(`✅ Deleted file: ${filePath}`);
+      console.log(` Deleted file: ${filePath}`);
       return true;
     }
-    console.log(`⚠️ File not found: ${filePath}`);
+    console.log(`File not found: ${filePath}`);
     return false;
   } catch (error) {
-    console.error('❌ Error deleting file:', error);
+    console.error(' Error deleting file:', error);
     return false;
   }
 };
@@ -130,7 +130,7 @@ const processAvatar = async (file, userId) => {
       .jpeg({ quality: 90 })
       .toFile(outputPath);
 
-    // Delete original file
+ 
     if (file.path !== outputPath) {
       deleteFile(file.path);
     }
@@ -142,7 +142,7 @@ const processAvatar = async (file, userId) => {
       mimetype: 'image/jpeg'
     };
   } catch (error) {
-    // Clean up on error
+   
     if (file.path) deleteFile(file.path);
     throw error;
   }
@@ -159,7 +159,7 @@ const processCompanyLogo = async (file, employerId) => {
     const filename = `logo-${employerId}-${Date.now()}.jpg`;
     const outputPath = path.join(UPLOAD_DIRS.COMPANY_LOGOS, filename);
 
-    // Resize and optimize logo
+    
     await sharp(file.path)
       .resize(400, 400, {
         fit: 'contain',
@@ -168,7 +168,7 @@ const processCompanyLogo = async (file, employerId) => {
       .jpeg({ quality: 90 })
       .toFile(outputPath);
 
-    // Delete original file
+    
     if (file.path !== outputPath) {
       deleteFile(file.path);
     }
@@ -196,7 +196,7 @@ const saveResume = async (file, userId) => {
     const filename = generateUniqueFilename(file.originalname);
     const outputPath = path.join(UPLOAD_DIRS.RESUMES, filename);
 
-    // Move file to destination
+    
     fs.renameSync(file.path, outputPath);
 
     return {
@@ -223,7 +223,7 @@ const saveDocument = async (file, userId) => {
     const filename = generateUniqueFilename(file.originalname);
     const outputPath = path.join(UPLOAD_DIRS.DOCUMENTS, filename);
 
-    // Move file to destination
+    
     fs.renameSync(file.path, outputPath);
 
     return {
@@ -310,10 +310,10 @@ const cleanOldFiles = async (directory, days = 30) => {
       }
     }
 
-    console.log(`✅ Cleaned ${deletedCount} old files from ${directory}`);
+    console.log(` Cleaned ${deletedCount} old files from ${directory}`);
     return deletedCount;
   } catch (error) {
-    console.error('❌ Error cleaning old files:', error);
+    console.error(' Error cleaning old files:', error);
     return 0;
   }
 };
@@ -322,7 +322,7 @@ const cleanOldFiles = async (directory, days = 30) => {
  * Clean temp directory
  */
 const cleanTempDirectory = async () => {
-  return await cleanOldFiles(UPLOAD_DIRS.TEMP, 1); // Clean files older than 1 day
+  return await cleanOldFiles(UPLOAD_DIRS.TEMP, 1);
 };
 
 /**

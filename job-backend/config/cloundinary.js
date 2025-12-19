@@ -18,12 +18,12 @@ const validateConfig = () => {
   const missing = requiredVars.filter(varName => !process.env[varName]);
   
   if (missing.length > 0) {
-    console.warn(`⚠️ Missing Cloudinary config: ${missing.join(', ')}`);
-    console.warn('⚠️ File upload features will not work without Cloudinary credentials');
+    console.warn(` Missing Cloudinary config: ${missing.join(', ')}`);
+    console.warn(' File upload features will not work without Cloudinary credentials');
     return false;
   }
   
-  console.log('✅ Cloudinary configured successfully');
+  console.log(' Cloudinary configured successfully');
   return true;
 };
 
@@ -137,14 +137,14 @@ const deleteFile = async (publicId, resourceType = 'image') => {
     });
     
     if (result.result === 'ok') {
-      console.log(`✅ Deleted file: ${publicId}`);
+      console.log(` Deleted file: ${publicId}`);
       return true;
     } else {
-      console.warn(`⚠️ File not found or already deleted: ${publicId}`);
+      console.warn(` File not found or already deleted: ${publicId}`);
       return false;
     }
   } catch (error) {
-    console.error(`❌ Error deleting file ${publicId}:`, error.message);
+    console.error(` Error deleting file ${publicId}:`, error.message);
     return false;
   }
 };
@@ -158,7 +158,7 @@ const getFileUrl = (publicId, options = {}) => {
   try {
     return cloudinary.url(publicId, options);
   } catch (error) {
-    console.error('❌ Error generating file URL:', error.message);
+    console.error(' Error generating file URL:', error.message);
     return null;
   }
 };
@@ -175,10 +175,10 @@ const uploadBase64 = async (base64String, folder = 'job-portal/temp') => {
       resource_type: 'auto'
     });
     
-    console.log(`✅ Uploaded base64 image to ${folder}`);
+    console.log(`Uploaded base64 image to ${folder}`);
     return result;
   } catch (error) {
-    console.error('❌ Error uploading base64 image:', error.message);
+    console.error(' Error uploading base64 image:', error.message);
     throw error;
   }
 };

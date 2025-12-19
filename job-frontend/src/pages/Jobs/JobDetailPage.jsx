@@ -15,29 +15,30 @@ function JobDetailPage() {
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [applyForm, setApplyForm] = useState({
     selectedCV: null,
-    cvMode: 'select', // 'select' hoặc 'upload'
+    cvMode: 'select', 
     coverLetter: '',
     expectedSalary: '',
     availableFrom: ''
   });
+  const [userCVs, setUserCVs] = useState([]); 
+  const [loadingCVs, setLoadingCVs] = useState(false); 
   const [submitting, setSubmitting] = useState(false);
 
-  // Thêm log vào useEffect
+  
 useEffect(() => {
   const fetchJob = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      console.log(' Fetching job with ID:', id); // ← THÊM
-      
+      console.log(' Fetching job with ID:', id); 
       const response = await axios.get(`http://localhost:5000/api/jobs/${id}`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
       
-      console.log(' Full response:', response.data); // ← THÊM
-      console.log(' Job data:', response.data.data); // ← THÊM
-      console.log(' Job ID:', response.data.data?.id); // ← THÊM
+      console.log(' Full response:', response.data); 
+      console.log(' Job data:', response.data.data); 
+      console.log(' Job ID:', response.data.data?.id); 
       
       if (response.data.success) {
         setJob(response.data.data);
@@ -59,6 +60,37 @@ useEffect(() => {
     fetchJob();
   }
 }, [id, navigate]);
+
+  
+  useEffect(() => {
+    const fetchUserCVs = async () => {
+      if (!showApplyModal) return;
+      
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      try {
+        setLoadingCVs(true);
+        const response = await axios.get('http://localhost:5000/api/cvs/my-cvs', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        console.log(' User CVs fetched:', response.data);
+        
+        if (response.data.success) {
+          setUserCVs(response.data.data || []);
+        }
+      } catch (error) {
+        console.error(' Error fetching user CVs:', error);
+        
+        setUserCVs([]);
+      } finally {
+        setLoadingCVs(false);
+      }
+    };
+
+    fetchUserCVs();
+  }, [showApplyModal]);
 
   const handleSaveJob = async () => {
     const token = localStorage.getItem('token');
@@ -82,7 +114,7 @@ useEffect(() => {
 
         if (response.data.success) {
           setIsSaved(false);
-          alert('✓ Đã bỏ lưu công việc!');
+          alert(' Đã bỏ lưu công việc!');
         }
       } else {
         const response = await axios.post(
@@ -117,18 +149,18 @@ useEffect(() => {
 
 
   const handleApplyJob = async () => {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-      alert('Vui lòng đăng nhập để ứng tuyển!');
-      navigate('/login');
-      return;
-    }
+  const token = localStorage.getItem('token');
+  
+  if (!token) {
+    alert('Vui lòng đăng nhập để ứng tuyển!');
+    navigate('/login');
+    return;
+  }
 
-
+   
     let jobUrl = job.url || job.originalUrl || job.original_url;
     
-
+    
     if (!jobUrl && job.description) {
       const parser = new DOMParser();
       const doc = parser.parseFromString(job.description, 'text/html');
@@ -145,7 +177,7 @@ useEffect(() => {
       }
 
       try {
-       
+      
         const response = await axios.post(
           'http://localhost:5000/api/jobs/apply',
           {
@@ -168,7 +200,7 @@ useEffect(() => {
         if (response.data.success) {
           console.log(' Application saved successfully');
           window.open(jobUrl, '_blank');
-          alert('✓ Đã lưu thông tin ứng tuyển và mở trang ứng tuyển!');
+          alert(' Đã lưu thông tin ứng tuyển và mở trang ứng tuyển!');
         }
       } catch (error) {
         console.error(' Error saving application:', error);
@@ -187,9 +219,8 @@ useEffect(() => {
         }
       }
     } 
-    
     else {
-      
+     
       setShowApplyModal(true);
     }
   };
@@ -198,7 +229,7 @@ useEffect(() => {
  const handleSubmitApplication = async () => {
   
   if (!applyForm.selectedCV) {
-    alert('❌ Vui lòng chọn CV!');
+    alert('⚠ Vui lòng chọn CV!');
     return;
   }
 
@@ -212,50 +243,155 @@ useEffect(() => {
   try {
     setSubmitting(true);
 
+    
+    let jobUrl = job.url || job.originalUrl || job.original_url;
+    
+    if (!jobUrl && job.description) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(job.description, 'text/html');
+      const link = doc.querySelector('a[href]');
+      if (link) {
+        jobUrl = link.getAttribute('href');
+      }
+    }
+    
+    if (jobUrl) {
+      
+      if (!jobUrl.startsWith('http://') && !jobUrl.startsWith('https://')) {
+        jobUrl = 'https://' + jobUrl;
+      }
+
+      let cvToSave = null;
+      
+      if (applyForm.selectedCV instanceof File) {
+        cvToSave = applyForm.selectedCV.name;
+      } else if (typeof applyForm.selectedCV === 'number') {
+        const selectedCv = userCVs.find(cv => cv.id === applyForm.selectedCV);
+        cvToSave = selectedCv?.file_path || selectedCv?.file_name || `CV_ID_${applyForm.selectedCV}`;
+      }
+
+      try {
+        const response = await axios.post(
+          'http://localhost:5000/api/jobs/apply',
+          {
+            job_id: String(job.id || id),
+            job_title: job.title,
+            company_name: job.companyName, 
+            company_logo: job.companyLogo || null,
+            location: job.location,
+            salary: formatSalary(),
+            cv_used: cvToSave,
+            cover_letter: applyForm.coverLetter || null,
+            expected_salary: applyForm.expectedSalary ? parseInt(applyForm.expectedSalary) : null,
+            available_from: applyForm.availableFrom || null
+          },
+          {
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        if (response.data.success) {
+          console.log(' Application saved for external job');
+          setShowApplyModal(false);
+          setApplyForm({
+            selectedCV: null,
+            cvMode: 'select',
+            coverLetter: '',
+            expectedSalary: '',
+            availableFrom: ''
+          });
+          
+          window.open(jobUrl, '_blank');
+          alert(' Đã lưu thông tin ứng tuyển và mở trang ứng tuyển!');
+        }
+      } catch (error) {
+        console.error(' Error saving external job application:', error);
+        
+        if (error.response?.status === 401) {
+          alert('⚠ Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!');
+          navigate('/login');
+          return;
+        }
+        
+        const userConfirm = window.confirm(
+          'Không thể lưu thông tin ứng tuyển. Bạn vẫn muốn mở trang ứng tuyển?'
+        );
+        if (userConfirm) {
+          window.open(jobUrl, '_blank');
+          setShowApplyModal(false);
+        }
+      }
+      
+      return;
+    }
+
+    //  INTERNAL JOB: Fixed CV upload
     const jobId = parseInt(id); 
     
-    console.log('🔍 DEBUG INFO:');
+    console.log(' DEBUG INFO:');
     console.log('  URL param id:', id);
-    console.log('  job state:', job);
     console.log('  job.id:', job?.id);
     console.log('  Using jobId:', jobId);
     
     if (!jobId || isNaN(jobId)) {
-      console.error('❌ Invalid job ID:', jobId);
-      alert('❌ Lỗi: Không tìm thấy ID công việc. Vui lòng tải lại trang!');
+      console.error(' Invalid job ID:', jobId);
+      alert(' Lỗi: Không tìm thấy ID công việc. Vui lòng tải lại trang!');
       setSubmitting(false);
       return;
     }
     
     const formData = new FormData();
     
-    // QUAN TRỌNG: Không cần thêm jobId vào formData
-    // vì nó đã có trong URL rồi!
-    
+    //  FIXED: Handle CV properly
     if (applyForm.selectedCV instanceof File) {
-      formData.append('resume', applyForm.selectedCV);
-    } else {
-      formData.append('cvFile', applyForm.selectedCV);
+      // New file upload - MUST use 'cv' as field name (matching backend multer)
+      console.log(' Uploading new CV file:', applyForm.selectedCV.name);
+      console.log(' File size:', (applyForm.selectedCV.size / 1024).toFixed(2), 'KB');
+      console.log(' File type:', applyForm.selectedCV.type);
+      
+      //  CRITICAL FIX: Changed from 'cv_file' to 'cv'
+      formData.append('cv', applyForm.selectedCV);
+    } 
+    else if (typeof applyForm.selectedCV === 'number') {
+      // Existing CV ID from database
+      console.log(' Using existing CV ID:', applyForm.selectedCV);
+      formData.append('cv_id', applyForm.selectedCV);
+    } 
+    else {
+      console.error(' Invalid CV selection type:', typeof applyForm.selectedCV);
+      alert(' Lỗi: CV không hợp lệ. Vui lòng chọn lại!');
+      setSubmitting(false);
+      return;
     }
     
+    // Add other fields
     if (applyForm.coverLetter) {
-      formData.append('coverLetter', applyForm.coverLetter);
+      formData.append('cover_letter', applyForm.coverLetter);
     }
     if (applyForm.expectedSalary) {
-      formData.append('expectedSalary', parseInt(applyForm.expectedSalary));
+      formData.append('expected_salary', parseInt(applyForm.expectedSalary));
     }
+    formData.append('salary_currency', 'VND');
     if (applyForm.availableFrom) {
-      formData.append('availableFrom', applyForm.availableFrom);
+      formData.append('available_from', applyForm.availableFrom);
     }
 
-    console.log('📤 Sending FormData:');
+    // Log FormData for debugging
+    console.log(' Sending FormData:');
     for (let [key, value] of formData.entries()) {
-      console.log(`  ${key}:`, value);
+      if (value instanceof File) {
+        console.log(`  ${key}: [File] ${value.name} (${(value.size / 1024).toFixed(2)} KB)`);
+      } else {
+        console.log(`  ${key}:`, value);
+      }
     }
 
-    // ✅ SỬA Ở ĐÂY - Thêm /apply/${jobId} vào URL
+    // Send application for internal job
     const response = await axios.post(
-      `http://localhost:5000/api/applications/apply/${jobId}`,  // ← THAY ĐỔI DUY NHẤT
+      `http://localhost:5000/api/applications/apply/${jobId}`,  
       formData,
       {
         headers: { 
@@ -265,10 +401,10 @@ useEffect(() => {
       }
     );
 
-    console.log('✅ Application response:', response.data);
+    console.log(' Application response:', response.data);
 
     if (response.data.success) {
-      alert('✅ Ứng tuyển thành công! Nhà tuyển dụng sẽ xem xét hồ sơ của bạn.');
+      alert(' Ứng tuyển thành công! Nhà tuyển dụng sẽ xem xét hồ sơ của bạn.');
       setShowApplyModal(false);
       setApplyForm({
         selectedCV: null,
@@ -279,28 +415,27 @@ useEffect(() => {
       });
     }
   } catch (error) {
-    console.error('❌ Error submitting application:', error);
-    console.error('❌ Error response:', error.response?.data);
+    console.error(' Error submitting application:', error);
+    console.error(' Error response:', error.response?.data);
     
     if (error.response?.status === 401) {
-      alert('❌ Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!');
+      alert(' Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!');
       navigate('/login');
     } else if (error.response?.status === 400) {
       const errorMsg = error.response.data?.message || 'Dữ liệu không hợp lệ';
-      alert('❌ ' + errorMsg);
+      alert('' + errorMsg);
     } else if (error.response?.status === 409) {
-      alert('⚠️ Bạn đã ứng tuyển công việc này rồi!');
+      alert(' Bạn đã ứng tuyển công việc này rồi!');
     } else if (error.response?.status === 404) {
-      alert('❌ Không tìm thấy công việc này!');
+      alert(' Không tìm thấy công việc này!');
     } else if (error.response?.status === 500) {
-      console.error('💥 Server Error Details:', {
+      console.error('Server Error:', {
         message: error.response.data?.message,
-        error: error.response.data?.error,
-        stack: error.response.data?.stack
+        error: error.response.data?.error
       });
-      alert('❌ Lỗi server: ' + (error.response.data?.message || 'Vui lòng thử lại sau'));
+      alert(' Lỗi server: ' + (error.response.data?.message || 'Vui lòng thử lại sau'));
     } else {
-      alert('❌ Có lỗi xảy ra: ' + (error.response?.data?.message || error.message));
+      alert(' Có lỗi xảy ra: ' + (error.response?.data?.message || error.message));
     }
   } finally {
     setSubmitting(false);
@@ -318,6 +453,16 @@ useEffect(() => {
   };
 
   const parseJobSections = () => {
+    //  Ưu tiên các trường riêng biệt từ CreateJob (employer-created jobs)
+    if (job.requirements || job.benefits) {
+      return {
+        description: job.description || '',
+        requirements: job.requirements || '',
+        benefits: job.benefits || ''
+      };
+    }
+    
+    //  Xử lý các trường từ database với nhiều định dạng tên khác nhau
     if (job.job_description || job.job_requirements || job.job_benefits) {
       return {
         description: job.job_description || job.description || '',
@@ -326,6 +471,7 @@ useEffect(() => {
       };
     }
     
+    // ✅ Xử lý jobs crawled từ web (có HTML trong description)
     if (!job.description) return { description: '', requirements: '', benefits: '' };
     
     const parser = new DOMParser();
@@ -337,7 +483,6 @@ useEffect(() => {
       benefits: ''
     };
 
-   
     const requirementKeywords = ['yêu cầu', 'requirements', 'qualification', 'kỹ năng', 'yêu cầu ứng viên'];
     const benefitKeywords = ['quyền lợi', 'benefits', 'chế độ', 'đãi ngộ', 'phúc lợi'];
     
@@ -361,7 +506,6 @@ useEffect(() => {
       }
     });
 
-    
     if (!sections.requirements && !sections.benefits) {
       sections.description = job.description;
     }
@@ -410,7 +554,6 @@ useEffect(() => {
   return (
     <div className="job-detail-page">
       <div className="container">
-        {/* Job Header */}
         <div className="job-header">
           <div className="job-header-content">
             <div className="company-logo">
@@ -454,7 +597,7 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* Quick Info */}
+        {/* Quick Info Bar */}
         <div className="quick-info">
           <div className="info-item">
             <span className="info-label"> Mức lương</span>
@@ -480,11 +623,11 @@ useEffect(() => {
 
         {/* Main Content */}
         <div className="job-content">
-          {/* Left Column */}
+          {/* Main Details */}
           <div className="job-main">
-            {/* Description */}
+            {/* Job Description */}
             <section className="job-section">
-              <h2 className="section-title">📋 Mô tả công việc</h2>
+              <h2 className="section-title"> Mô tả công việc</h2>
               {sections.description ? (
                 <div 
                   className="section-content"
@@ -532,9 +675,9 @@ useEffect(() => {
             )}
           </div>
 
-          {/* Right Sidebar */}
+          {/* Sidebar */}
           <div className="job-sidebar">
-            {/* Apply CTA */}
+            {/* CTA Card */}
             <div className="sidebar-card cta-card">
               <h3>Sẵn sàng ứng tuyển?</h3>
               <p>Gửi hồ sơ của bạn ngay hôm nay!</p>
@@ -546,7 +689,7 @@ useEffect(() => {
               </button>
             </div>
 
-            {/* Job Details */}
+            {/* Job Details Card */}
             <div className="sidebar-card">
               <h3>📄 Chi tiết công việc</h3>
               <div className="job-details">
@@ -584,7 +727,7 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Apply Modal - CHỈ CHO JOB NỘI BỘ */}
+      {/*  FIXED: Application Modal with proper CV handling */}
       {showApplyModal && (
         <div className="modal-overlay" onClick={() => setShowApplyModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -597,7 +740,7 @@ useEffect(() => {
               <div className="form-group">
                 <label>Chọn CV <span style={{color: 'red'}}>*</span></label>
                 
-                {/* Tab chọn CV có sẵn hoặc upload mới */}
+                {/* CV Selection Tabs */}
                 <div className="cv-selection-tabs" style={{marginBottom: '10px'}}>
                   <button 
                     type="button"
@@ -632,27 +775,63 @@ useEffect(() => {
                   </button>
                 </div>
 
-                {/* Chọn CV có sẵn */}
+                {/*   Select existing CV from database */}
                 {applyForm.cvMode !== 'upload' && (
                   <>
-                    <select 
-                      value={typeof applyForm.selectedCV === 'string' ? applyForm.selectedCV : ''} 
-                      onChange={(e) => setApplyForm({...applyForm, selectedCV: e.target.value})}
-                      className="form-control"
-                      required
-                    >
-                      <option value="">-- Chọn CV --</option>
-                      <option value="/uploads/cvs/cv1.pdf">CV Tiếng Việt</option>
-                      <option value="/uploads/cvs/cv2.pdf">CV Tiếng Anh</option>
-                      <option value="/uploads/cvs/cv3.pdf">CV Fullstack Developer</option>
-                    </select>
-                    <small className="form-hint">
-                      Chưa có CV? <a href="/create-cv" target="_blank" rel="noopener noreferrer">Tạo CV ngay</a>
-                    </small>
+                    {loadingCVs ? (
+                      <div style={{padding: '20px', textAlign: 'center'}}>
+                        <div className="spinner"></div>
+                        <p>Đang tải danh sách CV...</p>
+                      </div>
+                    ) : userCVs.length > 0 ? (
+                      <>
+                        <select 
+                          value={typeof applyForm.selectedCV === 'number' ? applyForm.selectedCV : ''} 
+                          onChange={(e) => {
+                            const cvId = parseInt(e.target.value);
+                            console.log('📎 Selected CV ID:', cvId);
+                            setApplyForm({...applyForm, selectedCV: cvId});
+                          }}
+                          className="form-control"
+                          required
+                        >
+                          <option value="">-- Chọn CV --</option>
+                          {userCVs.map(cv => (
+                            <option key={cv.id} value={cv.id}>
+                              {cv.file_name} 
+                              {cv.is_default && ' (Mặc định)'}
+                              {' - Tải lên: ' + new Date(cv.upload_date).toLocaleDateString('vi-VN')}
+                            </option>
+                          ))}
+                        </select>
+                        <small className="form-hint">
+                          Chưa có CV phù hợp? <a href="/create-cv" target="_blank" rel="noopener noreferrer">Tạo CV ngay</a>
+                        </small>
+                      </>
+                    ) : (
+                      <div style={{padding: '20px', textAlign: 'center', background: '#f8f9fa', borderRadius: '8px'}}>
+                        <p>Bạn chưa có CV nào. Vui lòng upload CV hoặc <a href="/create-cv" target="_blank" rel="noopener noreferrer">tạo CV mới</a>.</p>
+                        <button 
+                          type="button"
+                          onClick={() => setApplyForm({...applyForm, cvMode: 'upload', selectedCV: null})}
+                          style={{
+                            marginTop: '10px',
+                            padding: '8px 16px',
+                            background: '#007bff',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Upload CV ngay
+                        </button>
+                      </div>
+                    )}
                   </>
                 )}
 
-                {/* Upload CV mới */}
+                {/* Upload new CV */}
                 {applyForm.cvMode === 'upload' && (
                   <>
                     <input 
@@ -661,12 +840,13 @@ useEffect(() => {
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
-                          // Validate file size (max 5MB)
+                          // Validate file size
                           if (file.size > 5 * 1024 * 1024) {
                             alert('File quá lớn! Vui lòng chọn file dưới 5MB');
                             e.target.value = '';
                             return;
                           }
+                          console.log(' New CV file selected:', file.name);
                           setApplyForm({...applyForm, selectedCV: file});
                         }
                       }}
@@ -732,7 +912,7 @@ useEffect(() => {
                 onClick={handleSubmitApplication}
                 disabled={submitting || !applyForm.selectedCV}
               >
-                {submitting ? '⏳ Đang gửi...' : 'Gửi hồ sơ'}
+                {submitting ? '⏳ Đang gửi...' : ' Gửi hồ sơ'}
               </button>
             </div>
           </div>

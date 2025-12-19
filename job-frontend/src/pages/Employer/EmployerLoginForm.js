@@ -88,7 +88,7 @@ function EmployerLoginForm({ redirectToCheckout = false }) {
 
       
     } catch (err) {
-      console.error('❌ Lỗi đăng nhập:', err);
+      console.error(' Lỗi đăng nhập:', err);
       if (err.response) {
         setError(err.response.data.message || 'Email hoặc mật khẩu không đúng');
       } else {
@@ -114,7 +114,7 @@ function EmployerLoginForm({ redirectToCheckout = false }) {
           <p>Quản lý tin tuyển dụng của bạn</p>
         </div>
 
-        {error && <div className="error-message">⚠️ {error}</div>}
+        {error && <div className="error-message"> {error}</div>}
 
         <form className="employer-login-form" onSubmit={handleSubmit}>
           <div className="form-group">

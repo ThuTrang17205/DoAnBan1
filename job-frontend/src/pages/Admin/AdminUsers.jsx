@@ -8,13 +8,13 @@ const AdminUsers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Pagination & filters
+ 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
 
-  // Fetch users
+  
   useEffect(() => {
     fetchUsers();
   }, [currentPage, searchTerm, roleFilter]);
@@ -73,7 +73,7 @@ const AdminUsers = () => {
       }
 
       alert('Xóa user thành công!');
-      fetchUsers(); // Refresh list
+      fetchUsers(); 
     } catch (err) {
       console.error('Error deleting user:', err);
       alert('Lỗi khi xóa user!');
@@ -109,7 +109,7 @@ const AdminUsers = () => {
 
   return (
     <div className="admin-jobs-container">
-      {/* Header */}
+    
       <div className="page-header">
         <div>
           <h1> Quản lý Users</h1>
@@ -117,7 +117,7 @@ const AdminUsers = () => {
         </div>
       </div>
 
-      {/* Filters */}
+      
       <div className="filters-section">
         <form onSubmit={handleSearch} className="search-form">
           <input
@@ -145,14 +145,14 @@ const AdminUsers = () => {
         </select>
       </div>
 
-      {/* Error Message */}
+      
       {error && (
         <div className="error-message">
           <p>Lỗi {error}</p>
         </div>
       )}
 
-      {/* Users Table */}
+      
       <div className="table-container">
         <table className="data-table">
           <thead>
@@ -211,7 +211,7 @@ const AdminUsers = () => {
         </table>
       </div>
 
-      {/* Pagination */}
+      
       {totalPages > 1 && (
         <div className="pagination">
           <button

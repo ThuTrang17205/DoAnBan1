@@ -29,33 +29,34 @@ export default function CreateJob() {
   }, []);
 
   const fetchCategories = async () => {
-    try {
-      setLoadingCategories(true);
-      const response = await axios.get('http://localhost:5000/api/categories');
-      
-      console.log('Full response:', response.data);
-      console.log('Type of categories:', typeof response.data.categories);
-      console.log('Is array?', Array.isArray(response.data.categories));
-      
-      let categoriesData = [];
-      
-      if (response.data.categories && Array.isArray(response.data.categories)) {
-        categoriesData = response.data.categories;
-      } else if (Array.isArray(response.data)) {
-        categoriesData = response.data;
-      } else if (response.data.data && Array.isArray(response.data.data)) {
-        categoriesData = response.data.data;
-      }
-      
-      console.log('Final categories:', categoriesData);
-      setCategories(categoriesData);
-      
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      setCategories([]); 
-      setLoadingCategories(false);
+  try {
+    setLoadingCategories(true);
+    const response = await axios.get('http://localhost:5000/api/categories');
+    
+    console.log('Full response:', response.data);
+    console.log('Type of categories:', typeof response.data.categories);
+    console.log('Is array?', Array.isArray(response.data.categories));
+    
+    let categoriesData = [];
+    
+    if (response.data.categories && Array.isArray(response.data.categories)) {
+      categoriesData = response.data.categories;
+    } else if (Array.isArray(response.data)) {
+      categoriesData = response.data;
+    } else if (response.data.data && Array.isArray(response.data.data)) {
+      categoriesData = response.data.data;
     }
-  };
+    
+    console.log('Final categories:', categoriesData);
+    setCategories(categoriesData);
+    setLoadingCategories(false); 
+    
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    setCategories([]); 
+    setLoadingCategories(false);
+  }
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -98,26 +99,31 @@ export default function CreateJob() {
       const token = localStorage.getItem('token');
       
      
+      
       const userStr = localStorage.getItem('user');
       const user = userStr ? JSON.parse(userStr) : {};
-      const company = user.company_name || user.companyName || user.company || 'Công ty';
+      const companyName = user.company_name || user.companyName || user.company || 'Công ty chưa cập nhật';
 
+      console.log(' User info:', user);
+      console.log(' Company name:', companyName);
       
-const jobData = {
-  title: formData.title.trim(),
-  description: formData.description.trim(),
-  requirements: formData.requirements.trim(),
-  benefits: formData.benefits?.trim() || null,
-  location: formData.location.trim(),
-  job_type: formData.job_type,       
-  experience_level: formData.experience_level, 
-  category: formData.category,       
-  min_salary: formData.min_salary ? parseInt(formData.min_salary) : null,
-  max_salary: formData.max_salary ? parseInt(formData.max_salary) : null,
-  currency: formData.currency,
-  positions: parseInt(formData.positions) || 1,
-  deadline: formData.deadline || null,
-};
+      //  Tạo object jobData với đầy đủ thông tin
+      const jobData = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        requirements: formData.requirements.trim(),
+        benefits: formData.benefits?.trim() || null,
+        location: formData.location.trim(),
+        job_type: formData.job_type,       
+        experience_level: formData.experience_level, 
+        category: formData.category,
+        company_name: companyName, 
+        min_salary: formData.min_salary ? parseInt(formData.min_salary) : null,
+        max_salary: formData.max_salary ? parseInt(formData.max_salary) : null,
+        currency: formData.currency,
+        positions: parseInt(formData.positions) || 1,
+        deadline: formData.deadline || null,
+      };
 
 
     
@@ -227,7 +233,7 @@ const jobData = {
                       </option>
                     ))
                   ) : (
-                    <option disabled>⚠️ Không có danh mục</option>
+                    <option disabled> Không có danh mục</option>
                   )}
                 </select>
               </div>
@@ -366,7 +372,7 @@ const jobData = {
 
           {/* Mô tả công việc */}
           <div className="form-section">
-            <h2>📋 Mô tả công việc</h2>
+            <h2> Mô tả công việc</h2>
             
             <div className="form-group">
               <label htmlFor="description">

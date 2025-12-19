@@ -57,7 +57,7 @@ const AdminApplicationDetail = () => {
       }
 
       alert('Cập nhật trạng thái thành công!');
-      fetchApplicationDetail(); // Refresh
+      fetchApplicationDetail(); 
     } catch (err) {
       console.error('Error updating status:', err);
       alert('Lỗi khi cập nhật trạng thái!');
@@ -136,23 +136,17 @@ const AdminApplicationDetail = () => {
 
   return (
     <div className="admin-jobs-container">
-      {/* Header */}
+      {}
       <div className="page-header">
         <div>
           <h1> Chi tiết Application #{id}</h1>
           <p>Thông tin đầy đủ về đơn ứng tuyển</p>
         </div>
-        <button 
-          className="btn-secondary"
-          onClick={() => navigate('/admin/applications')}
-        >
-           Quay lại
-        </button>
       </div>
 
-      {/* Main Content */}
+      
       <div className="detail-container">
-        {/* Application Info Card */}
+        
         <div className="detail-card">
           <div className="card-header">
             <h2> Thông tin ứng tuyển</h2>
@@ -196,7 +190,7 @@ const AdminApplicationDetail = () => {
           </div>
         </div>
 
-        {/* Candidate Info Card */}
+        
         <div className="detail-card">
           <div className="card-header">
             <h2> Thông tin ứng viên</h2>
@@ -242,7 +236,6 @@ const AdminApplicationDetail = () => {
           </div>
         </div>
 
-        {/* Job Info Card */}
         <div className="detail-card">
           <div className="card-header">
             <h2> Thông tin công việc</h2>
@@ -304,7 +297,7 @@ const AdminApplicationDetail = () => {
           </div>
         </div>
 
-        {/* Action Buttons */}
+       
         <div className="detail-actions">
           <button
             className="btn-danger"

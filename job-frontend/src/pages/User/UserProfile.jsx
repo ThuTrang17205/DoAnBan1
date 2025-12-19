@@ -16,19 +16,19 @@ function UserProfile() {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        console.log('❌ No token found, redirecting to login...');
+        console.log(' No token found, redirecting to login...');
         window.location.href = '/login';
         return;
       }
 
-      console.log('🔍 Fetching user data from API...');
+      console.log(' Fetching user data from API...');
       const response = await fetch('http://localhost:5000/api/auth/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ User data received:', JSON.stringify(data, null, 2));
+        console.log(' User data received:', JSON.stringify(data, null, 2));
         
         const userData = data.user || data;
         
@@ -43,12 +43,12 @@ function UserProfile() {
           cvCount: 2
         });
       } else if (response.status === 401 || response.status === 403) {
-        console.log('❌ Token invalid, clearing and redirecting...');
+        console.log(' Token invalid, clearing and redirecting...');
         localStorage.removeItem('token');
         window.location.href = '/login';
       }
     } catch (error) {
-      console.error('❌ Error fetching user data:', error);
+      console.error(' Error fetching user data:', error);
     }
   };
 
@@ -65,21 +65,21 @@ function UserProfile() {
         const data = await response.json();
         setSavedJobsCount(data.saved || 0);
         setAppliedJobsCount(data.applied || 0);
-        console.log('📊 Job stats loaded from API:', data);
+        console.log(' Job stats loaded from API:', data);
       } else {
-        console.log('⚠️ Stats API returned:', response.status);
+        console.log(' Stats API returned:', response.status);
         setSavedJobsCount(0);
         setAppliedJobsCount(0);
       }
     } catch (error) {
-      console.error('❌ Error loading job stats:', error);
+      console.error(' Error loading job stats:', error);
       setSavedJobsCount(0);
       setAppliedJobsCount(0);
     }
   };
 
   const handleLogout = () => {
-    console.log('🚪 Logging out...');
+    console.log(' Logging out...');
     localStorage.removeItem('token');
     localStorage.clear();
     window.location.href = '/login';
@@ -95,7 +95,7 @@ function UserProfile() {
             {user.avatar ? (
               <img src={user.avatar} alt={user.name} />
             ) : (
-              <span className="avatar-icon">👤</span>
+              <span className="avatar-icon"></span>
             )}
           </div>
           <h2>{user.name}</h2>
@@ -107,24 +107,24 @@ function UserProfile() {
 
         <nav className="profile-menu">
           <button className={`menu-item ${activeSection === 'jobs' ? 'active' : ''}`} onClick={() => setActiveSection('jobs')}>
-            <span>📊 Quản lý tìm việc</span>
+            <span> Quản lý tìm việc</span>
             <span className="arrow">›</span>
           </button>
           <button className={`menu-item ${activeSection === 'cv' ? 'active' : ''}`} onClick={() => setActiveSection('cv')}>
-            <span>📄 Quản lý CV & Cover letter</span>
+            <span> Quản lý CV & Cover letter</span>
             <span className="arrow">›</span>
           </button>
           <button className={`menu-item ${activeSection === 'email' ? 'active' : ''}`} onClick={() => setActiveSection('email')}>
-            <span>📧 Cài đặt email & thông báo</span>
+            <span> Cài đặt email & thông báo</span>
             <span className="arrow">›</span>
           </button>
           <button className={`menu-item ${activeSection === 'security' ? 'active' : ''}`} onClick={() => setActiveSection('security')}>
-            <span>🔒 Cá nhân & Bảo mật</span>
+            <span> Cá nhân & Bảo mật</span>
             <span className="arrow">›</span>
           </button>
         </nav>
 
-        <button className="logout-btn" onClick={handleLogout}>🚪 Đăng xuất</button>
+        <button className="logout-btn" onClick={handleLogout}> Đăng xuất</button>
       </aside>
 
       <main className="profile-content">
@@ -163,8 +163,8 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
       }
 
       if (activeTab === 'saved') {
-        // ✅ Load saved jobs
-        console.log('🔄 Loading saved jobs...');
+        
+        console.log(' Loading saved jobs...');
         const response = await fetch(`http://localhost:5000/api/jobs/saved`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -174,21 +174,21 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
         }
         
         const data = await response.json();
-        console.log('📦 Saved jobs response:', data);
+        console.log(' Saved jobs response:', data);
         
         const jobs = Array.isArray(data) ? data : (data.data || data.jobs || []);
-        console.log(`✅ Loaded ${jobs.length} saved jobs`);
+        console.log(` Loaded ${jobs.length} saved jobs`);
         setSavedJobs(jobs);
         
       } else {
-        // ✅ Load applied jobs from BOTH sources
-        console.log('🔄 Loading applied jobs from multiple sources...');
+        
+        console.log(' Loading applied jobs from multiple sources...');
         
         let allApplications = [];
         
-        // 1️⃣ Internal applications (jobs posted by employers)
+        
         try {
-          console.log('📋 Fetching internal applications...');
+          console.log(' Fetching internal applications...');
           const internalResponse = await fetch(
             `http://localhost:5000/api/applications/my-applications?limit=1000`,
             { headers: { 'Authorization': `Bearer ${token}` } }
@@ -196,21 +196,21 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
           
           if (internalResponse.ok) {
             const internalData = await internalResponse.json();
-            console.log('📦 Internal API response:', internalData);
+            console.log(' Internal API response:', internalData);
             
             const internal = internalData.applications || internalData.data || [];
-            console.log(`✅ Internal applications: ${internal.length}`);
+            console.log(` Internal applications: ${internal.length}`);
             allApplications = [...allApplications, ...internal];
           } else {
-            console.warn(`⚠️ Internal API returned: ${internalResponse.status}`);
+            console.warn(` Internal API returned: ${internalResponse.status}`);
           }
         } catch (err) {
-          console.error('❌ Internal API error:', err);
+          console.error(' Internal API error:', err);
         }
         
-        // 2️⃣ External applications (crawled jobs)
+       
         try {
-          console.log('🌐 Fetching external applications...');
+          console.log(' Fetching external applications...');
           const externalResponse = await fetch(
             `http://localhost:5000/api/jobs/applied?limit=1000`,
             { headers: { 'Authorization': `Bearer ${token}` } }
@@ -218,34 +218,34 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
           
           if (externalResponse.ok) {
             const externalData = await externalResponse.json();
-            console.log('📦 External API response:', externalData);
+            console.log(' External API response:', externalData);
             
             const external = externalData.data || externalData.applications || externalData.jobs || [];
-            console.log(`✅ External applications: ${external.length}`);
+            console.log(` External applications: ${external.length}`);
             allApplications = [...allApplications, ...external];
           } else {
-            console.warn(`⚠️ External API returned: ${externalResponse.status}`);
-            // Don't throw error - external API might not be implemented yet
+            console.warn(` External API returned: ${externalResponse.status}`);
+            
           }
         } catch (err) {
-          console.error('❌ External API error:', err);
-          // Don't throw - continue with internal apps only
+          console.error(' External API error:', err);
+          
         }
 
-        // ✅ Validate and clean data
-        console.log(`📊 Total raw applications: ${allApplications.length}`);
+        
+        console.log(` Total raw applications: ${allApplications.length}`);
         
         allApplications = allApplications.filter(job => {
           const isValid = job && (job.job_title || job.title) && (job.job_id || job.id);
           if (!isValid) {
-            console.warn('⚠️ Invalid job entry:', job);
+            console.warn(' Invalid job entry:', job);
           }
           return isValid;
         });
         
-        console.log(`✅ Valid applications after filtering: ${allApplications.length}`);
+        console.log(` Valid applications after filtering: ${allApplications.length}`);
 
-        // ✅ Normalize data structure
+        
         allApplications = allApplications.map(job => ({
           id: job.id || job.job_id,
           job_id: job.job_id || job.id,
@@ -259,18 +259,18 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
           cv_used: job.cv_used || null
         }));
 
-        // ✅ Sort by date (newest first)
+        
         allApplications.sort((a, b) => 
           new Date(b.applied_date) - new Date(a.applied_date)
         );
 
-        console.log('📊 Final applications to display:', allApplications.length);
-        console.log('🔍 Sample application:', allApplications[0]);
+        console.log(' Final applications to display:', allApplications.length);
+        console.log(' Sample application:', allApplications[0]);
         
         setAppliedJobs(allApplications);
       }
     } catch (error) {
-      console.error(`❌ Error loading ${activeTab} jobs:`, error);
+      console.error(` Error loading ${activeTab} jobs:`, error);
       setError(`Không thể tải dữ liệu: ${error.message}`);
       activeTab === 'saved' ? setSavedJobs([]) : setAppliedJobs([]);
     } finally {
@@ -288,11 +288,11 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
       if (response.ok) {
         setSavedJobs(savedJobs.filter(job => job.job_id !== jobId));
         onRefresh();
-        alert('✅ Đã bỏ lưu công việc!');
+        alert(' Đã bỏ lưu công việc!');
       }
     } catch (error) {
-      console.error('❌ Error unsaving job:', error);
-      alert('❌ Có lỗi xảy ra!');
+      console.error(' Error unsaving job:', error);
+      alert(' Có lỗi xảy ra!');
     }
   };
 
@@ -315,19 +315,19 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
       if (response.ok) {
         onRefresh(); 
         loadJobs();
-        alert('✅ Đã thêm vào danh sách ứng tuyển!');
+        alert(' Đã thêm vào danh sách ứng tuyển!');
       } else {
         const error = await response.json();
-        alert(error.error || '❌ Có lỗi xảy ra!');
+        alert(error.error || ' Có lỗi xảy ra!');
       }
     } catch (error) {
-      console.error('❌ Error applying:', error);
-      alert('❌ Có lỗi xảy ra!');
+      console.error(' Error applying:', error);
+      alert(' Có lỗi xảy ra!');
     }
   };
 
   const filterAndSortJobs = (jobs) => {
-    console.log(`🔍 Filtering ${jobs.length} jobs with search term: "${searchTerm}"`);
+    console.log(` Filtering ${jobs.length} jobs with search term: "${searchTerm}"`);
     
     let filtered = jobs.filter(job => {
       const titleMatch = (job.job_title || '').toLowerCase().includes(searchTerm.toLowerCase());
@@ -335,7 +335,7 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
       return titleMatch || companyMatch;
     });
     
-    console.log(`✅ ${filtered.length} jobs after filtering`);
+    console.log(` ${filtered.length} jobs after filtering`);
     
     if (sortBy === 'newest') {
       filtered.sort((a, b) => new Date(b.saved_date || b.applied_date) - new Date(a.saved_date || a.applied_date));
@@ -349,8 +349,8 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
   const currentJobs = activeTab === 'saved' ? savedJobs : appliedJobs;
   const displayJobs = filterAndSortJobs(currentJobs);
 
-  // ✅ Debug logging
-  console.log('🎯 Render state:', {
+  
+  console.log(' Render state:', {
     activeTab,
     currentJobsLength: currentJobs.length,
     displayJobsLength: displayJobs.length,
@@ -390,20 +390,20 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
           className={`tab-btn ${activeTab === 'saved' ? 'active' : ''}`} 
           onClick={() => setActiveTab('saved')}
         >
-          💾 Việc làm đã lưu ({savedJobsCount})
+           Việc làm đã lưu ({savedJobsCount})
         </button>
         <button 
           className={`tab-btn ${activeTab === 'applied' ? 'active' : ''}`} 
           onClick={() => setActiveTab('applied')}
         >
-          📤 Việc làm đã ứng tuyển ({appliedJobsCount})
+          Việc làm đã ứng tuyển ({appliedJobsCount})
         </button>
       </div>
 
       <div className="jobs-controls">
         <input 
           type="text" 
-          placeholder="🔍 Tìm kiếm công việc, công ty..." 
+          placeholder=" Tìm kiếm công việc, công ty..." 
           value={searchTerm} 
           onChange={(e) => setSearchTerm(e.target.value)} 
           className="search-input" 
@@ -421,7 +421,7 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
           onClick={() => { loadJobs(); onRefresh(); }}
           disabled={loading}
         >
-          🔄 Làm mới
+           Làm mới
         </button>
       </div>
 
@@ -434,7 +434,7 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
           color: '#c00',
           marginBottom: '1rem'
         }}>
-          ⚠️ {error}
+           {error}
         </div>
       )}
 
@@ -488,28 +488,23 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
                 Hiển thị {displayJobs.length} / {currentJobs.length} công việc
               </div>
               
-              {displayJobs.map(job => (
+ {displayJobs.map(job => (
                 <div key={job.id || job.job_id} className="job-card">
-                  <div className="job-logo">
-                    {job.company_logo ? (
-                      <img src={job.company_logo} alt={job.company_name} />
-                    ) : (
-                      <span className="logo-placeholder">🏢</span>
-                    )}
+                  <div className="job-info">
                   </div>
                   <div className="job-info">
                     <h3 className="job-title">{job.job_title || 'Tên công việc'}</h3>
                     <p className="job-company">{job.company_name || 'Tên công ty'}</p>
                     <div className="job-details">
                       <span>📍 {job.location || 'Hồ Chí Minh'}</span>
-                      <span>💰 {job.salary || 'Thỏa thuận'}</span>
+                      <span> {job.salary || 'Thỏa thuận'}</span>
                       <span>📅 {new Date(job.saved_date || job.applied_date).toLocaleDateString('vi-VN')}</span>
                     </div>
                     {activeTab === 'applied' && (
                       <span className={`status-badge ${job.status || 'pending'}`}>
-                        {job.status === 'pending' ? '⏳ Đang chờ' : 
-                         job.status === 'reviewing' ? '👀 Đang xem xét' : 
-                         '✅ Đã phản hồi'}
+                        {job.status === 'pending' ? ' Đang chờ' : 
+                         job.status === 'reviewing' ? ' Đang xem xét' : 
+                         ' Đã phản hồi'}
                       </span>
                     )}
                   </div>
@@ -520,13 +515,13 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
                           className="btn-apply" 
                           onClick={() => handleApplyFromSaved(job)}
                         >
-                          📤 Ứng tuyển ngay
+                           Ứng tuyển ngay
                         </button>
                         <button 
                           className="btn-unsave" 
                           onClick={() => handleUnsaveJob(job.job_id)}
                         >
-                          ❌ Bỏ lưu
+                           Bỏ lưu
                         </button>
                       </>
                     ) : (
@@ -534,7 +529,7 @@ function JobsSection({ savedJobsCount, appliedJobsCount, onRefresh }) {
                         className="btn-view" 
                         onClick={() => window.open(`/jobs/${job.job_id}`, '_blank')}
                       >
-                        👁️ Xem chi tiết
+                         Xem chi tiết
                       </button>
                     )}
                   </div>
@@ -570,11 +565,11 @@ function CVSection({ user }) {
       });
       const data = await response.json();
       if (data.success) {
-        console.log('✅ CVs loaded:', data.data);
+        console.log(' CVs loaded:', data.data);
         setCvList(data.data);
       }
     } catch (error) {
-      console.error('❌ Error loading CVs:', error);
+      console.error(' Error loading CVs:', error);
       setCvList([]);
     } finally {
       setLoading(false);
@@ -589,11 +584,11 @@ function CVSection({ user }) {
       });
       const data = await response.json();
       if (data.success) {
-        console.log('✅ Cover letters loaded:', data.data);
+        console.log(' Cover letters loaded:', data.data);
         setCoverLetters(data.data);
       }
     } catch (error) {
-      console.error('❌ Error loading cover letters:', error);
+      console.error(' Error loading cover letters:', error);
       setCoverLetters([]);
     }
   };
@@ -602,15 +597,15 @@ function CVSection({ user }) {
     const file = e.target.files[0];
     if (!file) return;
     const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    if (!validTypes.includes(file.type)) { alert('❌ Chỉ chấp nhận file PDF, DOC, DOCX'); return; }
-    if (file.size > 5 * 1024 * 1024) { alert('❌ File không được vượt quá 5MB'); return; }
+    if (!validTypes.includes(file.type)) { alert(' Chỉ chấp nhận file PDF, DOC, DOCX'); return; }
+    if (file.size > 5 * 1024 * 1024) { alert(' File không được vượt quá 5MB'); return; }
     setSelectedFile(file);
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) { alert('❌ Vui lòng chọn file'); return; }
+    if (!selectedFile) { alert(' Vui lòng chọn file'); return; }
     const token = localStorage.getItem('token');
-    if (!token) { alert('❌ Bạn chưa đăng nhập'); return; }
+    if (!token) { alert(' Bạn chưa đăng nhập'); return; }
     try {
       setUploading(true);
       const formData = new FormData();
@@ -623,16 +618,16 @@ function CVSection({ user }) {
       });
       const data = await response.json();
       if (data.success) {
-        alert(`✅ Tải lên ${activeTab === 'cv' ? 'CV' : 'Cover letter'} thành công!`);
+        alert(` Tải lên ${activeTab === 'cv' ? 'CV' : 'Cover letter'} thành công!`);
         setShowUploadModal(false);
         setSelectedFile(null);
         activeTab === 'cv' ? loadCVs() : loadCoverLetters();
       } else {
-        alert(data.message || '❌ Upload thất bại');
+        alert(data.message || ' Upload thất bại');
       }
     } catch (error) {
-      console.error('❌ Upload error:', error);
-      alert('❌ Có lỗi xảy ra');
+      console.error(' Upload error:', error);
+      alert(' Có lỗi xảy ra');
     } finally {
       setUploading(false);
     }
@@ -646,10 +641,10 @@ function CVSection({ user }) {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
-      if (data.success) { alert('✅ Đã đặt làm CV mặc định!'); loadCVs(); }
+      if (data.success) { alert(' Đã đặt làm CV mặc định!'); loadCVs(); }
     } catch (error) {
-      console.error('❌ Error:', error);
-      alert('❌ Có lỗi xảy ra');
+      console.error(' Error:', error);
+      alert(' Có lỗi xảy ra');
     }
   };
 
@@ -664,12 +659,12 @@ function CVSection({ user }) {
       });
       const data = await response.json();
       if (data.success) {
-        alert('✅ Đã xóa file!');
+        alert(' Đã xóa file!');
         type === 'cv' ? loadCVs() : loadCoverLetters();
       }
     } catch (error) {
-      console.error('❌ Delete error:', error);
-      alert('❌ Có lỗi xảy ra');
+      console.error(' Delete error:', error);
+      alert(' Có lỗi xảy ra');
     }
   };
 
@@ -679,19 +674,19 @@ function CVSection({ user }) {
       <div className="cv-stats">
         <div className="cv-stat-card"><span className="stat-icon">📄</span><div><h3>{cvList.length}</h3><p>CV đã tải lên</p></div></div>
         <div className="cv-stat-card"><span className="stat-icon">✉️</span><div><h3>{coverLetters.length}</h3><p>Cover letter</p></div></div>
-        <div className="cv-stat-card"><span className="stat-icon">👁️</span><div><h3>0</h3><p>Lượt xem CV</p></div></div>
+        <div className="cv-stat-card"><span className="stat-icon"></span><div><h3>0</h3><p>Lượt xem CV</p></div></div>
       </div>
       <div className="cv-tabs">
         <button className={`tab-btn ${activeTab === 'cv' ? 'active' : ''}`} onClick={() => setActiveTab('cv')}>📄 CV của tôi ({cvList.length})</button>
         <button className={`tab-btn ${activeTab === 'cover' ? 'active' : ''}`} onClick={() => setActiveTab('cover')}>✉️ Cover letter ({coverLetters.length})</button>
       </div>
       <div className="cv-actions-bar">
-        <button className="btn-upload-cv" onClick={() => setShowUploadModal(true)}>⬆️ Tải lên {activeTab === 'cv' ? 'CV mới' : 'Cover letter mới'}</button>
+        <button className="btn-upload-cv" onClick={() => setShowUploadModal(true)}> Tải lên {activeTab === 'cv' ? 'CV mới' : 'Cover letter mới'}</button>
         <button className="btn-create-cv" onClick={() => window.location.href = '/create-cv'}>
-          ✨ Tạo CV 
+           Tạo CV 
         </button>
         <button className="btn-create-cv" onClick={() => window.location.href = '/cover-letter'}>
-          ✨ Tạo Cover Letter 
+           Tạo Cover Letter 
         </button>
       </div>
       {activeTab === 'cv' ? (
@@ -701,7 +696,7 @@ function CVSection({ user }) {
           ) : cvList.length === 0 ? (
             <div className="empty-state">
               <div className="empty-icon">📄</div><h3>Chưa có CV nào</h3><p>Tải lên CV của bạn để ứng tuyển nhanh hơn</p>
-              <button className="btn-upload-cv" onClick={() => setShowUploadModal(true)}>⬆️ Tải lên CV đầu tiên</button>
+              <button className="btn-upload-cv" onClick={() => setShowUploadModal(true)}>Tải lên CV đầu tiên</button>
             </div>
           ) : (
             cvList.map(cv => (
@@ -714,19 +709,19 @@ function CVSection({ user }) {
                   </div>
                   <div className="cv-meta">
                     <span>📅 {new Date(cv.uploaded_at).toLocaleDateString('vi-VN')}</span>
-                    <span>💾 {cv.file_size}</span>
+                    <span> {cv.file_size}</span>
                   </div>
                 </div>
                 <div className="cv-actions">
-                  <button className="btn-icon" title="Xem CV" onClick={() => window.open(cv.file_url, '_blank')}>👁️</button>
-                  <button className="btn-icon" title="Tải xuống" onClick={() => {
+                  <button className="btn-text" title="Xem CV" onClick={() => window.open(cv.file_url, '_blank')}>Xem</button>
+                  <button className="btn-text" title="Tải xuống" onClick={() => { 
                     const link = document.createElement('a');
                     link.href = cv.file_url;
                     link.download = cv.file_name;
                     link.click();
-                  }}>⬇️</button>
-                  {!cv.is_default && <button className="btn-icon" title="Đặt làm mặc định" onClick={() => handleSetDefault(cv.id)}>⭐</button>}
-                  <button className="btn-icon btn-delete" title="Xóa" onClick={() => handleDelete(cv.id, 'cv')}>🗑️</button>
+                  }}>Tải xuống</button>
+                  {!cv.is_default && <button className="btn-text btn-default" title="Đặt làm mặc định" onClick={() => handleSetDefault(cv.id)}>Đặt mặc định</button>}
+                  <button className="btn-text btn-delete" title="Xóa" onClick={() => handleDelete(cv.id, 'cv')}>Xóa</button>
                 </div>
               </div>
             ))
@@ -739,7 +734,7 @@ function CVSection({ user }) {
           ) : coverLetters.length === 0 ? (
             <div className="empty-state">
               <div className="empty-icon">✉️</div><h3>Chưa có Cover letter nào</h3><p>Tải lên Cover letter để tăng cơ hội được tuyển dụng</p>
-              <button className="btn-upload-cv" onClick={() => setShowUploadModal(true)}>⬆️ Tải lên Cover letter đầu tiên</button>
+              <button className="btn-upload-cv" onClick={() => setShowUploadModal(true)}> Tải lên Cover letter đầu tiên</button>
             </div>
           ) : (
             coverLetters.map(letter => (
@@ -749,18 +744,20 @@ function CVSection({ user }) {
                   <h3>{letter.file_name}</h3>
                   <div className="cv-meta">
                     <span>📅 {new Date(letter.uploaded_at).toLocaleDateString('vi-VN')}</span>
-                    <span>💾 {letter.file_size}</span>
+                    <span> {letter.file_size}</span>
                   </div>
                 </div>
                 <div className="cv-actions">
-                  <button className="btn-icon" title="Xem" onClick={() => window.open(letter.file_url, '_blank')}>👁️</button>
+                  <button className="btn-icon" title="Xem CoverLetter " onClick={() => window.open(letter.file_url, '_blank')}>Xem</button>
                   <button className="btn-icon" title="Tải xuống" onClick={() => {
                     const link = document.createElement('a');
                     link.href = letter.file_url;
                     link.download = letter.file_name;
                     link.click();
-                  }}>⬇️</button>
-                  <button className="btn-icon btn-delete" title="Xóa" onClick={() => handleDelete(letter.id, 'cover')}>🗑️</button>
+                  }}>Tải xuống</button>
+                  {! letter.is_default && <button className="btn-text btn-default" title="Đặt làm mặc định" onClick={() => handleSetDefault(letter.id)}>Đặt mặc định</button>}
+                  <button className="btn-icon btn-delete" title="Xóa" onClick={() => handleDelete(letter.id, 'cover')}>Xóa</button>
+
                 </div>
               </div>
             ))
@@ -771,7 +768,7 @@ function CVSection({ user }) {
         <div className="modal-overlay" onClick={() => setShowUploadModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>⬆️ Tải lên {activeTab === 'cv' ? 'CV' : 'Cover letter'}</h2>
+              <h2>⬆ Tải lên {activeTab === 'cv' ? 'CV' : 'Cover letter'}</h2>
               <button className="btn-close" onClick={() => setShowUploadModal(false)}>✕</button>
             </div>
             <div className="modal-body">
@@ -782,7 +779,7 @@ function CVSection({ user }) {
                 <button className="btn-browse" onClick={() => document.getElementById('fileInput').click()} disabled={uploading}>📂 Chọn file từ máy tính</button>
                 {selectedFile && (
                   <div style={{ marginTop: '1rem', padding: '1rem', background: 'white', borderRadius: '8px', textAlign: 'center' }}>
-                    <p style={{ marginBottom: '1rem', color: '#10b981', fontWeight: 600 }}>✅ Đã chọn: {selectedFile.name}</p>
+                    <p style={{ marginBottom: '1rem', color: '#10b981', fontWeight: 600 }}> Đã chọn: {selectedFile.name}</p>
                     <button 
                       onClick={handleUpload} 
                       disabled={uploading}
@@ -791,7 +788,7 @@ function CVSection({ user }) {
                         border: 'none', borderRadius: '8px', cursor: uploading ? 'not-allowed' : 'pointer', fontWeight: 600
                       }}
                     >
-                      {uploading ? '⏳ Đang tải lên...' : '⬆️ Xác nhận tải lên'}
+                      {uploading ? ' Đang tải lên...' : '⬆Xác nhận tải lên'}
                     </button>
                   </div>
                 )}
@@ -825,7 +822,7 @@ function EmailSection() {
     setSaving(true);
     setTimeout(() => {
       setSaving(false);
-      alert('✅ Đã lưu cài đặt thông báo!');
+      alert(' Đã lưu cài đặt thông báo!');
     }, 1000);
   };
 
@@ -834,13 +831,13 @@ function EmailSection() {
       <h1 className="section-title">Cài đặt email & thông báo</h1>
       
       <div className="settings-section">
-        <h2 className="settings-subtitle">📧 Thông báo qua Email</h2>
+        <h2 className="settings-subtitle"> Thông báo qua Email</h2>
         <p className="settings-description">Chọn các loại email bạn muốn nhận từ Job Portal</p>
         
         <div className="settings-list">
           <div className="setting-item">
             <div className="setting-info">
-              <h3>🔔 Thông báo việc làm mới</h3>
+              <h3> Thông báo việc làm mới</h3>
               <p>Nhận email khi có việc làm phù hợp với hồ sơ của bạn</p>
             </div>
             <label className="toggle-switch">
@@ -851,7 +848,7 @@ function EmailSection() {
 
           <div className="setting-item">
             <div className="setting-info">
-              <h3>📤 Cập nhật đơn ứng tuyển</h3>
+              <h3> Cập nhật đơn ứng tuyển</h3>
               <p>Thông báo khi nhà tuyển dụng xem hoặc phản hồi đơn của bạn</p>
             </div>
             <label className="toggle-switch">
@@ -862,7 +859,7 @@ function EmailSection() {
 
           <div className="setting-item">
             <div className="setting-info">
-              <h3>🏢 Tin tức từ công ty</h3>
+              <h3> Tin tức từ công ty</h3>
               <p>Nhận thông tin về các công ty bạn quan tâm</p>
             </div>
             <label className="toggle-switch">
@@ -873,7 +870,7 @@ function EmailSection() {
 
           <div className="setting-item">
             <div className="setting-info">
-              <h3>📰 Bản tin tuần</h3>
+              <h3> Bản tin tuần</h3>
               <p>Tổng hợp các việc làm và tin tức hàng tuần</p>
             </div>
             <label className="toggle-switch">
@@ -884,7 +881,7 @@ function EmailSection() {
 
           <div className="setting-item">
             <div className="setting-info">
-              <h3>🎁 Khuyến mãi & Ưu đãi</h3>
+              <h3> Khuyến mãi & Ưu đãi</h3>
               <p>Nhận thông tin về các chương trình khuyến mãi</p>
             </div>
             <label className="toggle-switch">
@@ -895,7 +892,7 @@ function EmailSection() {
 
           <div className="setting-item">
             <div className="setting-info">
-              <h3>⚙️ Thông báo hệ thống</h3>
+              <h3> Thông báo hệ thống</h3>
               <p>Email quan trọng về tài khoản và bảo mật</p>
             </div>
             <label className="toggle-switch">
@@ -907,12 +904,12 @@ function EmailSection() {
       </div>
 
       <div className="settings-section">
-        <h2 className="settings-subtitle">⏰ Tần suất thông báo</h2>
+        <h2 className="settings-subtitle"> Tần suất thông báo</h2>
         <div className="frequency-options">
           <label className="frequency-option">
             <input type="radio" name="frequency" value="instant" checked={notificationFrequency === 'instant'} onChange={(e) => setNotificationFrequency(e.target.value)} />
             <div className="frequency-content">
-              <h3>⚡ Ngay lập tức</h3>
+              <h3> Ngay lập tức</h3>
               <p>Nhận thông báo ngay khi có cập nhật</p>
             </div>
           </label>
@@ -920,7 +917,7 @@ function EmailSection() {
           <label className="frequency-option">
             <input type="radio" name="frequency" value="daily" checked={notificationFrequency === 'daily'} onChange={(e) => setNotificationFrequency(e.target.value)} />
             <div className="frequency-content">
-              <h3>📅 Hàng ngày</h3>
+              <h3> Hàng ngày</h3>
               <p>Tổng hợp 1 lần mỗi ngày vào 9h sáng</p>
             </div>
           </label>
@@ -928,7 +925,7 @@ function EmailSection() {
           <label className="frequency-option">
             <input type="radio" name="frequency" value="weekly" checked={notificationFrequency === 'weekly'} onChange={(e) => setNotificationFrequency(e.target.value)} />
             <div className="frequency-content">
-              <h3>📆 Hàng tuần</h3>
+              <h3> Hàng tuần</h3>
               <p>Tổng hợp 1 lần mỗi tuần vào thứ 2</p>
             </div>
           </label>
@@ -937,10 +934,10 @@ function EmailSection() {
 
       <div className="settings-actions">
         <button className="btn-save" onClick={handleSave} disabled={saving}>
-          {saving ? '⏳ Đang lưu...' : '💾 Lưu thay đổi'}
+          {saving ? ' Đang lưu...' : ' Lưu thay đổi'}
         </button>
         <button className="btn-cancel" onClick={() => window.location.reload()}>
-          ❌ Hủy bỏ
+           Hủy bỏ
         </button>
       </div>
     </div>
@@ -957,14 +954,14 @@ function SecuritySection({ user }) {
 
   const handlePasswordChange = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('❌ Mật khẩu mới không khớp!');
+      alert(' Mật khẩu mới không khớp!');
       return;
     }
     if (passwordData.newPassword.length < 6) {
-      alert('❌ Mật khẩu phải có ít nhất 6 ký tự!');
+      alert(' Mật khẩu phải có ít nhất 6 ký tự!');
       return;
     }
-    alert('✅ Đổi mật khẩu thành công!');
+    alert(' Đổi mật khẩu thành công!');
     setShowChangePassword(false);
     setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
   };
@@ -975,8 +972,8 @@ function SecuritySection({ user }) {
       
       <div className="security-card">
         <div className="security-card-header">
-          <h2>👤 Thông tin cá nhân</h2>
-          <button className="btn-edit-profile">✏️ Chỉnh sửa</button>
+          <h2> Thông tin cá nhân</h2>
+          <button className="btn-edit-profile"> Chỉnh sửa</button>
         </div>
         <div className="security-info-grid">
           <div className="security-info-item">
@@ -1002,17 +999,17 @@ function SecuritySection({ user }) {
 
       <div className="security-card">
         <div className="security-card-header">
-          <h2>🔒 Bảo mật tài khoản</h2>
+          <h2> Bảo mật tài khoản</h2>
         </div>
         
         <div className="security-options">
           <div className="security-option">
             <div className="security-option-info">
-              <h3>🔑 Mật khẩu</h3>
+              <h3> Mật khẩu</h3>
               <p>Thay đổi mật khẩu của bạn để bảo mật tài khoản</p>
             </div>
             <button className="btn-change-password" onClick={() => setShowChangePassword(!showChangePassword)}>
-              {showChangePassword ? '❌ Hủy' : '🔄 Đổi mật khẩu'}
+              {showChangePassword ? ' Hủy' : ' Đổi mật khẩu'}
             </button>
           </div>
 
@@ -1049,39 +1046,39 @@ function SecuritySection({ user }) {
                 />
               </div>
               <button className="btn-save-password" onClick={handlePasswordChange}>
-                💾 Lưu mật khẩu mới
+                 Lưu mật khẩu mới
               </button>
             </div>
           )}
 
           <div className="security-option">
             <div className="security-option-info">
-              <h3>🔐 Xác thực 2 bước</h3>
+              <h3> Xác thực 2 bước</h3>
               <p>Tăng cường bảo mật với xác thực qua email</p>
               <span className="badge-inactive">Chưa kích hoạt</span>
             </div>
-            <button className="btn-enable">✅ Bật</button>
+            <button className="btn-enable"> Bật</button>
           </div>
 
           <div className="security-option">
             <div className="security-option-info">
-              <h3>📱 Thiết bị đăng nhập</h3>
+              <h3> Thiết bị đăng nhập</h3>
               <p>Quản lý các thiết bị đã đăng nhập tài khoản</p>
             </div>
-            <button className="btn-manage">⚙️ Quản lý</button>
+            <button className="btn-manage"> Quản lý</button>
           </div>
 
           <div className="security-option security-option-danger">
             <div className="security-option-info">
-              <h3>⚠️ Xóa tài khoản</h3>
+              <h3> Xóa tài khoản</h3>
               <p>Xóa vĩnh viễn tài khoản và toàn bộ dữ liệu của bạn</p>
             </div>
             <button className="btn-delete-account" onClick={() => {
-              if (window.confirm('⚠️ Bạn có chắc chắn muốn xóa tài khoản? Hành động này không thể hoàn tác!')) {
+              if (window.confirm(' Bạn có chắc chắn muốn xóa tài khoản? Hành động này không thể hoàn tác!')) {
                 alert('Tính năng đang phát triển');
               }
             }}>
-              🗑️ Xóa tài khoản
+               Xóa tài khoản
             </button>
           </div>
         </div>
@@ -1089,11 +1086,10 @@ function SecuritySection({ user }) {
 
       <div className="security-card">
         <div className="security-card-header">
-          <h2>📊 Lịch sử hoạt động</h2>
+          <h2> Lịch sử hoạt động</h2>
         </div>
         <div className="activity-list">
           <div className="activity-item">
-            <span className="activity-icon">🔐</span>
             <div className="activity-info">
               <h4>Đăng nhập thành công</h4>
               <p>Chrome trên Windows • Hanoi, Vietnam</p>
@@ -1101,7 +1097,6 @@ function SecuritySection({ user }) {
             </div>
           </div>
           <div className="activity-item">
-            <span className="activity-icon">📄</span>
             <div className="activity-info">
               <h4>Tải lên CV mới</h4>
               <p>CV_TranTuyetLy_2024.pdf</p>
@@ -1109,7 +1104,6 @@ function SecuritySection({ user }) {
             </div>
           </div>
           <div className="activity-item">
-            <span className="activity-icon">📤</span>
             <div className="activity-info">
               <h4>Ứng tuyển công việc</h4>
               <p>Senior Frontend Developer tại FPT Software</p>

@@ -1,5 +1,5 @@
 // ========================
-// 🚀 CHUẨN HOÁ DỮ LIỆU JOBS
+// 🚀 CHUẨN HOÁ DỮ LIỆU JOBS - COMPLETE VERSION
 // ========================
 
 console.log("🔧 Bắt đầu chuẩn hoá dữ liệu từ raw_jobs...");
@@ -326,9 +326,11 @@ async function isDuplicate(title, company, location) {
 // ========================
 (async () => {
   try {
+    // ✅ Lấy dữ liệu từ raw_jobs
     const { rows } = await pool.query("SELECT * FROM raw_jobs");
     console.log(`📦 Có ${rows.length} job thô cần xử lý`);
 
+    // ✅ Tạo bảng jobs với UNIQUE constraint và company_logo
     await pool.query(`
       CREATE TABLE IF NOT EXISTS jobs (
         id SERIAL PRIMARY KEY,
@@ -340,52 +342,69 @@ async function isDuplicate(title, company, location) {
         currency VARCHAR(10),
         category TEXT,
         description TEXT,
-        url TEXT UNIQUE,
+        url TEXT,
         source TEXT,
-        posted_at TIMESTAMP DEFAULT NOW()
+        company_logo TEXT,
+        posted_at TIMESTAMP DEFAULT NOW(),
+        CONSTRAINT jobs_url_unique UNIQUE(url)
       )
     `);
 
+    console.log("✅ Đã tạo/kiểm tra bảng jobs với UNIQUE constraint và company_logo");
+
     let count = 0;
+    let skipped = 0;
+    
     for (const job of rows) {
-      if (!job.title || !job.company) continue;
+      if (!job.title || !job.company) {
+        skipped++;
+        continue;
+      }
 
       const location = normalizeLocation(job.location);
       const { min, max, currency } = normalizeSalary(job.salary);
       const category = detectCategory(job.title, job.description || "");
 
-      const duplicate = await isDuplicate(job.title, job.company, location);
-      if (duplicate) {
-        console.log(`⚠️ Bỏ qua job trùng: ${job.title}`);
-        continue;
+      try {
+        await pool.query(
+          `INSERT INTO jobs (title, company, location, min_salary, max_salary, currency, category, description, url, source, company_logo)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11);`,
+          [
+            job.title.trim(),
+            job.company.trim(),
+            location,
+            min,
+            max,
+            currency,
+            category,
+            job.description || null,
+            job.url,
+            job.source || "CareerViet",
+            job.company_logo || null
+          ]
+        );
+
+        count++;
+        console.log(`✅ ${count}. ${job.title} → ${category}`);
+      } catch (insertErr) {
+        console.error(`❌ Lỗi insert job "${job.title}":`, insertErr.message);
+        skipped++;
       }
-
-      await pool.query(
-        `INSERT INTO jobs (title, company, location, min_salary, max_salary, currency, category, description, url, source)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
-         ON CONFLICT (url) DO NOTHING;`,
-        [
-          job.title.trim(),
-          job.company.trim(),
-          location,
-          min,
-          max,
-          currency,
-          category,
-          job.description || null,
-          job.url,
-          job.source || "topcv",
-        ]
-      );
-
-      count++;
-      console.log(`✅ ${count}. ${job.title} → ${category}`);
     }
 
+    console.log("\n" + "=".repeat(60));
+    console.log("📊 TỔNG KẾT CHUẨN HOÁ");
+    console.log("=".repeat(60));
+    console.log(`✅ Đã lưu thành công: ${count} job`);
+    console.log(`⚠️  Bỏ qua/Trùng:      ${skipped} job`);
+    console.log(`📦 Tổng cộng:         ${rows.length} job`);
+    console.log("=".repeat(60));
     console.log(`🎯 Hoàn tất! Đã lưu ${count} job sạch vào bảng "jobs".`);
+    
   } catch (err) {
     console.error("❌ Lỗi:", err);
   } finally {
     await pool.end();
+    console.log("\n🔒 Đã đóng kết nối database");
   }
 })();

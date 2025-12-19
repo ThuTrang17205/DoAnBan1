@@ -4,21 +4,21 @@ import { Outlet, useLocation, Navigate } from 'react-router-dom';
 const AdminLayout = () => {
   const location = useLocation();
   
-  // Kiểm tra xem có phải trang login không
+  
   const isLoginPage = location.pathname === '/admin-login';
   
-  // Kiểm tra token admin (nếu cần bảo vệ dashboard)
+  
   const adminToken = localStorage.getItem('adminToken');
   const isDashboard = location.pathname === '/admin-dashboard';
 
-  // Nếu là dashboard mà không có token, redirect về login
+ 
   if (isDashboard && !adminToken) {
     return <Navigate to="/admin-login" replace />;
   }
 
   return (
     <>
-      {/* Hiển thị header cho admin (trừ login page) */}
+      {}
       {!isLoginPage && (
         <div style={{ 
           padding: '15px 30px', 

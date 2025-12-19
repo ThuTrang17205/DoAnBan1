@@ -1,4 +1,4 @@
-// ===================== EMPLOYER MODEL =====================
+
 const pool = require('../config/db');
 
 class Employer {
@@ -43,7 +43,7 @@ class Employer {
       const result = await pool.query(query, params);
       return result.rows;
     } catch (error) {
-      console.error('❌ Error in Employer.findAll:', error.message);
+      console.error(' Error in Employer.findAll:', error.message);
       throw error;
     }
   }
@@ -66,7 +66,7 @@ class Employer {
       );
       return result.rows[0] || null;
     } catch (error) {
-      console.error('❌ Error in Employer.findById:', error.message);
+      console.error(' Error in Employer.findById:', error.message);
       throw error;
     }
   }
@@ -89,7 +89,7 @@ class Employer {
       );
       return result.rows[0] || null;
     } catch (error) {
-      console.error('❌ Error in Employer.findByUserId:', error.message);
+      console.error(' Error in Employer.findByUserId:', error.message);
       throw error;
     }
   }
@@ -107,7 +107,7 @@ class Employer {
         description = ''
       } = employerData;
 
-      // Kiểm tra user_id đã có employer profile chưa
+      
       const existing = await this.findByUserId(user_id);
       if (existing) {
         throw new Error('Employer profile already exists for this user');
@@ -120,10 +120,10 @@ class Employer {
         [user_id, company, description]
       );
 
-      console.log('✅ Employer profile created for user ID:', user_id);
+      console.log(' Employer profile created for user ID:', user_id);
       return result.rows[0];
     } catch (error) {
-      console.error('❌ Error in Employer.create:', error.message);
+      console.error(' Error in Employer.create:', error.message);
       throw error;
     }
   }
@@ -150,10 +150,10 @@ class Employer {
         throw new Error('Employer not found');
       }
 
-      console.log('✅ Employer profile updated, ID:', id);
+      console.log(' Employer profile updated, ID:', id);
       return result.rows[0];
     } catch (error) {
-      console.error('❌ Error in Employer.update:', error.message);
+      console.error(' Error in Employer.update:', error.message);
       throw error;
     }
   }
@@ -179,7 +179,7 @@ class Employer {
         industry
       } = updates;
       
-      // Update employers table
+      
       const employerResult = await client.query(
         `UPDATE employers 
          SET company = COALESCE($1, company), 
@@ -189,7 +189,7 @@ class Employer {
         [company, description, userId]
       );
 
-      // Update users table với company info
+      
       if (company_name || contact_person || phone || company_size || industry) {
         await client.query(
           `UPDATE users 
@@ -204,11 +204,11 @@ class Employer {
       }
 
       await client.query('COMMIT');
-      console.log('✅ Employer profile updated for user ID:', userId);
+      console.log(' Employer profile updated for user ID:', userId);
       return employerResult.rows[0];
     } catch (error) {
       await client.query('ROLLBACK');
-      console.error('❌ Error in Employer.updateByUserId:', error.message);
+      console.error(' Error in Employer.updateByUserId:', error.message);
       throw error;
     } finally {
       client.release();
@@ -225,10 +225,10 @@ class Employer {
     try {
       await client.query('BEGIN');
       
-      // Xóa tất cả jobs của employer này
+      
       await client.query('DELETE FROM jobs WHERE employer_id = $1', [id]);
       
-      // Xóa employer profile
+      
       const result = await client.query(
         'DELETE FROM employers WHERE id = $1 RETURNING *',
         [id]
@@ -240,11 +240,11 @@ class Employer {
         throw new Error('Employer not found');
       }
       
-      console.log('✅ Employer profile deleted, ID:', id);
+      console.log(' Employer profile deleted, ID:', id);
       return true;
     } catch (error) {
       await client.query('ROLLBACK');
-      console.error('❌ Error in Employer.delete:', error.message);
+      console.error(' Error in Employer.delete:', error.message);
       throw error;
     } finally {
       client.release();
@@ -270,7 +270,7 @@ class Employer {
       );
       return result.rows;
     } catch (error) {
-      console.error('❌ Error in Employer.getJobs:', error.message);
+      console.error(' Error in Employer.getJobs:', error.message);
       throw error;
     }
   }
@@ -288,7 +288,7 @@ class Employer {
       }
       return await this.getJobs(employer.id);
     } catch (error) {
-      console.error('❌ Error in Employer.getJobsByUserId:', error.message);
+      console.error(' Error in Employer.getJobsByUserId:', error.message);
       throw error;
     }
   }
@@ -315,7 +315,7 @@ class Employer {
       );
       return result.rows;
     } catch (error) {
-      console.error('❌ Error in Employer.getApplications:', error.message);
+      console.error(' Error in Employer.getApplications:', error.message);
       throw error;
     }
   }
@@ -327,19 +327,19 @@ class Employer {
    */
   static async getStatistics(employerId) {
     try {
-      // Total jobs
+      
       const jobsResult = await pool.query(
         'SELECT COUNT(*) FROM jobs WHERE employer_id = $1',
         [employerId]
       );
       
-      // Open jobs
+      
       const openJobsResult = await pool.query(
         'SELECT COUNT(*) FROM jobs WHERE employer_id = $1 AND status = $2',
         [employerId, 'open']
       );
       
-      // Total applications
+      
       const applicationsResult = await pool.query(
         `SELECT COUNT(*) 
          FROM applications a
@@ -348,7 +348,7 @@ class Employer {
         [employerId]
       );
       
-      // Pending applications
+      
       const pendingResult = await pool.query(
         `SELECT COUNT(*) 
          FROM applications a
@@ -364,7 +364,7 @@ class Employer {
         pendingApplications: parseInt(pendingResult.rows[0].count)
       };
     } catch (error) {
-      console.error('❌ Error in Employer.getStatistics:', error.message);
+      console.error(' Error in Employer.getStatistics:', error.message);
       throw error;
     }
   }
@@ -391,7 +391,7 @@ class Employer {
       );
       return result.rows;
     } catch (error) {
-      console.error('❌ Error in Employer.search:', error.message);
+      console.error(' Error in Employer.search:', error.message);
       throw error;
     }
   }
@@ -405,7 +405,7 @@ class Employer {
       const result = await pool.query('SELECT COUNT(*) FROM employers');
       return parseInt(result.rows[0].count);
     } catch (error) {
-      console.error('❌ Error in Employer.count:', error.message);
+      console.error(' Error in Employer.count:', error.message);
       throw error;
     }
   }
@@ -431,7 +431,7 @@ class Employer {
       );
       return result.rows;
     } catch (error) {
-      console.error('❌ Error in Employer.getTopEmployers:', error.message);
+      console.error(' Error in Employer.getTopEmployers:', error.message);
       throw error;
     }
   }

@@ -16,7 +16,7 @@ class AppError extends Error {
 }
 
 /**
- * Handle Mongoose Validation Error
+ * Handle  Validation Error
  */
 const handleValidationError = (err) => {
   const errors = {};
@@ -32,7 +32,7 @@ const handleValidationError = (err) => {
 };
 
 /**
- * Handle Mongoose Duplicate Key Error
+ * Handle  Duplicate Key Error
  */
 const handleDuplicateKeyError = (err) => {
   const field = Object.keys(err.keyValue)[0];
@@ -56,7 +56,7 @@ const handleDuplicateKeyError = (err) => {
 };
 
 /**
- * Handle Mongoose Cast Error (Invalid ObjectId)
+ * Handle  Cast Error (Invalid ObjectId)
  */
 const handleCastError = (err) => {
   return {
@@ -124,7 +124,7 @@ const sendErrorDev = (err, res) => {
  * Send Error Response in Production
  */
 const sendErrorProd = (err, res) => {
-  // Operational, trusted error: send message to client
+ 
   if (err.isOperational) {
     res.status(err.statusCode).json({
       success: false,
@@ -134,7 +134,7 @@ const sendErrorProd = (err, res) => {
   } 
   // Programming or unknown error: don't leak error details
   else {
-    console.error('💥 ERROR:', err);
+    console.error(' ERROR:', err);
     res.status(500).json({
       success: false,
       message: 'Đã xảy ra lỗi. Vui lòng thử lại sau'
@@ -157,48 +157,48 @@ const errorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
-  // Development environment
+
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
   } 
-  // Production environment
+ 
   else {
     let error = { ...err };
     error.message = err.message;
     error.name = err.name;
 
-    // Mongoose Validation Error
+   
     if (err.name === 'ValidationError') {
       const validationError = handleValidationError(err);
       error = new AppError(validationError.message, validationError.statusCode);
       error.errors = validationError.errors;
     }
 
-    // Mongoose Duplicate Key Error
+   
     if (err.code === 11000) {
       const duplicateError = handleDuplicateKeyError(err);
       error = new AppError(duplicateError.message, duplicateError.statusCode);
     }
 
-    // Mongoose Cast Error
+   
     if (err.name === 'CastError') {
       const castError = handleCastError(err);
       error = new AppError(castError.message, castError.statusCode);
     }
 
-    // JWT Error
+   
     if (err.name === 'JsonWebTokenError') {
       const jwtError = handleJWTError();
       error = new AppError(jwtError.message, jwtError.statusCode);
     }
 
-    // JWT Expired Error
+    
     if (err.name === 'TokenExpiredError') {
       const jwtExpiredError = handleJWTExpiredError();
       error = new AppError(jwtExpiredError.message, jwtExpiredError.statusCode);
     }
 
-    // Multer Error
+    
     if (err.name === 'MulterError') {
       const multerError = handleMulterError(err);
       error = new AppError(multerError.message, multerError.statusCode);
@@ -291,7 +291,7 @@ const paginationResponse = (res, data, page, limit, total) => {
  * Log Error (for external logging services)
  */
 const logError = (err) => {
-  // TODO: Send to external logging service (e.g., Sentry, LogRocket)
+ 
   console.error('Error details:', {
     name: err.name,
     message: err.message,

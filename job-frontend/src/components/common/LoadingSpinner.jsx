@@ -1,28 +1,16 @@
 import React from 'react';
 import './LoadingSpinner.css';
 
-/**
- * LoadingSpinner Component
- * 
- * Usage:
- * <LoadingSpinner />                                    // Default
- * <LoadingSpinner size="small" />                       // Small size
- * <LoadingSpinner size="large" />                       // Large size
- * <LoadingSpinner text="Đang tải..." />                 // With text
- * <LoadingSpinner fullScreen />                         // Full screen overlay
- * <LoadingSpinner color="#4a90e2" />                    // Custom color
- * <LoadingSpinner type="dots" />                        // Different animation
- */
 
 function LoadingSpinner({ 
-  size = 'medium',        // 'small' | 'medium' | 'large'
-  text = '',              // Text hiển thị dưới spinner
-  fullScreen = false,     // Hiển thị full screen overlay
-  color = '#4a90e2',      // Màu spinner
-  type = 'spinner'        // 'spinner' | 'dots' | 'pulse' | 'bars'
+  size = 'medium',        
+  text = '',              
+  fullScreen = false,     
+  color = '#4a90e2',      
+  type = 'spinner'        
 }) {
   
-  // Size mapping
+  
   const sizeMap = {
     small: 30,
     medium: 50,
@@ -31,7 +19,7 @@ function LoadingSpinner({
 
   const spinnerSize = sizeMap[size] || sizeMap.medium;
 
-  // Render different types of loaders
+ 
   const renderLoader = () => {
     switch (type) {
       case 'dots':
@@ -93,7 +81,7 @@ function LoadingSpinner({
   return content;
 }
 
-// Export variants để sử dụng nhanh
+
 export const SmallSpinner = (props) => <LoadingSpinner size="small" {...props} />;
 export const LargeSpinner = (props) => <LoadingSpinner size="large" {...props} />;
 export const FullScreenSpinner = (props) => <LoadingSpinner fullScreen {...props} />;
@@ -101,7 +89,7 @@ export const DotsLoader = (props) => <LoadingSpinner type="dots" {...props} />;
 export const PulseLoader = (props) => <LoadingSpinner type="pulse" {...props} />;
 export const BarsLoader = (props) => <LoadingSpinner type="bars" {...props} />;
 
-// Skeleton Loading Component
+
 export function SkeletonLoader({ 
   count = 1, 
   height = 20, 
@@ -127,7 +115,7 @@ export function SkeletonLoader({
   );
 }
 
-// Card Skeleton
+
 export function CardSkeleton() {
   return (
     <div className="card-skeleton">
@@ -141,7 +129,7 @@ export function CardSkeleton() {
   );
 }
 
-// Job Card Skeleton
+
 export function JobCardSkeleton() {
   return (
     <div className="job-card-skeleton">

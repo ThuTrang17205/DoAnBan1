@@ -210,3 +210,34 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+/* Nút xem CV */
+.btn-view-cv {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #3498db;
+  color: white !important;
+  text-decoration: none;
+  border-radius: 6px;
+  fontSize: 14px;
+  font-weight: 600;
+  transition: all 0.3s;
+  margin-top: 15px;
+}
+
+.btn-view-cv:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+/* Hoặc style cùng dòng với các nút khác */
+.app-actions-extended {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.app-actions-extended .btn-view-cv {
+  flex: 1;
+  text-align: center;
+}

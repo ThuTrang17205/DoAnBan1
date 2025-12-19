@@ -311,8 +311,8 @@ function PreviewModal({ template, onClose }) {
             </div>
 
             <div className="modal-actions">
-              <button className="btn-primary">✏️ Sử dụng mẫu này</button>
-              <button className="btn-secondary">📥 Tải xuống</button>
+              <button className="btn-primary"> Sử dụng mẫu này</button>
+              <button className="btn-secondary"> Tải xuống</button>
             </div>
           </div>
         </div>

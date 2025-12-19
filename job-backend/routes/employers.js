@@ -1,11 +1,11 @@
 /**
- * Employer Routes - FIXED ORDER
+ * Employer Routes  1111
  */
 
 const express = require('express');
 const router = express.Router();
 
-// Middleware
+
 const { authMiddleware } = require('../middleware/auth');
 const { isEmployer } = require('../middleware/roleCheck');
 const { 
@@ -20,10 +20,9 @@ const {
   generalLimiter
 } = require('../middleware/rateLimiter');
 
-// Controllers
+
 const employerController = require('../controllers/employerController');
 
-// ✅ Middleware tắt cache
 const disableCache = (req, res, next) => {
   res.set({
     'Cache-Control': 'no-store, no-cache, must-revalidate, private',
@@ -33,7 +32,7 @@ const disableCache = (req, res, next) => {
   next();
 };
 
-// ==================== PUBLIC ROUTES ====================
+
 
 /**
  * @route   POST /api/employers/register
@@ -42,7 +41,7 @@ const disableCache = (req, res, next) => {
  */
 router.post(
   '/register',
-  validateEmployerRegistration,
+  
   employerController.register
 );
 
@@ -69,8 +68,8 @@ router.get(
   employerController.getAllEmployers
 );
 
-// ==================== PROTECTED ROUTES ====================
-// Apply authentication to all routes below
+
+
 router.use(authMiddleware);
 router.use(isEmployer);
 
@@ -116,7 +115,7 @@ router.get(
   employerController.getDashboardStats
 );
 
-// ==================== JOB MANAGEMENT ROUTES ====================
+
 
 /**
  * @route   GET /api/employers/me/jobs
@@ -176,7 +175,7 @@ router.delete(
   employerController.deleteJob
 );
 
-// ✅ THÊM ROUTES ĐÓng/MỞ JOB - ĐẶT SAU /me/jobs/:id
+
 /**
  * @route   PUT /api/employers/me/jobs/:id/close
  * @desc    Close job posting
@@ -221,7 +220,7 @@ router.post(
   employerController.uploadLogo
 );
 
-// ==================== PUBLIC EMPLOYER PROFILE ====================
+
 
 /**
  * @route   GET /api/employers/:id

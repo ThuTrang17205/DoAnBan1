@@ -1,4 +1,3 @@
-// RegisterForm.js - Dành cho ỨNG VIÊN
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +26,7 @@ function RegisterForm({ onRegisterSuccess }) {
     setError('');
     setLoading(true);
 
-    // Validate dữ liệu nhập tay
+    // Validation
     if (!formData.fullName.trim() || !formData.email.trim() || 
         !formData.password.trim() || !formData.confirmPassword.trim()) {
       setError('Vui lòng nhập đầy đủ thông tin');
@@ -48,35 +47,49 @@ function RegisterForm({ onRegisterSuccess }) {
     }
 
     try {
-// Dòng 52-56
-const response = await axios.post('http://localhost:5000/api/employers/register', {
-  username: formData.fullName,  // ✅ Đổi fullName → username
-  email: formData.email,
-  password: formData.password,
-  role: 'user'
-}, {
-        withCredentials: true
-      });
-
-      console.log('✅ Đăng ký thành công:', response.data);
+      // Log the data being sent
+      const requestData = {
+        username: formData.fullName,  
+        email: formData.email,
+        password: formData.password,
+        role: 'user'
+      };
       
-      // Lưu token nếu có
+      console.log('Sending registration data:', requestData);
+
+      const response = await axios.post(
+  'http://localhost:5000/api/auth/register',  
+  requestData,
+  {
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }
+);
+
+      console.log('Đăng ký thành công:', response.data);
+      
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }
       
-      alert('🎉 Đăng ký thành công!');
+      alert('Đăng ký thành công!');
       
-      // Gọi callback nếu có
       if (onRegisterSuccess) {
         onRegisterSuccess();
       }
       
       navigate('/');
     } catch (err) {
-      console.error('❌ Lỗi đăng ký:', err);
+      console.error('Lỗi đăng ký đầy đủ:', err);
+      console.error('Response data:', err.response?.data);
+      console.error('Response status:', err.response?.status);
+      
       if (err.response) {
-        setError(err.response.data.message || 'Email đã được sử dụng');
+        setError(err.response.data.message || err.response.data.error || 'Email đã được sử dụng');
+      } else if (err.request) {
+        setError('Không nhận được phản hồi từ server');
       } else {
         setError('Không thể kết nối đến server');
       }
@@ -85,13 +98,10 @@ const response = await axios.post('http://localhost:5000/api/employers/register'
     }
   };
 
-  // Đăng ký bằng Google - SET ROLE 'user' TRƯỚC
-  // Đăng ký bằng Google - Redirect thẳng (KHÔNG dùng popup)
-const handleGoogleRegister = () => {
-  console.log('🔵 Redirecting to Google register...');
-  // ✅ Redirect trực tiếp, KHÔNG mở popup
-  window.location.href = 'http://localhost:5000/api/auth/google/register';
-};
+  const handleGoogleRegister = () => {
+    console.log('Redirecting to Google register...');
+    window.location.href = 'http://localhost:5000/api/auth/google/register';
+  };
 
   const handleGoToLogin = () => {
     navigate('/login');
@@ -109,11 +119,11 @@ const handleGoogleRegister = () => {
 
         {error && (
           <div className="error-message">
-            ⚠️ {error}
+            ⚠ {error}
           </div>
         )}
 
-        <div className="register-form-wrapper">
+        <form onSubmit={handleSubmit} className="register-form-wrapper">
           <div className="form-group">
             <label className="form-label">Họ và tên</label>
             <input
@@ -124,6 +134,7 @@ const handleGoogleRegister = () => {
               value={formData.fullName}
               onChange={handleChange}
               disabled={loading}
+              autoComplete="name"
             />
           </div>
 
@@ -137,6 +148,7 @@ const handleGoogleRegister = () => {
               value={formData.email}
               onChange={handleChange}
               disabled={loading}
+              autoComplete="email"
             />
           </div>
 
@@ -150,6 +162,7 @@ const handleGoogleRegister = () => {
               value={formData.password}
               onChange={handleChange}
               disabled={loading}
+              autoComplete="new-password"
             />
           </div>
 
@@ -163,49 +176,48 @@ const handleGoogleRegister = () => {
               value={formData.confirmPassword}
               onChange={handleChange}
               disabled={loading}
+              autoComplete="new-password"
             />
           </div>
 
           <button 
-            type="button" 
+            type="submit" 
             className="submit-button"
             disabled={loading}
-            onClick={handleSubmit}
           >
             {loading ? 'Đang đăng ký...' : 'Đăng Ký'}
           </button>
+        </form>
 
-          <div className="divider">
-            <span className="divider-text">Hoặc</span>
-          </div>
+        <div className="divider">
+          <span className="divider-text">Hoặc</span>
+        </div>
 
-          {/* Nút đăng ký bằng Google */}
+        <button 
+          type="button" 
+          className="google-button"
+          onClick={handleGoogleRegister}
+          disabled={loading}
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginRight: '8px'}}>
+            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+            <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.184l-2.909-2.258c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.44 15.983 5.485 18 9.003 18z" fill="#34A853"/>
+            <path d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9.001c0 1.452.348 2.827.957 4.041l3.007-2.332z" fill="#FBBC05"/>
+            <path d="M9.003 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.426 0 9.003 0 5.485 0 2.44 2.017.96 4.958L3.967 7.29c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"/>
+          </svg>
+          {loading ? 'Đang xử lý...' : 'Đăng ký bằng tài khoản Google'}
+        </button>
+
+        <div className="login-link">
+          <span className="login-text">Đã có tài khoản?</span>
           <button 
             type="button" 
-            className="google-button"
-            onClick={handleGoogleRegister}
+            className="login-button"
+            onClick={handleGoToLogin}
             disabled={loading}
           >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginRight: '8px'}}>
-              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
-              <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.184l-2.909-2.258c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.44 15.983 5.485 18 9.003 18z" fill="#34A853"/>
-              <path d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9.001c0 1.452.348 2.827.957 4.041l3.007-2.332z" fill="#FBBC05"/>
-              <path d="M9.003 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.426 0 9.003 0 5.485 0 2.44 2.017.96 4.958L3.967 7.29c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"/>
-            </svg>
-            {loading ? 'Đang xử lý...' : 'Đăng ký bằng tài khoản Google'}
+            Đăng nhập ngay
           </button>
-
-          <div className="login-link">
-            <span className="login-text">Đã có tài khoản?</span>
-            <button 
-              type="button" 
-              className="login-button"
-              onClick={handleGoToLogin}
-              disabled={loading}
-            >
-              Đăng nhập ngay
-            </button>
-          </div>
         </div>
       </div>
     </div>

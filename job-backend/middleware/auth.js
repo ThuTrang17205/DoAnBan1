@@ -5,7 +5,7 @@
 
 const jwt = require('jsonwebtoken');
 
-// JWT Secret (nên đặt trong .env file)
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
 
 /**
@@ -14,7 +14,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
  */
 const authMiddleware = (req, res, next) => {
   try {
-    // Lấy token từ header
+   
     const authHeader = req.headers.authorization;
     
     console.log('=== AUTH MIDDLEWARE ===');
@@ -27,7 +27,6 @@ const authMiddleware = (req, res, next) => {
       });
     }
 
-    // Token format: "Bearer <token>"
     const token = authHeader.startsWith('Bearer ')
       ? authHeader.slice(7)
       : authHeader;
@@ -41,11 +40,11 @@ const authMiddleware = (req, res, next) => {
       });
     }
 
-    // Verify token
+    
     const decoded = jwt.verify(token, JWT_SECRET);
     console.log('Token decoded:', decoded);
 
-    // Attach user info to request
+  
     req.user = {
       id: decoded.id || decoded.userId,
       email: decoded.email,
@@ -81,10 +80,10 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-// ✅ THÊM MỚI: Alias cho protect (tương thích với applicationRoutes.js)
+
 const protect = authMiddleware;
 
-// ✅ THÊM MỚI: Middleware kiểm tra role
+
 const authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {
@@ -105,7 +104,7 @@ const authorize = (...roles) => {
       });
     }
 
-    console.log('✅ Authorization passed');
+    console.log(' Authorization passed');
     next();
   };
 };
@@ -140,20 +139,20 @@ const verifyAdmin = (req, res, next) => {
       });
     }
 
-    // Verify token
+    
     const decoded = jwt.verify(token, JWT_SECRET);
     console.log('Decoded token:', decoded);
 
-    // KIỂM TRA ROLE ADMIN
+  
     if (decoded.role !== 'admin') {
-      console.log('❌ User role is:', decoded.role, '(not admin)');
+      console.log(' User role is:', decoded.role, '(not admin)');
       return res.status(403).json({
         success: false,
         message: 'Bạn không có quyền truy cập! Chỉ admin mới được phép.'
       });
     }
 
-    // Attach admin info to request
+    
     req.user = {
       id: decoded.id || decoded.userId,
       email: decoded.email,
@@ -162,7 +161,7 @@ const verifyAdmin = (req, res, next) => {
       ...decoded
     };
 
-    console.log('✅ Admin verified:', req.user);
+    console.log('Admin verified:', req.user);
     next();
   } catch (error) {
     console.error('Admin verification error:', error.message);
@@ -255,11 +254,11 @@ const decodeToken = (token) => {
   }
 };
 
-// ✅ EXPORT ĐẦY ĐỦ
+
 module.exports = {
   authMiddleware,
-  protect,          // ← THÊM
-  authorize,        // ← THÊM
+  protect,          
+  authorize,       
   verifyAdmin,
   optionalAuth,
   generateToken,

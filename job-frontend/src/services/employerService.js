@@ -2,13 +2,9 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api/employer';
 
-/**
- * Employer Service
- * Xử lý tất cả các API calls liên quan đến employer
- */
 
 const employerService = {
-  // Đăng ký employer
+ 
   register: async (employerData) => {
     try {
       const response = await axios.post(`${API_URL}/register`, employerData);
@@ -28,7 +24,7 @@ const employerService = {
     }
   },
 
-  // Đăng nhập employer
+ 
   login: async (credentials) => {
     try {
       const response = await axios.post(`${API_URL}/login`, credentials);
@@ -48,13 +44,13 @@ const employerService = {
     }
   },
 
-  // Đăng xuất employer
+ 
   logout: () => {
     localStorage.removeItem('employerToken');
     return { success: true };
   },
 
-  // Kiểm tra token employer
+ 
   verifyToken: async () => {
     try {
       const token = localStorage.getItem('employerToken');
@@ -81,7 +77,7 @@ const employerService = {
     }
   },
 
-  // Lấy thông tin profile
+  
   getProfile: async () => {
     try {
       const token = localStorage.getItem('employerToken');
@@ -103,7 +99,7 @@ const employerService = {
     }
   },
 
-  // Cập nhật profile
+ 
   updateProfile: async (profileData) => {
     try {
       const token = localStorage.getItem('employerToken');
@@ -129,7 +125,7 @@ const employerService = {
     }
   },
 
-  // Tạo job mới
+  
   createJob: async (jobData) => {
     try {
       const token = localStorage.getItem('employerToken');
@@ -155,7 +151,7 @@ const employerService = {
     }
   },
 
-  // Lấy danh sách jobs của employer
+  
   getMyJobs: async (params = {}) => {
     try {
       const token = localStorage.getItem('employerToken');
@@ -178,7 +174,6 @@ const employerService = {
     }
   },
 
-  // Cập nhật job
   updateJob: async (jobId, jobData) => {
     try {
       const token = localStorage.getItem('employerToken');
@@ -204,7 +199,7 @@ const employerService = {
     }
   },
 
-  // Xóa job
+  
   deleteJob: async (jobId) => {
     try {
       const token = localStorage.getItem('employerToken');
@@ -226,7 +221,7 @@ const employerService = {
     }
   },
 
-  // Lấy danh sách ứng viên cho một job
+ 
   getJobApplications: async (jobId) => {
     try {
       const token = localStorage.getItem('employerToken');
@@ -248,7 +243,7 @@ const employerService = {
     }
   },
 
-  // Cập nhật trạng thái ứng viên
+  
   updateApplicationStatus: async (applicationId, status) => {
     try {
       const token = localStorage.getItem('employerToken');
@@ -274,7 +269,7 @@ const employerService = {
     }
   },
 
-  // Lấy dashboard statistics
+
   getDashboardStats: async () => {
     try {
       const token = localStorage.getItem('employerToken');

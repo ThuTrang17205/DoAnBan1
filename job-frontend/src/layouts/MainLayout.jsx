@@ -6,7 +6,7 @@ import Footer from '../components/common/Footer';
 const MainLayout = ({ isLoggedIn, onLogout }) => {
   const location = useLocation();
   
-  // Routes không hiển thị Navbar/Footer (nếu cần)
+  
   const hideNavbarRoutes = ['/login', '/register'];
   const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
 

@@ -1,0 +1,45 @@
+{
+  "fullName": "Lê Chiến",
+  "position": "Lập trình viên",
+  "phone": "(024) 6580 6588",
+  "email": "lechienhust@gmail.com",
+  "address": "Quận Đống Đa, Hà Nội",
+  "birthDate": "24/09/1997",
+  "website": "Nam",
+  "objective": "Vận dụng kiến thức đã học tại trường, trách nghiệm thực tế để nâng cao vị trí trong các bộ môn khác nhau. Tôi muốn trở thành một lập trình viên chuyên nghiệp, công việc linh động, nhiều thử thách để vận dụng những kỹ năng chuyên môn mạnh mẽ tự bản thân để đóng góp cho tổ chức những giá trị thiết thực nhất. Không ngừng nâng cao kỹ năng chuyên môn và sử dụng các công cụ lưu về ý nghĩa thực tế nhất.",
+  "avatar": "",
+  "experience": [
+    {
+      "company": "Công ty TNHH MTV SVT",
+      "position": "Front End Developer",
+      "period": "2021 - 2024",
+      "description": "• Quản lý các dự án phát triển giao diện trang web từ thiết kế ban đầu cho đến hoàn thiện, tối ưu mọi khả năng tương thích trên nhiều thiết bị quyết và nền tảng.\n• Tham gia đánh giá và thử nghiệm các tính năng mới để đảm bảo web hoạt động ổn định và mang lại trải nghiệm tốt nhất cho người dùng.\n• Hợp tác chặt chẽ với các lập trình viên và thiết kế để đạp ứng các yêu cầu, mục tiêu và khác thay phong thước dữ liệu độc ưu ái.\n• Phát triển và tích hợp các chức để tùy chỉnh và WordPress, PHP- Fusion và GorentoCS.\n• Tiến hành đào tạo cho không hàng và cách xử lý hệ thống quản lý nội dung hàng web.\n• Xây dựng và duy trì các phần mềm client-side bằng cách sử dụng HTML để dự tòa hoạt tần cho các phần tử trên nền web.\n• Nội triển khai, phát triển và chờ nghiệm một số ứng dụng xây dựng các tên phần dịch vụ một.\n• Lấu các cứu hoạt, kiến thích trong nhóm với các chức nơi phụ tạp, tham gia nhóm xét, đónh gỡ source code của các thành viên trong nhóm"
+    },
+    {
+      "company": "Công ty CP công nghệ NDS",
+      "position": "React Developer",
+      "period": "2019 - 2021",
+      "description": "• Phát triển và cước thành viên trong danh thực hiện lập trình và phát triển các ổn phẩm trên nền tảng web, desktop và thiện hoại dựa trên JavaScript, HTML, CSS...\n• Quản lý và duy trì các hệ thống cũ để đảm bảo hoạt động tối ưu.\n• Cùng với các cô thành viên khác tự dụy logic, dựa tao các ổi phẩm tìm vấn đề trong lập trình.\n• Sửa lỗi phát sinh và cải thiện hiệu suất hoạt động của ứng dụng.\n• Chưa toàn phương pháp và các tính năng thêm vào dỡch hư cấu liệu.\n• Quyết định phương pháp lập trình và cách thức xử lý trong gia trình phật trình viền, cấm trước là xác định các tính năng để ngược phân tần điều cho."
+    },
+    {
+      "company": "Công ty CP TopCV",
+      "position": "Web Developer",
+      "period": "2017 - 2019",
+      "description": "• Phát triển các phần mềm trung thân thiết kể người dùng gia tăng lưu lượng truy cập, luật viền trang và trái nghiệm người dùng trên tốt.\n• Thực hiện bảo trì và cập nhật cho các trang web thách thức nhân lực tại.\n• Thực hiện thiết kế layout website, cắt HTML & CSS các sản phảm marketing.\n• Viết và tỉa trường lực liên phần mềm và tương số kỹ thuật.\n• Làm việc họp nhóm trực tuyến và offline."
+    }
+  ],
+  "education": [
+    {
+      "school": "Đại học TopCV",
+      "degree": "Công nghệ thông tin",
+      "period": "2014 - 2017",
+      "details": "• Tốt nghiệp loại Giỏi\n• Đạt học bổng 2016 và 2017\n• Đạt giải nhì nghiệm cứu khoa học công nghệ"
+    }
+  ],
+  "skills": [
+    "Kỹ năng giao tiếp",
+    "Kỹ năng đồm phù",
+    "Kỹ năng thuyết trình"
+  ],
+  "hobbies": "Đọc sách\nNấu ăn"
+}

@@ -1,9 +1,6 @@
 import api from './api';
 
-/**
- * Authentication Service
- * All authentication-related API calls
- */
+
 
 const authService = {
   /**
@@ -19,7 +16,7 @@ const authService = {
         password,
       });
 
-      // Save token and user to localStorage
+      
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }
@@ -42,7 +39,7 @@ const authService = {
     try {
       const response = await api.post('/auth/register', userData);
 
-      // Save token and user to localStorage
+     
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }
@@ -62,17 +59,15 @@ const authService = {
    */
   logout: async () => {
     try {
-      // Optional: Call backend logout endpoint
-      // await api.post('/auth/logout');
-
-      // Clear local storage
+      
+      
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('adminToken');
 
       return { success: true };
     } catch (error) {
-      // Clear local storage anyway
+     
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('adminToken');
@@ -102,7 +97,7 @@ const authService = {
     try {
       const response = await api.get('/auth/profile');
       
-      // Update user in localStorage
+      
       if (response.data.user) {
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
@@ -122,7 +117,7 @@ const authService = {
     try {
       const response = await api.put('/auth/profile', updates);
       
-      // Update user in localStorage
+      
       if (response.data.user) {
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
@@ -214,7 +209,7 @@ const authService = {
         password,
       });
 
-      // Save token and admin user
+     
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('adminToken', response.data.token);

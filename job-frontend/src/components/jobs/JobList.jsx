@@ -298,11 +298,11 @@ const fetchJobs = async (options = {}) => {
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
               >
-                ← Trước
+                 Trước
               </button>
 
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => {
-                // Chỉ hiển thị 5 pages xung quanh current page
+                
                 if (
                   page === 1 ||
                   page === totalPages ||
@@ -328,7 +328,7 @@ const fetchJobs = async (options = {}) => {
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
-                Sau →
+                Sau 
               </button>
             </div>
           )}

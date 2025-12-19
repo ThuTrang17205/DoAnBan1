@@ -130,14 +130,14 @@ const AdminSettings = () => {
   };
 
   const handleSystemSettingsUpdate = () => {
-    // Save to localStorage for now (in real app, save to backend)
+    
     localStorage.setItem('systemSettings', JSON.stringify(systemSettings));
     alert('Cập nhật cài đặt hệ thống thành công!');
   };
 
   return (
     <div className="admin-jobs-container">
-      {/* Header */}
+      
       <div className="page-header">
         <div>
           <h1> Cài đặt Admin</h1>
@@ -146,7 +146,7 @@ const AdminSettings = () => {
       </div>
 
       <div className="settings-container">
-        {/* Profile Settings */}
+        
         <div className="settings-card">
           <div className="card-header">
             <h2> Thông tin cá nhân</h2>
@@ -191,7 +191,7 @@ const AdminSettings = () => {
           </div>
         </div>
 
-        {/* Password Change */}
+        
         <div className="settings-card">
           <div className="card-header">
             <h2> Đổi mật khẩu</h2>
@@ -238,7 +238,7 @@ const AdminSettings = () => {
           </div>
         </div>
 
-        {/* System Settings */}
+       
         <div className="settings-card">
           <div className="card-header">
             <h2> Cài đặt hệ thống</h2>

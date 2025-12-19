@@ -60,10 +60,10 @@ export default function PaymentPage() {
     }).format(amount);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-   
+    // Validate required fields
     if (!formData.companyName || !formData.email || !formData.phone) {
       alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
       return;
@@ -76,13 +76,71 @@ export default function PaymentPage() {
       }
     }
 
-   
     setPaymentStatus('processing');
 
-  
-    setTimeout(() => {
-      setPaymentStatus('success');
-    }, 2000);
+    try {
+      const token = localStorage.getItem('token');
+      
+      console.log('🔄 Calling subscription API...');
+      console.log('Package info:', selectedPackage);
+      
+      const response = await fetch('http://localhost:5000/api/subscriptions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          packageName: selectedPackage.name,
+          price: selectedPackage.price,
+          duration: selectedPackage.duration,
+          paymentMethod: paymentMethod,
+          orderId: orderId,
+          companyInfo: {
+            companyName: formData.companyName,
+            taxCode: formData.taxCode,
+            email: formData.email,
+            phone: formData.phone
+          }
+        })
+      });
+
+      const data = await response.json();
+      console.log('📦 Subscription response:', data);
+
+      if (response.ok && data.success) {
+        // Cập nhật localStorage với thông tin subscription mới
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          
+          // Cập nhật các thông tin subscription
+          user.subscription_status = 'active';
+          user.subscription_type = selectedPackage.name;
+          user.package_type = data.subscription?.package_type || 'professional';
+          user.posts_remaining = data.subscription?.posts_remaining || 10;
+          user.subscription_end_date = data.subscription?.end_date;
+          
+          // Lưu lại vào localStorage
+          localStorage.setItem('user', JSON.stringify(user));
+          
+          console.log('✅ User updated:', user);
+        }
+
+        // Delay để hiển thị animation
+        setTimeout(() => {
+          setPaymentStatus('success');
+        }, 1500);
+      } else {
+        console.error('❌ Payment failed:', data);
+        alert('❌ Lỗi thanh toán: ' + (data.message || 'Vui lòng thử lại'));
+        setPaymentStatus('form');
+      }
+    } catch (error) {
+      console.error('❌ Payment error:', error);
+      alert('Có lỗi xảy ra khi xử lý thanh toán. Vui lòng thử lại!');
+      setPaymentStatus('form');
+    }
   };
 
   const handleBackClick = () => {
@@ -92,9 +150,15 @@ export default function PaymentPage() {
   };
 
   const handleStartUsing = () => {
+    // Clear temporary data
     localStorage.removeItem('selectedPackage');
     localStorage.removeItem('redirectAfterLogin');
+    
+    // Navigate to dashboard
     navigate('/employer-dashboard');
+    
+    // Reload để cập nhật UI với subscription mới
+    window.location.reload();
   };
 
   if (paymentStatus === 'processing') {
@@ -160,12 +224,12 @@ export default function PaymentPage() {
             </div>
 
             <div className="email-notice">
-              <h3> Thông tin đã được gửi đến email</h3>
+              <h3>✉️ Thông tin đã được gửi đến email</h3>
               <p>
                 Chúng tôi đã gửi thông tin đơn hàng và hướng dẫn sử dụng đến email: <strong>{formData.email}</strong>
               </p>
               <p>
-                Gói dịch vụ của bạn sẽ được kích hoạt trong vòng 5-10 phút.
+                Gói dịch vụ của bạn đã được kích hoạt thành công!
               </p>
             </div>
 
@@ -193,7 +257,7 @@ export default function PaymentPage() {
 
   return (
     <div className="payment-page">
-      {}
+      {/* Header */}
       <div className="payment-header">
         <div className="payment-header-content">
           <h1 className="payment-title">Thanh toán</h1>
@@ -201,9 +265,9 @@ export default function PaymentPage() {
       </div>
 
       <div className="payment-content">
-        {}
+        {/* Left Column - Form */}
         <div>
-          {}
+          {/* Payment Methods */}
           <div className="form-card">
             <h2>Phương thức thanh toán</h2>
             <div className="payment-methods">
@@ -231,7 +295,7 @@ export default function PaymentPage() {
             </div>
           </div>
 
-          {}
+          {/* Company Info */}
           <div className="form-card">
             <h2>Thông tin công ty</h2>
             <div className="form-group">
@@ -282,7 +346,7 @@ export default function PaymentPage() {
             </div>
           </div>
 
-          {}
+          {/* Card Info */}
           {paymentMethod === 'card' && (
             <div className="form-card">
               <h2>Thông tin thẻ</h2>
@@ -338,7 +402,7 @@ export default function PaymentPage() {
             </div>
           )}
 
-          {}
+          {/* Bank Transfer */}
           {paymentMethod === 'bank' && (
             <div className="form-card">
               <h2>Thông tin chuyển khoản</h2>
@@ -357,7 +421,7 @@ export default function PaymentPage() {
                 </div>
                 <div className="bank-row">
                   <span className="bank-label">Nội dung:</span>
-                  <span className="bank-content">THANHTOAN [Email của bạn]</span>
+                  <span className="bank-content">THANHTOAN {formData.email}</span>
                 </div>
               </div>
               <p className="bank-note">
@@ -366,7 +430,7 @@ export default function PaymentPage() {
             </div>
           )}
 
-          {}
+          {/* MoMo */}
           {paymentMethod === 'momo' && (
             <div className="form-card">
               <h2>Thanh toán qua MoMo</h2>
@@ -383,7 +447,7 @@ export default function PaymentPage() {
           )}
         </div>
 
-        {}
+        {/* Right Column - Order Summary */}
         <div className="order-summary">
           <div className="form-card">
             <h2>Thông tin đơn hàng</h2>

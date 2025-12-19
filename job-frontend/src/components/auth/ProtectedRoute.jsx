@@ -1,22 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-// Nếu file là LoadingSpinner.jsx
-import LoadingSpinner from 'components/common/LoadingSpinner';
-/**
- * ProtectedRoute Component
- * Bảo vệ routes yêu cầu authentication
- * 
- * Usage:
- * <ProtectedRoute>
- *   <ProfilePage />
- * </ProtectedRoute>
- * 
- * With role checking:
- * <ProtectedRoute requiredRole="admin">
- *   <AdminDashboard />
- * </ProtectedRoute>
- */
 
+import LoadingSpinner from 'components/common/LoadingSpinner';
 function ProtectedRoute({ 
   children, 
   requiredRole = null,
@@ -27,12 +12,12 @@ function ProtectedRoute({
 }) {
   const location = useLocation();
   
-  // Lấy token và user info từ localStorage
+ 
   const token = localStorage.getItem('token');
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
 
-  // Custom auth check function (nếu có)
+
   if (checkAuth) {
     const authResult = checkAuth();
     if (!authResult.isAuthenticated) {
@@ -46,9 +31,9 @@ function ProtectedRoute({
     }
   }
 
-  // Kiểm tra token
+ 
   if (!token) {
-    console.log('🚫 No token found, redirecting to login');
+    console.log(' No token found, redirecting to login');
     return (
       <Navigate 
         to={redirectTo} 
@@ -58,12 +43,12 @@ function ProtectedRoute({
     );
   }
 
-  // Kiểm tra role nếu required
+  
   if (requiredRole) {
     if (!user || user.role !== requiredRole) {
-      console.log(`🚫 Required role: ${requiredRole}, User role: ${user?.role}`);
+      console.log(` Required role: ${requiredRole}, User role: ${user?.role}`);
       
-      // Hiển thị fallback component hoặc redirect
+ 
       if (fallbackComponent) {
         return fallbackComponent;
       }
@@ -78,13 +63,11 @@ function ProtectedRoute({
     }
   }
 
-  // Authenticated - render children
+ 
   return children;
 }
 
-/**
- * AdminRoute - Shortcut cho admin routes
- */
+
 export function AdminRoute({ children, ...props }) {
   return (
     <ProtectedRoute 
@@ -97,9 +80,7 @@ export function AdminRoute({ children, ...props }) {
   );
 }
 
-/**
- * EmployerRoute - Shortcut cho employer routes
- */
+
 export function EmployerRoute({ children, ...props }) {
   return (
     <ProtectedRoute 
@@ -112,9 +93,7 @@ export function EmployerRoute({ children, ...props }) {
   );
 }
 
-/**
- * UserRoute - Shortcut cho user routes
- */
+
 export function UserRoute({ children, ...props }) {
   return (
     <ProtectedRoute 
@@ -127,25 +106,20 @@ export function UserRoute({ children, ...props }) {
   );
 }
 
-/**
- * GuestRoute - Routes chỉ cho người chưa đăng nhập
- * (Login, Register pages)
- */
+
 export function GuestRoute({ children, redirectTo = '/' }) {
   const location = useLocation();
   const token = localStorage.getItem('token');
 
   if (token) {
-    console.log('✅ Already logged in, redirecting to home');
+    console.log(' Already logged in, redirecting to home');
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
   return children;
 }
 
-/**
- * RoleBasedRoute - Route dựa trên nhiều roles
- */
+
 export function RoleBasedRoute({ 
   children, 
   allowedRoles = [], 
@@ -157,7 +131,7 @@ export function RoleBasedRoute({
   const user = userStr ? JSON.parse(userStr) : null;
 
   if (!user || !allowedRoles.includes(user.role)) {
-    console.log(`🚫 Access denied. Allowed roles: ${allowedRoles.join(', ')}, User role: ${user?.role}`);
+    console.log(` Access denied. Allowed roles: ${allowedRoles.join(', ')}, User role: ${user?.role}`);
     
     if (fallback) {
       return fallback;
@@ -175,9 +149,7 @@ export function RoleBasedRoute({
   return children;
 }
 
-/**
- * ConditionalRoute - Route với custom condition
- */
+
 export function ConditionalRoute({ 
   children, 
   condition, 
@@ -203,10 +175,7 @@ export function ConditionalRoute({
   return children;
 }
 
-/**
- * LoadingRoute - Route với loading state
- * Useful khi cần verify token với backend trước khi render
- */
+
 export function LoadingRoute({ 
   children, 
   isLoading, 
@@ -219,9 +188,7 @@ export function LoadingRoute({
   return children;
 }
 
-/**
- * Unauthorized Page Component
- */
+
 export function UnauthorizedPage() {
   const location = useLocation();
   const requiredRole = location.state?.requiredRole;
@@ -290,7 +257,7 @@ export function UnauthorizedPage() {
             cursor: 'pointer'
           }}
         >
-          🏠 Trang chủ
+           Trang chủ
         </button>
       </div>
     </div>

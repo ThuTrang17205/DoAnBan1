@@ -1,29 +1,17 @@
-/**
- * Employer Controller - PostgreSQL Version
- * Compatible with pg Pool
- */
 
-const pool = require('../config/db'); // ✅ PostgreSQL Pool
+const { pool } = require('../config/db');
 
-// @desc    Create new job posting
-// @route   POST /api/employers/me/jobs
-// @access  Private (Employer)
-// @desc    Create new job posting
-// @route   POST /api/employers/me/jobs
-// @access  Private (Employer)
-// @desc    Create new job posting
-// @route   POST /api/employers/me/jobs
-// @access  Private (Employer)
+
 exports.createJob = async (req, res) => {
   const client = await pool.connect();
   try {
     console.log(">>> EMPLOYER ID:", req.user?.id);
     const employerId = req.user.id;
 
-    // START TRANSACTION
+  
     await client.query("BEGIN");
 
-    // 1. Lấy thông tin công ty
+   
     const companyResult = await client.query(
       "SELECT id, package_type, remaining_jobs, current_jobs, name FROM companies WHERE employer_id = $1",
       [employerId]
@@ -36,27 +24,57 @@ exports.createJob = async (req, res) => {
 
     const company = companyResult.rows[0];
 
-    // 2. Kiểm tra gói FREE
-    if (company.package_type.toUpperCase() === "FREE") {
-      if (company.remaining_jobs <= 0) {
-        await client.query("ROLLBACK");
-        return res.status(403).json({
-          success: false,
-          message: "Gói FREE chỉ được đăng 2 job. Vui lòng nâng cấp gói!"
-        });
-      }
+  
+if (company.package_type.toUpperCase() === "FREE") {
+  if (company.remaining_jobs <= 0) {
+    await client.query("ROLLBACK");
+    return res.status(403).json({
+      success: false,
+      message: "Gói FREE chỉ được đăng 2 job. Vui lòng nâng cấp gói!",
+      code: 'JOBS_LIMIT_REACHED'
+    });
+  }
+  
+ 
+  await client.query(
+    `UPDATE companies 
+     SET remaining_jobs = remaining_jobs - 1,
+         current_jobs = current_jobs + 1
+     WHERE id = $1`,
+    [company.id]
+  );
+} else {
+ 
+  if (company.package_type !== 'PREMIUM' && company.remaining_jobs <= 0) {
+    await client.query("ROLLBACK");
+    return res.status(403).json({
+      success: false,
+      message: `Bạn đã hết lượt đăng tin. Vui lòng nâng cấp gói hoặc chờ gia hạn!`,
+      code: 'JOBS_LIMIT_REACHED'
+    });
+  }
+  
+  
+  if (company.package_type !== 'PREMIUM') {
+    await client.query(
+      `UPDATE companies 
+       SET remaining_jobs = remaining_jobs - 1,
+           current_jobs = current_jobs + 1
+       WHERE id = $1`,
+      [company.id]
+    );
+  } else {
+   
+    await client.query(
+      `UPDATE companies 
+       SET current_jobs = current_jobs + 1
+       WHERE id = $1`,
+      [company.id]
+    );
+  }
+}
 
-      // TRỪ 1 SLOT
-      await client.query(
-        `UPDATE companies 
-         SET remaining_jobs = remaining_jobs - 1,
-             current_jobs   = current_jobs + 1
-         WHERE id = $1`,
-        [company.id]
-      );
-    }
-
-    // 3. Lấy data từ request body
+    
     const { 
       title, 
       description, 
@@ -98,7 +116,7 @@ exports.createJob = async (req, res) => {
       });
     }
 
-    // 4. Tạo job với đầy đủ fields
+   
     const result = await client.query(
       `INSERT INTO jobs (
         title, 
@@ -154,7 +172,7 @@ exports.createJob = async (req, res) => {
         job_type || null,
         category || null,
         company.id,
-        company.name, // ✅ Thêm company_name
+        company.name, 
         employerId,
         'open',
         requirements || null,
@@ -181,7 +199,7 @@ exports.createJob = async (req, res) => {
       ]
     );
 
-    // commit
+   
     await client.query("COMMIT");
 
     res.json({
@@ -237,7 +255,7 @@ exports.updateJob = async (req, res) => {
     res.status(200).json({ success: true, message: "Cập nhật thành công" });
 
   } catch (error) {
-    console.error("❌ Update job error:", error);
+    console.error("Update job error:", error);
     res.status(500).json({ success: false, message: "Lỗi hệ thống" });
   }
 };
@@ -270,7 +288,7 @@ exports.deleteJob = async (req, res) => {
     res.status(200).json({ success: true, message: "Xoá thành công" });
 
   } catch (error) {
-    console.error("❌ Delete job error:", error);
+    console.error(" Delete job error:", error);
     res.status(500).json({ success: false, message: "Lỗi hệ thống" });
   }
 };
@@ -284,7 +302,7 @@ exports.getJobById = async (req, res) => {
     const employerId = req.user.id;
     const jobId = req.params.id;
 
-    // ✅ B1: Lấy company_id của employer
+   
     const companyResult = await pool.query(
       "SELECT id FROM companies WHERE employer_id = $1",
       [employerId]
@@ -299,7 +317,7 @@ exports.getJobById = async (req, res) => {
 
     const companyId = companyResult.rows[0].id;
 
-    // ✅ B2: Query với companyId
+    
     const result = await pool.query(`
       SELECT 
         j.*,
@@ -308,7 +326,7 @@ exports.getJobById = async (req, res) => {
       LEFT JOIN applications a ON j.id = a.job_id
       WHERE j.id = $1 AND j.company_id = $2
       GROUP BY j.id
-    `, [jobId, companyId]);  // ✅ Dùng companyId
+    `, [jobId, companyId]); 
 
     if (result.rows.length === 0) {
       return res.status(404).json({
@@ -323,7 +341,7 @@ exports.getJobById = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Get job by ID error:', error);
+    console.error(' Get job by ID error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi lấy thông tin tin tuyển dụng',
@@ -343,7 +361,7 @@ exports.getMyJobs = async (req, res) => {
     const { page = 1, limit = 10, status, search } = req.query;
     const offset = (page - 1) * limit;
 
-    // 👉 B1: Lấy company_id của employer
+    
     const companyResult = await pool.query(
       "SELECT id FROM companies WHERE employer_id = $1",
       [employerId]
@@ -360,9 +378,9 @@ exports.getMyJobs = async (req, res) => {
     }
 
     const companyId = companyResult.rows[0].id;
-    console.log("🏢 Company ID:", companyId);
+    console.log(" Company ID:", companyId);
 
-    // 👉 B2: Build query bằng companyId
+    
     let query = `
       SELECT 
         j.*,
@@ -392,11 +410,11 @@ exports.getMyJobs = async (req, res) => {
 
     params.push(Number(limit), offset);
 
-    // 👉 Lấy jobs
+   
     const jobsResult = await pool.query(query, params);
     const jobs = jobsResult.rows;
 
-    // 👉 Count total
+    
     let countQuery = `SELECT COUNT(*) FROM jobs WHERE company_id = $1`;
     const countParams = [companyId];
     let countIndex = 2;
@@ -425,7 +443,7 @@ exports.getMyJobs = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Get my jobs error:', error);
+    console.error(' Get my jobs error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi lấy danh sách công việc',
@@ -443,17 +461,17 @@ exports.getMyApplications = async (req, res) => {
     const { page = 1, limit = 10, status, jobId } = req.query;
     const offset = (page - 1) * limit;
 
-    console.log('🔍 Getting applications for employer:', employerId);
-    console.log('📋 Filters:', { status, jobId });
+    console.log(' Getting applications for employer:', employerId);
+    console.log(' Filters:', { status, jobId });
 
-    // ✅ LẤY COMPANY_ID
+  
     const companyResult = await pool.query(
       "SELECT id FROM companies WHERE employer_id = $1",
       [employerId]
     );
 
     if (companyResult.rows.length === 0) {
-      console.log('❌ No company found for employer:', employerId);
+      console.log(' No company found for employer:', employerId);
       return res.json({
         success: true,
         applications: [],
@@ -464,10 +482,9 @@ exports.getMyApplications = async (req, res) => {
     }
 
     const companyId = companyResult.rows[0].id;
-    console.log('🏢 Company ID:', companyId);
+    console.log(' Company ID:', companyId);
 
-    // ✅ QUERY VỚI CẢ 2 ĐIỀU KIỆN (posted_by HOẶC company_id)
-    // Vì có thể job được tạo bằng posted_by hoặc company_id
+  
     let query = `
       SELECT 
         a.*,
@@ -488,7 +505,7 @@ exports.getMyApplications = async (req, res) => {
     const params = [employerId, companyId];
     let paramIndex = 3;
 
-    // Add filters
+    
     if (status) {
       query += ` AND a.status = $${paramIndex}`;
       params.push(status);
@@ -504,16 +521,15 @@ exports.getMyApplications = async (req, res) => {
     query += ` ORDER BY a.created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
     params.push(Number(limit), offset);
 
-    console.log('📝 Query:', query);
-    console.log('📝 Params:', params);
+    console.log(' Query:', query);
+    console.log(' Params:', params);
 
-    // Get applications
+  
     const appsResult = await pool.query(query, params);
     const applications = appsResult.rows;
 
-    console.log('✅ Found applications:', applications.length);
+    console.log(' Found applications:', applications.length);
 
-    // Get total count
     let countQuery = `
       SELECT COUNT(*) as total 
       FROM applications a
@@ -538,7 +554,7 @@ exports.getMyApplications = async (req, res) => {
     const countResult = await pool.query(countQuery, countParams);
     const total = parseInt(countResult.rows[0].total);
 
-    console.log('📊 Total applications:', total);
+    console.log(' Total applications:', total);
 
     res.json({
       success: true,
@@ -550,7 +566,7 @@ exports.getMyApplications = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Get my applications error:', error);
+    console.error(' Get my applications error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi lấy danh sách ứng tuyển',
@@ -565,7 +581,7 @@ exports.getDashboardStats = async (req, res) => {
   try {
     const employerId = req.user.id;
 
-    // Get jobs stats
+    
     const jobStatsResult = await pool.query(`
       SELECT 
         COUNT(*) as total_jobs,
@@ -578,7 +594,7 @@ exports.getDashboardStats = async (req, res) => {
 
     const jobStats = jobStatsResult.rows[0];
 
-    // Get applications stats
+    
     const appStatsResult = await pool.query(`
       SELECT 
         COUNT(*) as total_applications,
@@ -592,7 +608,7 @@ exports.getDashboardStats = async (req, res) => {
 
     const appStats = appStatsResult.rows[0];
 
-    // Get recent applications
+   
     const recentAppsResult = await pool.query(`
       SELECT 
         a.*,
@@ -627,7 +643,7 @@ exports.getDashboardStats = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Get dashboard stats error:', error);
+    console.error(' Get dashboard stats error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi lấy thống kê',
@@ -643,7 +659,7 @@ exports.getMyProfile = async (req, res) => {
   try {
     const employerId = req.user.id;
 
-    // Get user info
+   
     const userResult = await pool.query(
       'SELECT id, username, email, name, role, company_name, contact_person, phone, company_size, industry, created_at FROM users WHERE id = $1',
       [employerId]
@@ -658,7 +674,7 @@ exports.getMyProfile = async (req, res) => {
 
     const user = userResult.rows[0];
 
-    // Get additional stats
+   
     const jobCountResult = await pool.query(
       'SELECT COUNT(*) as count FROM jobs WHERE company_id = $1',
       [employerId]
@@ -690,7 +706,7 @@ exports.getMyProfile = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Get my profile error:', error);
+    console.error(' Get my profile error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi lấy thông tin profile',
@@ -716,7 +732,7 @@ exports.updateProfile = async (req, res) => {
       description
     } = req.body;
 
-    // Update user table
+    
     await pool.query(`
       UPDATE users 
       SET 
@@ -729,7 +745,7 @@ exports.updateProfile = async (req, res) => {
       WHERE id = $6
     `, [company_name, contact_person, phone, company_size, industry, employerId]);
 
-    // Get updated user info
+   
     const userResult = await pool.query(
       'SELECT id, username, email, name, role, company_name, contact_person, phone, company_size, industry FROM users WHERE id = $1',
       [employerId]
@@ -742,7 +758,7 @@ exports.updateProfile = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Update profile error:', error);
+    console.error(' Update profile error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi cập nhật thông tin',
@@ -766,7 +782,7 @@ exports.uploadLogo = async (req, res) => {
       });
     }
 
-    // Update logo in users table
+   
     await pool.query(
       'UPDATE users SET logo = $1, updated_at = NOW() WHERE id = $2',
       [logoUrl, employerId]
@@ -779,7 +795,7 @@ exports.uploadLogo = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Upload logo error:', error);
+    console.error(' Upload logo error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi upload logo',
@@ -803,7 +819,7 @@ exports.changePassword = async (req, res) => {
       });
     }
 
-    // Get current user
+    
     const userResult = await pool.query(
       'SELECT password FROM users WHERE id = $1',
       [employerId]
@@ -816,7 +832,7 @@ exports.changePassword = async (req, res) => {
       });
     }
 
-    // Verify current password (implement your password verification)
+   
     const bcrypt = require('bcrypt');
     const isMatch = await bcrypt.compare(currentPassword, userResult.rows[0].password);
 
@@ -827,10 +843,10 @@ exports.changePassword = async (req, res) => {
       });
     }
 
-    // Hash new password
+    
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Update password
+    
     await pool.query(
       'UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2',
       [hashedPassword, employerId]
@@ -842,7 +858,7 @@ exports.changePassword = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Change password error:', error);
+    console.error(' Change password error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi đổi mật khẩu',
@@ -872,7 +888,7 @@ exports.register = async (req, res) => {
     const contact_person = contactPerson;
     const company_size = companySize;
 
-    // Validate required fields
+    
     if (!email || !password || !company_name) {
       return res.status(400).json({
         success: false,
@@ -880,7 +896,7 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Check if email exists
+ 
     const existingUser = await pool.query(
       'SELECT id FROM users WHERE email = $1',
       [email]
@@ -893,15 +909,15 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Hash password
+    
     const bcrypt = require('bcrypt');
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // ✅ BẮT ĐẦU TRANSACTION
+    
     await pool.query('BEGIN');
 
     try {
-      // 1. Insert new user
+    
       const userResult = await pool.query(`
         INSERT INTO users (
           username, email, password, name, role, 
@@ -924,7 +940,6 @@ exports.register = async (req, res) => {
 
       const user = userResult.rows[0];
 
-      // 2. ✅ Tạo company (KHÔNG tạo employers nữa)
       await pool.query(`
         INSERT INTO companies (
           employer_id, 
@@ -948,10 +963,10 @@ exports.register = async (req, res) => {
         0
       ]);
 
-      // ✅ COMMIT TRANSACTION
+     
       await pool.query('COMMIT');
 
-      // Generate JWT token
+      
       const jwt = require('jsonwebtoken');
       const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
@@ -974,13 +989,13 @@ exports.register = async (req, res) => {
       });
 
     } catch (err) {
-      // ✅ ROLLBACK nếu có lỗi
+      
       await pool.query('ROLLBACK');
       throw err;
     }
 
   } catch (error) {
-    console.error('❌ Register error:', error);
+    console.error(' Register error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi đăng ký',
@@ -996,7 +1011,7 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate input
+   
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -1004,7 +1019,7 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Find user
+  
     const result = await pool.query(
       'SELECT * FROM users WHERE email = $1 AND role = $2',
       [email, 'employer']
@@ -1019,7 +1034,7 @@ exports.login = async (req, res) => {
 
     const user = result.rows[0];
 
-    // Verify password
+  
     const bcrypt = require('bcrypt');
     const isMatch = await bcrypt.compare(password, user.password);
 
@@ -1030,7 +1045,7 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Generate JWT token
+  
     const jwt = require('jsonwebtoken');
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
@@ -1057,7 +1072,7 @@ exports.login = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Login error:', error);
+    console.error(' Login error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi đăng nhập',
@@ -1074,7 +1089,7 @@ exports.getAllEmployers = async (req, res) => {
     const { page = 1, limit = 10, search, industry, company_size } = req.query;
     const offset = (page - 1) * limit;
 
-    // Build query
+  
     let query = `
       SELECT 
         u.id, 
@@ -1096,7 +1111,7 @@ exports.getAllEmployers = async (req, res) => {
     const params = [];
     let paramIndex = 1;
 
-    // Add filters
+  
     if (search) {
       query += ` AND (u.company_name ILIKE ${paramIndex} OR u.name ILIKE ${paramIndex})`;
       params.push(`%${search}%`);
@@ -1118,11 +1133,11 @@ exports.getAllEmployers = async (req, res) => {
     query += ` GROUP BY u.id ORDER BY u.id DESC LIMIT ${paramIndex} OFFSET ${paramIndex + 1}`;
     params.push(Number(limit), offset);
 
-    // Get employers
+   
     const result = await pool.query(query, params);
     const employers = result.rows;
 
-    // Get total count
+  
     let countQuery = `SELECT COUNT(*) as total FROM users WHERE role = 'employer'`;
     const countParams = [];
     let countParamIndex = 1;
@@ -1157,7 +1172,7 @@ exports.getAllEmployers = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Get all employers error:', error);
+    console.error(' Get all employers error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi lấy danh sách employers',
@@ -1173,7 +1188,7 @@ exports.getEmployerById = async (req, res) => {
   try {
     const employerId = req.params.id;
 
-    // Get employer info
+    
     const userResult = await pool.query(`
       SELECT 
         id, username, email, name, company_name,
@@ -1191,7 +1206,7 @@ exports.getEmployerById = async (req, res) => {
 
     const employer = userResult.rows[0];
 
-    // Get employer's jobs
+   
     const jobsResult = await pool.query(`
       SELECT 
         id, title, location, min_salary, max_salary, 
@@ -1202,7 +1217,7 @@ exports.getEmployerById = async (req, res) => {
       LIMIT 10
     `, [employerId]);
 
-    // Get stats
+  
     const statsResult = await pool.query(`
       SELECT 
         COUNT(*) as total_jobs,
@@ -1224,7 +1239,7 @@ exports.getEmployerById = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Get employer by ID error:', error);
+    console.error(' Get employer by ID error:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi lấy thông tin employer',
@@ -1240,7 +1255,7 @@ exports.closeJob = async (req, res) => {
     const employerId = req.user.id;
     const jobId = req.params.id;
 
-    // Lấy company_id của employer
+   
     const companyResult = await pool.query(
       "SELECT id FROM companies WHERE employer_id = $1",
       [employerId]
@@ -1255,7 +1270,7 @@ exports.closeJob = async (req, res) => {
 
     const companyId = companyResult.rows[0].id;
 
-    // Kiểm tra job có thuộc về employer này không
+   
     const checkResult = await pool.query(
       "SELECT id, status FROM jobs WHERE id = $1 AND company_id = $2",
       [jobId, companyId]
@@ -1277,7 +1292,7 @@ exports.closeJob = async (req, res) => {
       });
     }
 
-    // Đóng tin tuyển dụng
+ 
     await pool.query(
       "UPDATE jobs SET status = $1, updated_at = NOW() WHERE id = $2",
       ['closed', jobId]
@@ -1289,7 +1304,7 @@ exports.closeJob = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("❌ Close job error:", error);
+    console.error(" Close job error:", error);
     res.status(500).json({ 
       success: false, 
       message: "Lỗi hệ thống khi đóng tin tuyển dụng",
@@ -1306,7 +1321,7 @@ exports.reopenJob = async (req, res) => {
     const employerId = req.user.id;
     const jobId = req.params.id;
 
-    // Lấy company_id của employer
+  
     const companyResult = await pool.query(
       "SELECT id FROM companies WHERE employer_id = $1",
       [employerId]
@@ -1321,7 +1336,7 @@ exports.reopenJob = async (req, res) => {
 
     const companyId = companyResult.rows[0].id;
 
-    // Kiểm tra job có thuộc về employer này không
+    
     const checkResult = await pool.query(
       "SELECT id, status FROM jobs WHERE id = $1 AND company_id = $2",
       [jobId, companyId]
@@ -1343,7 +1358,7 @@ exports.reopenJob = async (req, res) => {
       });
     }
 
-    // Mở lại tin tuyển dụng
+
     await pool.query(
       "UPDATE jobs SET status = $1, updated_at = NOW() WHERE id = $2",
       ['open', jobId]
@@ -1355,11 +1370,211 @@ exports.reopenJob = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("❌ Reopen job error:", error);
+    console.error(" Reopen job error:", error);
     res.status(500).json({ 
       success: false, 
       message: "Lỗi hệ thống khi mở lại tin tuyển dụng",
       error: error.message
     });
+  }
+};
+// controllers/employerController.js
+const emailService = require('../services/emailService');
+const db = require('../config/db');
+
+/**
+ * Gửi lời mời ứng tuyển (VIP Feature)
+ */
+exports.sendJobInvitation = async (req, res) => {
+  try {
+    const { candidate_id, job_id, custom_message } = req.body;
+    const employer_id = req.user.id;
+    
+    // Kiểm tra employer có gói VIP không
+    const [company] = await db.query(
+      'SELECT * FROM companies WHERE employer_id = ? AND package_type != "Free"',
+      [employer_id]
+    );
+    
+    if (!company.length) {
+      return res.status(403).json({
+        success: false,
+        message: 'Bạn cần nâng cấp gói VIP để sử dụng tính năng này!'
+      });
+    }
+    
+    // Kiểm tra job thuộc về employer
+    const [job] = await db.query(
+      'SELECT * FROM jobs WHERE id = ? AND employer_id = ?',
+      [job_id, employer_id]
+    );
+    
+    if (!job.length) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy công việc!'
+      });
+    }
+    
+    // Lấy thông tin candidate
+    const [candidate] = await db.query(
+      'SELECT u.email FROM users u JOIN candidates c ON c.user_id = u.id WHERE c.id = ?',
+      [candidate_id]
+    );
+    
+    if (!candidate.length) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy ứng viên!'
+      });
+    }
+    
+    // ✅ Gửi email mời ứng tuyển
+    await emailService.sendJobInvitation(
+      candidate[0].email,
+      job[0],
+      custom_message
+    );
+    
+    // Lưu lịch sử gửi invitation (optional)
+    await db.query(
+      'INSERT INTO invitations (employer_id, candidate_id, job_id, message, sent_at) VALUES (?, ?, ?, ?, NOW())',
+      [employer_id, candidate_id, job_id, custom_message]
+    );
+    
+    res.json({
+      success: true,
+      message: 'Đã gửi lời mời ứng tuyển thành công!'
+    });
+    
+  } catch (error) {
+    console.error('Send invitation error:', error);
+    res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+};
+
+/**
+ * Nâng cấp gói VIP
+ */
+exports.upgradePackage = async (req, res) => {
+  try {
+    const { package_type, duration } = req.body; // duration: 1, 3, 6, 12 (months)
+    const employer_id = req.user.id;
+    
+    // Validate package type
+    const validPackages = ['VIP Basic', 'VIP Pro', 'VIP Premium'];
+    if (!validPackages.includes(package_type)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Gói VIP không hợp lệ!'
+      });
+    }
+    
+    // Lấy thông tin company hiện tại
+    const [company] = await db.query(
+      'SELECT * FROM companies WHERE employer_id = ?',
+      [employer_id]
+    );
+    
+    if (!company.length) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy công ty!'
+      });
+    }
+    
+    const oldPackage = company[0].package_type;
+    
+    // Tính ngày hết hạn
+    const expiredDate = new Date();
+    expiredDate.setMonth(expiredDate.getMonth() + duration);
+    
+    // Cập nhật package
+    await db.query(
+      `UPDATE companies 
+       SET package_type = ?, 
+           package_expired_at = ?,
+           ai_match_limit = CASE 
+             WHEN ? = 'VIP Premium' THEN 999999
+             WHEN ? = 'VIP Pro' THEN 200
+             WHEN ? = 'VIP Basic' THEN 50
+             ELSE 0
+           END,
+           ai_match_used = 0
+       WHERE employer_id = ?`,
+      [package_type, expiredDate, package_type, package_type, package_type, employer_id]
+    );
+    
+    // Lấy thông tin employer
+    const [employer] = await db.query(
+      'SELECT * FROM users WHERE id = ?',
+      [employer_id]
+    );
+    
+    // Lấy company info mới
+    const [updatedCompany] = await db.query(
+      'SELECT * FROM companies WHERE employer_id = ?',
+      [employer_id]
+    );
+    
+    // ✅ Gửi email xác nhận nâng cấp
+    emailService.sendPackageUpgradeConfirmation(
+      employer[0],
+      updatedCompany[0],
+      oldPackage,
+      package_type
+    ).catch(err => console.error('Failed to send upgrade email:', err));
+    
+    res.json({
+      success: true,
+      message: 'Nâng cấp gói VIP thành công!',
+      data: {
+        package_type,
+        expired_at: expiredDate,
+        ai_match_limit: updatedCompany[0].ai_match_limit
+      }
+    });
+    
+  } catch (error) {
+    console.error('Upgrade package error:', error);
+    res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+};
+
+/**
+ * Lấy thông tin gói VIP hiện tại
+ */
+exports.getPackageInfo = async (req, res) => {
+  try {
+    const employer_id = req.user.id;
+    
+    const [company] = await db.query(
+      'SELECT package_type, package_expired_at, ai_match_limit, ai_match_used FROM companies WHERE employer_id = ?',
+      [employer_id]
+    );
+    
+    if (!company.length) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy công ty!'
+      });
+    }
+    
+    const daysLeft = company[0].package_expired_at 
+      ? Math.ceil((new Date(company[0].package_expired_at) - new Date()) / (1000 * 60 * 60 * 24))
+      : 0;
+    
+    res.json({
+      success: true,
+      data: {
+        ...company[0],
+        days_left: daysLeft,
+        is_expired: daysLeft <= 0
+      }
+    });
+    
+  } catch (error) {
+    console.error('Get package info error:', error);
+    res.status(500).json({ success: false, message: 'Lỗi server' });
   }
 };

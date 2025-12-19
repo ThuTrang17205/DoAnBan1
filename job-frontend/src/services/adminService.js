@@ -2,13 +2,9 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api/admin';
 
-/**
- * Admin Service
- * Xử lý tất cả các API calls liên quan đến admin
- */
 
 const adminService = {
-  // Đăng nhập admin
+  
   login: async (credentials) => {
     try {
       const response = await axios.post(`${API_URL}/login`, credentials);
@@ -28,13 +24,13 @@ const adminService = {
     }
   },
 
-  // Đăng xuất admin
+  
   logout: () => {
     localStorage.removeItem('adminToken');
     return { success: true };
   },
 
-  // Kiểm tra token admin
+  
   verifyToken: async () => {
     try {
       const token = localStorage.getItem('adminToken');
@@ -61,7 +57,7 @@ const adminService = {
     }
   },
 
-  // Lấy dashboard statistics
+
   getDashboardStats: async () => {
     try {
       const token = localStorage.getItem('adminToken');
@@ -83,7 +79,7 @@ const adminService = {
     }
   },
 
-  // Quản lý users
+  
   getAllUsers: async (params = {}) => {
     try {
       const token = localStorage.getItem('adminToken');
@@ -106,7 +102,7 @@ const adminService = {
     }
   },
 
-  // Xóa user
+ 
   deleteUser: async (userId) => {
     try {
       const token = localStorage.getItem('adminToken');
@@ -128,7 +124,7 @@ const adminService = {
     }
   },
 
-  // Quản lý jobs
+ 
   getAllJobsAdmin: async (params = {}) => {
     try {
       const token = localStorage.getItem('adminToken');
@@ -151,7 +147,7 @@ const adminService = {
     }
   },
 
-  // Duyệt/từ chối job
+
   approveJob: async (jobId, status) => {
     try {
       const token = localStorage.getItem('adminToken');
@@ -177,7 +173,7 @@ const adminService = {
     }
   },
 
-  // Xóa job
+  
   deleteJob: async (jobId) => {
     try {
       const token = localStorage.getItem('adminToken');
@@ -199,7 +195,7 @@ const adminService = {
     }
   },
 
-  // Quản lý employers
+ 
   getAllEmployers: async (params = {}) => {
     try {
       const token = localStorage.getItem('adminToken');
@@ -222,7 +218,7 @@ const adminService = {
     }
   },
 
-  // Duyệt/từ chối employer
+  
   approveEmployer: async (employerId, status) => {
     try {
       const token = localStorage.getItem('adminToken');

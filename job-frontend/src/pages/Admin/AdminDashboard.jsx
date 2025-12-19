@@ -348,19 +348,22 @@ Backend URL: http://localhost:5000/api/admin/stats`}
         </div>
       )}
 
-      {/* Quick Actions */}
+        {/* Quick Actions */}
       <div className="quick-actions">
         <button className="action-btn" onClick={() => navigate('/admin/jobs')}>
-          <span>Thêm việc làm</span>
+          <span> Thêm việc làm</span>
         </button>
         <button className="action-btn" onClick={() => navigate('/admin/users')}>
-          <span>Quản lý users</span>
+          <span> Quản lý users</span>
+        </button>
+        <button className="action-btn" onClick={() => navigate('/admin/vip-management')}>
+          <span> Quản lý VIP & AI Match</span>
         </button>
         <button className="action-btn" onClick={() => navigate('/admin/applications')}>
-          <span>Đơn ứng tuyển</span>
+          <span> Đơn ứng tuyển</span>
         </button>
         <button className="action-btn" onClick={() => navigate('/admin/settings')}>
-          <span>Cài đặt</span>
+          <span> Cài đặt</span>
         </button>
       </div>
     </div>

@@ -1,298 +1,476 @@
-/* ==================== FOOTER ==================== */
-.footer {
-  background: #03417e;
-  color: #ffffff;
-  padding: 3rem 0 1rem;
-  margin-top: 4rem;
+/* ==========================================
+   EMERGENCY FIX - Quick Links Horizontal
+   Copy đoạn này vào đầu file Footer.css
+   ========================================== */
+
+/* Force quick-links to be horizontal */
+.footer-section.footer-links,
+.footer .footer-section.footer-links,
+footer .footer-section.footer-links {
+  display: block !important;
+  width: 100% !important;
+  margin-bottom: 1.5rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
+.quick-links,
+.footer .quick-links,
+footer .quick-links,
+.footer-section .quick-links,
+.footer-links .quick-links {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  gap: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+  width: 100% !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+
+.footer-link,
+.footer .footer-link,
+footer .footer-link,
+.quick-links .footer-link,
+.quick-links a {
+  display: inline-block !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  text-decoration: none !important;
+  font-size: 0.75rem !important;
+  padding: 0.25rem 0.5rem !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+/* ==========================================
+   HOẶC - Nếu cách trên không work
+   Thử override React inline styles
+   ========================================== */
+
+.quick-links[style] {
+  display: flex !important;
+  flex-direction: row !important;
+}
+
+.footer-link[style] {
+  display: inline-block !important;
+}
+
+/* ✅ CRITICAL: Reset và force grid layout */
+.footer {
+  background: #001f3f !important;
+  color: #ffffff !important;
+  padding: 2rem 0 1rem !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  display: block !important; /* Force block display */
+}
+
+.footer * {
+  box-sizing: border-box !important;
+}
+
+/* ✅ Container phải có width đầy đủ */
 .footer-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 2rem;
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  padding: 0 2rem !important;
+  width: 100% !important;
+  display: block !important;
+}
+
+/* ✅ MAIN FIX: Force Grid Layout cho footer-main */
+.footer-main {
+  display: grid !important; /* Force grid */
+  grid-template-columns: repeat(5, 1fr) !important; /* 5 cột bằng nhau */
+  gap: 1.5rem !important;
+  margin-bottom: 2rem !important;
+  width: 100% !important;
+  grid-auto-flow: column !important; /* Ép các item theo cột */
+}
+
+/* ✅ Nếu .footer-main không phải grid, force flex */
+.footer-main:not([style*="display: grid"]) {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  flex-wrap: nowrap !important;
+}
+
+/* ✅ Footer columns - CRITICAL */
+.footer-column {
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important; /* Quan trọng cho grid */
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* ✅ Nếu sử dụng các class khác */
+.footer-main > div,
+.footer-main > section,
+.footer-main > article {
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  flex: 1 !important;
 }
 
 /* Quick Links Section */
 .footer-section.footer-links {
-  margin-bottom: 3rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1.5rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  width: 100% !important;
 }
 
 .quick-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  flex-direction: row !important; /* Force row */
+  gap: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
 }
 
 .footer-link {
-  color: rgba(255, 255, 255, 0.7);
-  text-decoration: none;
-  font-size: 0.85rem;
-  transition: color 0.3s ease;
-  padding: 0.25rem 0;
+  color: rgba(255, 255, 255, 0.6) !important;
+  text-decoration: none !important;
+  font-size: 0.75rem !important;
+  padding: 0.25rem 0 !important;
+  white-space: nowrap !important;
 }
 
 .footer-link:hover {
-  color: #ffffff;
-  text-decoration: underline;
+  color: #ffffff !important;
 }
 
-/* Main Footer Grid */
-.footer-main {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 2rem;
-  margin-bottom: 3rem;
-}
-
-.footer-column {
-  display: flex;
-  flex-direction: column;
-}
-
+/* Footer Headings */
 .footer-heading {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+  margin-bottom: 0.75rem !important;
+  padding-bottom: 0 !important;
+  border-bottom: none !important;
+  white-space: nowrap !important;
 }
 
+/* Footer Lists */
 .footer-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 .footer-list li {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem !important;
 }
 
 .footer-list a {
-  color: rgba(255, 255, 255, 0.8);
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-  display: inline-block;
+  color: rgba(255, 255, 255, 0.7) !important;
+  text-decoration: none !important;
+  font-size: 0.8rem !important;
+  display: inline-block !important;
+  line-height: 1.4 !important;
+  transition: all 0.3s ease !important;
 }
 
 .footer-list a:hover {
-  color: #ffffff;
-  transform: translateX(5px);
+  color: #ffffff !important;
+  transform: translateX(3px) !important;
 }
 
+/* Footer Link More */
 .footer-link-more {
-  color: #4fc3f7;
-  font-size: 0.9rem;
-  margin-top: 1rem;
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  color: #4fc3f7 !important;
+  font-size: 0.8rem !important;
+  margin-top: 0.5rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  text-decoration: none !important;
+  font-weight: 500 !important;
 }
 
 .footer-link-more:hover {
-  color: #81d4fa;
-  transform: translateX(5px);
+  color: #81d4fa !important;
+  transform: translateX(3px) !important;
 }
 
 /* App Downloads */
 .app-downloads {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+  margin-top: 0.5rem !important;
 }
 
 .app-badge {
-  width: 140px;
-  height: auto;
-  cursor: pointer;
-  transition: transform 0.3s ease;
+  width: 120px !important;
+  height: auto !important;
+  cursor: pointer !important;
+  transition: transform 0.3s ease !important;
+  border-radius: 6px !important;
 }
 
 .app-badge:hover {
-  transform: scale(1.05);
+  transform: scale(1.05) !important;
 }
 
-/* Certification Badge */
+/* Certification */
 .certification {
-  margin-top: 0.5rem;
+  margin-top: 0.75rem !important;
 }
 
 .cert-badge {
-  width: 150px;
-  height: auto;
+  width: 120px !important;
+  height: auto !important;
 }
 
 /* Social Links */
 .social-links {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.75rem;
+  display: flex !important;
+  flex-direction: row !important; /* Force row */
+  gap: 0.75rem !important;
+  margin-top: 0.75rem !important;
+  flex-wrap: wrap !important;
 }
 
 .social-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-  text-decoration: none;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #ffffff !important;
+  font-size: 1rem !important;
+  text-decoration: none !important;
+  transition: all 0.3s ease !important;
 }
 
 .social-icon:hover {
-  background: #2563eb;
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-}
-
-/* Font Awesome Icons (fallback if not loaded) */
-.social-icon i::before {
-  display: inline-block;
-  font-style: normal;
-  font-variant: normal;
-  text-rendering: auto;
-  line-height: 1;
-}
-
-/* Facebook */
-.fa-facebook-f::before {
-  content: "f";
-  font-weight: 900;
-}
-
-/* LinkedIn */
-.fa-linkedin-in::before {
-  content: "in";
-  font-weight: 400;
-}
-
-/* TikTok */
-.fa-tiktok::before {
-  content: "♪";
-  font-size: 1.2rem;
-}
-
-/* YouTube */
-.fa-youtube::before {
-  content: "▶";
-  font-size: 0.9rem;
-}
-
-/* Spotify */
-.fa-spotify::before {
-  content: "♫";
-  font-size: 1.1rem;
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: translateY(-2px) !important;
 }
 
 /* Footer Bottom */
 .footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding-top: 1.5rem !important;
+  width: 100% !important;
 }
 
 .company-info {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem !important;
 }
 
 .company-info p {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.85rem;
-  line-height: 1.6;
-  margin: 0.5rem 0;
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-size: 0.75rem !important;
+  line-height: 1.5 !important;
+  margin: 0.25rem 0 !important;
 }
 
 .company-info strong {
-  color: #ffffff;
-  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500 !important;
 }
 
+/* Footer Logos */
+.footer-logos {
+  display: flex !important;
+  flex-direction: row !important; /* Force row */
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2rem !important;
+  margin: 1.5rem 0 !important;
+  flex-wrap: wrap !important;
+}
+
+.footer-logo {
+  height: 40px !important;
+  width: auto !important;
+  opacity: 0.8 !important;
+  transition: opacity 0.3s ease !important;
+}
+
+.footer-logo:hover {
+  opacity: 1 !important;
+}
+
+/* Copyright */
 .copyright {
-  text-align: center;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center !important;
+  padding-top: 1rem !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
 .copyright p {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.85rem;
-  margin: 0;
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-size: 0.75rem !important;
+  margin: 0.25rem 0 !important;
+  line-height: 1.4 !important;
 }
 
-/* ==================== RESPONSIVE ==================== */
+/* ==========================================
+   RESPONSIVE - Điều chỉnh số cột
+   ========================================== */
 @media (max-width: 1200px) {
   .footer-main {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr) !important;
   }
 }
 
 @media (max-width: 768px) {
   .footer {
-    padding: 2rem 0 1rem;
+    padding: 1.5rem 0 1rem !important;
   }
 
   .footer-content {
-    padding: 0 1rem;
+    padding: 0 1rem !important;
   }
 
   .footer-main {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+  }
+
+  .footer-heading {
+    font-size: 0.85rem !important;
+  }
+
+  .footer-list a {
+    font-size: 0.75rem !important;
   }
 
   .quick-links {
-    gap: 0.5rem;
+    gap: 0.4rem !important;
   }
 
   .footer-link {
-    font-size: 0.8rem;
-  }
-
-  .social-links {
-    gap: 0.75rem;
+    font-size: 0.7rem !important;
   }
 
   .social-icon {
-    width: 36px;
-    height: 36px;
-    font-size: 1rem;
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .app-badge {
+    width: 100px !important;
   }
 }
 
 @media (max-width: 480px) {
   .footer-main {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
   }
 
   .footer-heading {
-    font-size: 0.95rem;
+    font-size: 0.8rem !important;
   }
 
   .footer-list a {
-    font-size: 0.85rem;
+    font-size: 0.7rem !important;
   }
 
   .app-badge {
-    width: 120px;
+    width: 90px !important;
   }
 
   .company-info p {
-    font-size: 0.8rem;
+    font-size: 0.7rem !important;
+  }
+
+  .copyright p {
+    font-size: 0.7rem !important;
   }
 
   .quick-links {
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-direction: column !important;
+    gap: 0.25rem !important;
   }
+
+  .footer-logos {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  .footer-logo {
+    height: 32px !important;
+  }
+}
+
+/* ==========================================
+   DEBUG MODE (Uncomment để kiểm tra)
+   ========================================== */
+/*
+.footer {
+  outline: 3px solid red !important;
+}
+
+.footer-main {
+  outline: 3px solid yellow !important;
+  background: rgba(255, 255, 0, 0.1) !important;
+}
+
+.footer-column {
+  outline: 2px solid lime !important;
+  background: rgba(0, 255, 0, 0.1) !important;
+}
+*/
+
+/* ==========================================
+   FALLBACK: Nếu grid không work
+   ========================================== */
+@supports not (display: grid) {
+  .footer-main {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+  }
+  
+  .footer-column {
+    flex: 1 !important;
+    margin: 0 0.75rem !important;
+  }
+}
+
+/* ==========================================
+   ZALO BUTTON
+   ========================================== */
+.zalo-button {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  width: 60px !important;
+  height: 60px !important;
+  background: #0068ff !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 12px rgba(0, 104, 255, 0.4) !important;
+  cursor: pointer !important;
+  z-index: 1000 !important;
+  transition: all 0.3s ease !important;
+}
+
+.zalo-button:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 6px 20px rgba(0, 104, 255, 0.5) !important;
+}
+
+.zalo-button img {
+  width: 35px !important;
+  height: 35px !important;
 }

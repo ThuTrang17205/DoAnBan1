@@ -18,26 +18,20 @@ import { AuthProvider } from './context/AuthContext';
 import { JobProvider } from './context/JobContext';
 
 // ==================== AUTH COMPONENTS ====================
-import LoginForm from "./pages/User/LoginForm.js";
-import RegisterForm from "./pages/User/RegisterForm.js";
 import ForgotPassword from "./components/auth/ForgotPassword";
 import ResetPassword from "./components/auth/ResetPassword";
 
 // ==================== PAGES - HOME ====================
 import HomePage from "./pages/Home/HomePage";
 
+
 // ==================== PAGES - JOBS ====================
 import { CategoriesSection, CategoryJobsPage } from "./pages/Jobs/CategoryJobsPage";
 import JobDetailPage from "./pages/Jobs/JobDetailPage";
 import JobListPage from "./pages/Jobs/JobListPage";
 
-
-
 // ==================== PAGES - TOOLS ====================
 import ToolsSection from "./pages/Tools/ToolsSection";
-
-// ==================== COMPONENTS - JOBS ====================
-import TrendingJobsSection from "./components/jobs/TrendingJobsSection";
 
 // ==================== COMPONENTS - CV ====================
 import CVBuilder from "./components/CV/CVBuilder";
@@ -45,9 +39,11 @@ import CVTemplatesPage from "./components/CV/CVTemplatesPage";
 import CoverLetter from "./components/CV/CoverLetter";
 import CVwritingGuide from "./components/CV/CVwritingGuide";
 
-// ==================== COMPONENTS - PROFILE ====================
+// ====================PAGES - USER ====================
 import UserProfile from "./pages/User/UserProfile.jsx";
-import SavedJobs from "./components/profile/SavedJobs";
+import LoginForm from "./pages/User/LoginForm.js";
+import RegisterForm from "./pages/User/RegisterForm.js";
+
 
 // ==================== PAGES - EMPLOYER ====================
 import EmployerLanding from "./pages/Employer/EmployerLanding";
@@ -62,35 +58,20 @@ import EmployerStatistics from "./pages/Employer/EmployerStatistics";
 import PaymentPage from "./pages/Employer/PaymentPage";
 
 
-
 // ==================== PAGES - ADMIN ====================
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminLoginForm from "./pages/Admin/AdminLoginForm";
 import AdminUsers from "./pages/Admin/AdminUsers";
-import AdminEmployers from "./pages/Admin/AdminEmployers";
 import AdminJobs from "./pages/Admin/AdminJobs";
 import AdminApplications from "./pages/Admin/AdminApplications";
-import AdminCategories from "./pages/Admin/AdminCategories";
-import AdminReports from "./pages/Admin/AdminReports";
 import AdminSettings from "./pages/Admin/AdminSettings";
+import VIPEmployerManagement from "./pages/Admin/VIPEmployerManagement";
 import AdminEditJob from "./pages/Admin/AdminEditJob";
 import AdminApplicationDetail from './pages/Admin/AdminApplicationDetail';
 import AdminCreateJob from './pages/Admin/AdminCreateJob.jsx';
 
-// ==================== PAGES - APPLICATIONS ====================
-import ApplicationSubmit from "./pages/Applications/ApplicationSubmit";
-import ApplicationSuccess from "./pages/Applications/ApplicationSuccess";
 
-// ==================== PAGES - CATEGORIES ====================
-import CategoriesPage from "./pages/Categories/CategoriesPage";
-import CategoryDetail from "./pages/Categories/CategoryDetail";
 
-// ==================== PAGES - ABOUT ====================
-import AboutPage from "./pages/About/AboutPage";
-import ContactPage from "./pages/About/ContactPage";
-import FAQPage from "./pages/About/FAQPage";
-import PrivacyPolicy from "./pages/About/PrivacyPolicy";
-import TermsOfService from "./pages/About/TermsOfService";
 
 // ==================== LAYOUTS ====================
 import MainLayout from './layouts/MainLayout';
@@ -113,7 +94,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
       userRole = user?.role;
     }
   } catch (e) {
-    console.error('❌ Lỗi parse user:', e);
+    console.error(' Lỗi parse user:', e);
   }
   
   // Nếu không có role trong user object, thử lấy từ userRole key
@@ -122,17 +103,17 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   }
   
   console.log('═══════════════════════════════════════');
-  console.log('🔒 ProtectedRoute Check');
-  console.log('  📍 Path:', location.pathname);
-  console.log('  🎫 Token:', token ? 'EXISTS' : 'MISSING');
-  console.log('  🎫 AdminToken:', adminToken ? 'EXISTS' : 'MISSING');
-  console.log('  👤 UserRole:', userRole || '❌ MISSING');
-  console.log('  🎯 RequiredRole:', requiredRole || 'NONE');
+  console.log(' ProtectedRoute Check');
+  console.log('   Path:', location.pathname);
+  console.log('   Token:', token ? 'EXISTS' : 'MISSING');
+  console.log('   AdminToken:', adminToken ? 'EXISTS' : 'MISSING');
+  console.log('   UserRole:', userRole || ' MISSING');
+  console.log('   RequiredRole:', requiredRole || 'NONE');
   
-  // Check 1: Có token không?
+  
   const hasAuth = !!(token || adminToken);
   if (!hasAuth) {
-    console.log('  ❌ RESULT: NO TOKEN - Redirecting to login');
+    console.log('   RESULT: NO TOKEN - Redirecting to login');
     console.log('═══════════════════════════════════════');
     
     if (requiredRole === 'admin') {
@@ -144,30 +125,30 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
-  // Check 2: Role có match không?
+  
   if (requiredRole) {
     if (!userRole) {
-      console.log('  ❌ RESULT: NO ROLE in localStorage');
-      console.log('  🔄 Redirecting to home');
+      console.log('   RESULT: NO ROLE in localStorage');
+      console.log('   Redirecting to home');
       console.log('═══════════════════════════════════════');
       return <Navigate to="/" replace />;
     }
     
     if (userRole !== requiredRole) {
-      console.log('  ❌ RESULT: ROLE MISMATCH');
+      console.log('    RESULT: ROLE MISMATCH');
       console.log('    - Expected:', requiredRole);
       console.log('    - Got:', userRole);
-      console.log('  🔄 Redirecting to home');
+      console.log('     Redirecting to home');
       console.log('═══════════════════════════════════════');
       return <Navigate to="/" replace />;
     }
     
-    console.log('  ✅ RESULT: ROLE MATCH');
+    console.log('    RESULT: ROLE MATCH');
     console.log('    - Required:', requiredRole);
     console.log('    - Actual:', userRole);
   }
   
-  console.log('  ✅ ACCESS GRANTED');
+  console.log('   ACCESS GRANTED');
   console.log('═══════════════════════════════════════');
   return children;
 };
@@ -180,20 +161,20 @@ function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ==================== CHECK AUTH ON MOUNT ====================
+ 
   useEffect(() => {
     const token = localStorage.getItem('token');
     const adminToken = localStorage.getItem('adminToken');
     let role = localStorage.getItem('userRole');
     
-    // Thử lấy role từ user object nếu không có userRole key
+    
     if (!role) {
       try {
         const userStr = localStorage.getItem('user');
         if (userStr) {
           const user = JSON.parse(userStr);
           role = user?.role;
-          // Lưu lại vào userRole để dùng sau
+          
           if (role) {
             localStorage.setItem('userRole', role);
           }
@@ -203,7 +184,7 @@ function AppContent() {
       }
     }
     
-    // Auto-set role nếu có admin data
+  
     if (!role && adminToken) {
       const admin = localStorage.getItem('admin');
       if (admin) {
@@ -221,9 +202,9 @@ function AppContent() {
     
     const hasAuth = !!(token || adminToken);
     
-    // CHỈ UPDATE STATE KHI CÓ THAY ĐỔI
+   
     if (isLoggedIn !== hasAuth) {
-      console.log('🔐 Auth State Changed:', { 
+      console.log(' Auth State Changed:', { 
         token: !!token, 
         adminToken: !!adminToken,
         role,
@@ -234,9 +215,9 @@ function AppContent() {
     if (userRole !== role) {
       setUserRole(role);
     }
-  }, []); // CHỈ CHẠY 1 LẦN KHI MOUNT
+  }, []); 
 
-  // ==================== HANDLE GOOGLE OAUTH ====================
+ 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
@@ -250,13 +231,13 @@ function AppContent() {
     }
 
     if (token) {
-      console.log('✅ Google OAuth token received');
+      console.log(' Google OAuth token received');
       localStorage.setItem('token', token);
       localStorage.setItem('userRole', 'user');
       setIsLoggedIn(true);
       setUserRole('user');
       window.history.replaceState({}, document.title, '/');
-      alert('🎉 Đăng nhập thành công!');
+      alert(' Đăng nhập thành công!');
       window.location.href = '/';
     }
   }, [navigate]);
@@ -278,7 +259,7 @@ function AppContent() {
         setJobs([]);
       }
     } catch (err) {
-      console.error('❌ Error fetching jobs:', err);
+      console.error(' Error fetching jobs:', err);
     } finally {
       setLoading(false);
     }
@@ -286,16 +267,16 @@ function AppContent() {
 
   // ==================== LOGOUT ====================
   const handleLogout = () => {
-    console.log('🚪 Logging out...');
+    console.log(' Logging out...');
     localStorage.clear();
     setIsLoggedIn(false);
     setUserRole(null);
     navigate('/');
   };
 
-  // ==================== LOGIN SUCCESS ====================
+  
   const handleLoginSuccess = (role = 'user') => {
-    console.log('🎯 Login success, updating state...');
+    console.log(' Login success, updating state...');
     const token = localStorage.getItem('token');
     if (token) {
       setIsLoggedIn(true);
@@ -315,9 +296,8 @@ function AppContent() {
         <Route path="/jobs/:id" element={<JobDetailPage />} />
         
         {/* CATEGORY ROUTES */}
-        <Route path="/categories" element={<CategoriesPage />} />
+       
         <Route path="/category/:category" element={<CategoryJobsPage />} />
-        <Route path="/category/:id/detail" element={<CategoryDetail />} />
         
         {/* TOOLS & CV */}
         <Route path="/tools" element={<ToolsSection />} />
@@ -325,6 +305,7 @@ function AppContent() {
         <Route path="/cv-templates" element={<CVTemplatesPage />} />
         <Route path="/cover-letter" element={<CoverLetter />} />
         <Route path="/guidewritring-cv" element={<CVwritingGuide />} />
+      
         {/* AUTH ROUTES */}
         <Route
           path="/login"
@@ -349,12 +330,6 @@ function AppContent() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         
-        {/* ABOUT PAGES */}
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/faq" element={<FAQPage />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/terms" element={<TermsOfService />} />
       </Route>
 
       {/* ==================== USER LAYOUT ROUTES ==================== */}
@@ -364,14 +339,6 @@ function AppContent() {
           element={
             <ProtectedRoute requiredRole="user">
               <UserProfile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile/saved-jobs"
-          element={
-            <ProtectedRoute requiredRole="user">
-              <SavedJobs />
             </ProtectedRoute>
           }
         />
@@ -456,14 +423,6 @@ function AppContent() {
           }
         />
         <Route
-          path="/admin/employers"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <AdminEmployers />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/admin/jobs"
           element={
             <ProtectedRoute requiredRole="admin">
@@ -504,22 +463,6 @@ function AppContent() {
           }
         />
         <Route
-          path="/admin/categories"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <AdminCategories />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/reports"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <AdminReports />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/admin/settings"
           element={
             <ProtectedRoute requiredRole="admin">
@@ -527,6 +470,14 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
+<Route
+  path="/admin/vip-management"
+  element={
+    <ProtectedRoute requiredRole="admin">
+      <VIPEmployerManagement />
+    </ProtectedRoute>
+  }
+/>
       </Route>
 
       {/* ==================== 404 NOT FOUND ==================== */}

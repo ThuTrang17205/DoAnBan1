@@ -1,6 +1,6 @@
 // =============================================
 // utils/logger.js
-// WINSTON LOGGER FOR JOB PORTAL
+// WINSTON LOGGER FOR JOB PORTAL1111
 // =============================================
 
 const winston = require('winston');
@@ -16,7 +16,7 @@ const logsDir = path.join(__dirname, '../logs');
 // Tạo thư mục logs nếu chưa có
 if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });
-  console.log('✅ Created logs directory:', logsDir);
+  console.log(' Created logs directory:', logsDir);
 }
 
 // ============================================
@@ -133,7 +133,7 @@ if (process.env.NODE_ENV !== 'production') {
     level: 'debug'
   }));
   
-  logger.info('🎨 Console logging enabled (development mode)');
+  logger.info(' Console logging enabled (development mode)');
 }
 
 // ============================================
@@ -145,7 +145,7 @@ if (process.env.NODE_ENV !== 'production') {
  * @param {Object} req - Express request object
  */
 logger.logRequest = (req) => {
-  logger.info('📥 Incoming Request', {
+  logger.info(' Incoming Request', {
     method: req.method,
     url: req.originalUrl,
     ip: req.ip || req.connection.remoteAddress,
@@ -165,7 +165,7 @@ logger.logRequest = (req) => {
 logger.logResponse = (req, res, responseTime) => {
   const logLevel = res.statusCode >= 400 ? 'warn' : 'info';
   
-  logger[logLevel]('📤 Outgoing Response', {
+  logger[logLevel](' Outgoing Response', {
     method: req.method,
     url: req.originalUrl,
     statusCode: res.statusCode,
@@ -196,7 +196,7 @@ logger.logError = (err, req = null) => {
     };
   }
 
-  logger.error('❌ Error Occurred', errorLog);
+  logger.error(' Error Occurred', errorLog);
 };
 
 /**
@@ -206,7 +206,7 @@ logger.logError = (err, req = null) => {
  * @param {Object} details - Additional details
  */
 logger.logAuth = (action, user, details = {}) => {
-  logger.info('🔐 Auth Action', {
+  logger.info(' Auth Action', {
     action,
     userId: user?.id,
     email: user?.email,
@@ -223,7 +223,7 @@ logger.logAuth = (action, user, details = {}) => {
  * @param {Object} details - Additional details
  */
 logger.logDatabase = (operation, collection, details = {}) => {
-  logger.debug('💾 Database Operation', {
+  logger.debug(' Database Operation', {
     operation,
     collection,
     ...details
@@ -237,7 +237,7 @@ logger.logDatabase = (operation, collection, details = {}) => {
  * @param {Object} details - Additional details
  */
 logger.logExternalAPI = (service, endpoint, details = {}) => {
-  logger.info('🌐 External API Call', {
+  logger.info(' External API Call', {
     service,
     endpoint,
     ...details
@@ -250,7 +250,7 @@ logger.logExternalAPI = (service, endpoint, details = {}) => {
  * @param {Object} details - Event details
  */
 logger.logSecurity = (event, details = {}) => {
-  logger.warn('🔒 Security Event', {
+  logger.warn(' Security Event', {
     event,
     timestamp: new Date().toISOString(),
     ...details
@@ -266,7 +266,7 @@ logger.logSecurity = (event, details = {}) => {
 logger.logPerformance = (operation, duration, details = {}) => {
   const logLevel = duration > 1000 ? 'warn' : 'debug';
   
-  logger[logLevel]('⚡ Performance', {
+  logger[logLevel](' Performance', {
     operation,
     duration: `${duration}ms`,
     ...details
@@ -280,7 +280,7 @@ logger.logPerformance = (operation, duration, details = {}) => {
  * @param {Boolean} success - Whether email was sent successfully
  */
 logger.logEmail = (to, subject, success = true) => {
-  logger.info('📧 Email Sent', {
+  logger.info(' Email Sent', {
     to,
     subject,
     success,
@@ -295,7 +295,7 @@ logger.logEmail = (to, subject, success = true) => {
  * @param {Object} details - Additional details
  */
 logger.logScheduledJob = (jobName, status, details = {}) => {
-  logger.info('⏰ Scheduled Job', {
+  logger.info(' Scheduled Job', {
     jobName,
     status,
     timestamp: new Date().toISOString(),
@@ -310,7 +310,7 @@ logger.logScheduledJob = (jobName, status, details = {}) => {
  * @param {Number} size - File size in bytes
  */
 logger.logFileUpload = (filename, type, size) => {
-  logger.info('📎 File Upload', {
+  logger.info(' File Upload', {
     filename,
     type,
     size: `${(size / 1024).toFixed(2)} KB`,
@@ -332,7 +332,7 @@ logger.stream = {
 // LOGGER STARTUP INFO
 // ============================================
 
-logger.info('🚀 Logger initialized', {
+logger.info(' Logger initialized', {
   logLevel: logger.level,
   logsDirectory: logsDir,
   environment: process.env.NODE_ENV || 'development'

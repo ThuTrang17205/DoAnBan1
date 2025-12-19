@@ -1,16 +1,11 @@
-/**
- * Application Constants
- * Các hằng số dùng chung trong toàn bộ ứng dụng
- */
 
-// API Base URLs
 export const API_BASE_URL = 'http://localhost:5000/api';
 export const API_JOBS_URL = `${API_BASE_URL}/jobs`;
 export const API_AUTH_URL = `${API_BASE_URL}/auth`;
 export const API_ADMIN_URL = `${API_BASE_URL}/admin`;
 export const API_EMPLOYER_URL = `${API_BASE_URL}/employer`;
 
-// Job Categories
+
 export const JOB_CATEGORIES = [
   { 
     name: 'IT - Phần mềm',
@@ -62,7 +57,7 @@ export const JOB_CATEGORIES = [
   }
 ];
 
-// Job Types
+
 export const JOB_TYPES = [
   { value: 'fulltime', label: 'Full-time' },
   { value: 'parttime', label: 'Part-time' },
@@ -72,7 +67,7 @@ export const JOB_TYPES = [
   { value: 'internship', label: 'Thực tập' }
 ];
 
-// Experience Levels
+
 export const EXPERIENCE_LEVELS = [
   { value: 'fresher', label: 'Fresher (Chưa có kinh nghiệm)' },
   { value: 'junior', label: 'Junior (1-2 năm)' },
@@ -82,7 +77,7 @@ export const EXPERIENCE_LEVELS = [
   { value: 'manager', label: 'Manager' }
 ];
 
-// Salary Ranges
+
 export const SALARY_RANGES = [
   { value: 'all', label: 'Tất cả' },
   { value: 'negotiate', label: 'Thỏa thuận' },
@@ -97,7 +92,7 @@ export const SALARY_RANGES = [
   { value: 'over50', label: 'Trên 50 triệu' }
 ];
 
-// Locations
+
 export const LOCATIONS = [
   { value: 'all', label: 'Tất cả' },
   { value: 'Hà Nội', label: 'Hà Nội' },
@@ -112,7 +107,7 @@ export const LOCATIONS = [
   { value: 'Other', label: 'Khác' }
 ];
 
-// Application Status
+
 export const APPLICATION_STATUS = {
   PENDING: 'pending',
   REVIEWING: 'reviewing',
@@ -146,7 +141,7 @@ export const APPLICATION_STATUS_COLORS = {
   [APPLICATION_STATUS.WITHDRAWN]: '#6b7280'
 };
 
-// Job Status
+
 export const JOB_STATUS = {
   DRAFT: 'draft',
   PENDING: 'pending',
@@ -163,14 +158,14 @@ export const JOB_STATUS_LABELS = {
   [JOB_STATUS.REJECTED]: 'Bị từ chối'
 };
 
-// Pagination
+
 export const ITEMS_PER_PAGE = {
   JOBS: 12,
   APPLICATIONS: 10,
   USERS: 15
 };
 
-// LocalStorage Keys
+
 export const STORAGE_KEYS = {
   TOKEN: 'token',
   ADMIN_TOKEN: 'adminToken',
@@ -181,7 +176,7 @@ export const STORAGE_KEYS = {
   SEARCH_HISTORY: 'searchHistory'
 };
 
-// Validation Rules
+
 export const VALIDATION = {
   EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   PHONE_REGEX: /(84|0[3|5|7|8|9])+([0-9]{8})\b/,
@@ -192,7 +187,7 @@ export const VALIDATION = {
   DESCRIPTION_MIN_LENGTH: 50
 };
 
-// File Upload
+
 export const FILE_UPLOAD = {
   MAX_SIZE: 5 * 1024 * 1024, // 5MB
   ALLOWED_TYPES: {
@@ -201,7 +196,7 @@ export const FILE_UPLOAD = {
   }
 };
 
-// Date Formats
+
 export const DATE_FORMATS = {
   SHORT: 'DD/MM/YYYY',
   LONG: 'DD MMMM, YYYY',
@@ -209,7 +204,7 @@ export const DATE_FORMATS = {
   DISPLAY: 'DD/MM/YYYY HH:mm'
 };
 
-// Messages
+
 export const MESSAGES = {
   SUCCESS: {
     LOGIN: 'Đăng nhập thành công!',

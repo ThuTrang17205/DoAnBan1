@@ -14,7 +14,7 @@ const buildSearchQuery = (baseQuery, filters = {}, params = []) => {
   let values = [...params];
   let valueIndex = values.length + 1;
 
-  // Search keyword (search in title, description, company)
+  
   if (filters.search) {
     whereConditions.push(`(
       title ILIKE $${valueIndex} OR 
@@ -26,21 +26,21 @@ const buildSearchQuery = (baseQuery, filters = {}, params = []) => {
     valueIndex++;
   }
 
-  // Category filter
+  
   if (filters.category) {
     whereConditions.push(`category = $${valueIndex}`);
     values.push(filters.category);
     valueIndex++;
   }
 
-  // Location filter
+  
   if (filters.location) {
     whereConditions.push(`location ILIKE $${valueIndex}`);
     values.push(`%${filters.location}%`);
     valueIndex++;
   }
 
-  // Job type filter (full-time, part-time, etc.)
+  
   if (filters.jobType) {
     if (Array.isArray(filters.jobType)) {
       const placeholders = filters.jobType.map((_, i) => `$${valueIndex + i}`).join(', ');
@@ -54,7 +54,7 @@ const buildSearchQuery = (baseQuery, filters = {}, params = []) => {
     }
   }
 
-  // Salary range filter
+  
   if (filters.salaryMin) {
     whereConditions.push(`(salary_min >= $${valueIndex} OR salary >= $${valueIndex})`);
     values.push(filters.salaryMin);
@@ -67,7 +67,7 @@ const buildSearchQuery = (baseQuery, filters = {}, params = []) => {
     valueIndex++;
   }
 
-  // Experience level filter
+  
   if (filters.experienceLevel) {
     if (Array.isArray(filters.experienceLevel)) {
       const placeholders = filters.experienceLevel.map((_, i) => `$${valueIndex + i}`).join(', ');
@@ -81,47 +81,47 @@ const buildSearchQuery = (baseQuery, filters = {}, params = []) => {
     }
   }
 
-  // Education level filter
+  
   if (filters.educationLevel) {
     whereConditions.push(`education_level = $${valueIndex}`);
     values.push(filters.educationLevel);
     valueIndex++;
   }
 
-  // Status filter
+  
   if (filters.status) {
     whereConditions.push(`status = $${valueIndex}`);
     values.push(filters.status);
     valueIndex++;
   } else {
-    // Default: only active jobs
+    
     whereConditions.push(`status = 'active'`);
   }
 
-  // Featured filter
+  
   if (filters.isFeatured !== undefined) {
     whereConditions.push(`is_featured = $${valueIndex}`);
     values.push(filters.isFeatured);
     valueIndex++;
   }
 
-  // Date posted filter (last 24h, 7 days, 30 days)
+  
   if (filters.postedWithin) {
     const days = parseInt(filters.postedWithin);
     whereConditions.push(`created_at >= NOW() - INTERVAL '${days} days'`);
   }
 
-  // Skills filter
+  
   if (filters.skills) {
     const skills = Array.isArray(filters.skills) ? filters.skills : [filters.skills];
     const skillConditions = skills.map(skill => `skills ILIKE '%${skill}%'`);
     whereConditions.push(`(${skillConditions.join(' OR ')})`);
   }
 
-  // Not expired
+  
   whereConditions.push(`expires_at > NOW()`);
 
-  // Combine all conditions
+  
   if (whereConditions.length > 0) {
     query += ` WHERE ${whereConditions.join(' AND ')}`;
   }
@@ -155,7 +155,7 @@ const searchJobs = async (filters = {}, pagination = {}) => {
   const { page = 1, limit = 10, sortBy = 'newest' } = pagination;
   const offset = (page - 1) * limit;
 
-  // Build query
+  
   const baseQuery = `
     SELECT 
       j.*,
@@ -168,12 +168,12 @@ const searchJobs = async (filters = {}, pagination = {}) => {
   const { query: whereQuery, values } = buildSearchQuery(baseQuery, filters);
   const sortQuery = buildSortQuery(sortBy);
 
-  // Count total
+  
   const countQuery = `SELECT COUNT(*) FROM jobs j WHERE 1=1 ${whereQuery.split('WHERE')[1] || ''}`;
   const countResult = await pool.query(countQuery, values);
   const total = parseInt(countResult.rows[0].count);
 
-  // Get jobs
+  
   const finalQuery = `${whereQuery} ORDER BY ${sortQuery} LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
   values.push(limit, offset);
   
@@ -208,7 +208,7 @@ const getAutocompleteSuggestions = async (query, type = 'all', limit = 10) => {
   }
 
   try {
-    // Job titles
+    
     if (type === 'all' || type === 'jobs') {
       const jobQuery = `
         SELECT DISTINCT title, COUNT(*) as count
@@ -222,7 +222,7 @@ const getAutocompleteSuggestions = async (query, type = 'all', limit = 10) => {
       suggestions.jobs = jobResult.rows.map(r => r.title);
     }
 
-    // Companies
+    
     if (type === 'all' || type === 'companies') {
       const companyQuery = `
         SELECT DISTINCT company, COUNT(*) as count
@@ -236,7 +236,7 @@ const getAutocompleteSuggestions = async (query, type = 'all', limit = 10) => {
       suggestions.companies = companyResult.rows.map(r => r.company);
     }
 
-    // Locations
+    
     if (type === 'all' || type === 'locations') {
       const locationQuery = `
         SELECT DISTINCT location, COUNT(*) as count
@@ -250,7 +250,7 @@ const getAutocompleteSuggestions = async (query, type = 'all', limit = 10) => {
       suggestions.locations = locationResult.rows.map(r => r.location);
     }
 
-    // Categories
+    
     if (type === 'all' || type === 'categories') {
       const categoryQuery = `
         SELECT DISTINCT category, COUNT(*) as count
@@ -276,8 +276,8 @@ const getAutocompleteSuggestions = async (query, type = 'all', limit = 10) => {
  */
 const getPopularSearches = async (limit = 10) => {
   try {
-    // This would typically come from a search_history table
-    // For now, return most common job titles
+    
+    
     const query = `
       SELECT title, COUNT(*) as search_count
       FROM jobs
@@ -300,7 +300,7 @@ const getPopularSearches = async (limit = 10) => {
  */
 const getSimilarJobs = async (jobId, limit = 6) => {
   try {
-    // Get original job details
+    
     const jobQuery = 'SELECT * FROM jobs WHERE id = $1';
     const jobResult = await pool.query(jobQuery, [jobId]);
     
@@ -310,7 +310,7 @@ const getSimilarJobs = async (jobId, limit = 6) => {
 
     const job = jobResult.rows[0];
 
-    // Find similar jobs
+    
     const similarQuery = `
       SELECT 
         j.*,
@@ -358,7 +358,7 @@ const getSimilarJobs = async (jobId, limit = 6) => {
  */
 const getJobRecommendations = async (userId, limit = 10) => {
   try {
-    // Get user profile and preferences
+    
     const userQuery = `
       SELECT up.*, u.email
       FROM user_profiles up
@@ -368,13 +368,13 @@ const getJobRecommendations = async (userId, limit = 10) => {
     const userResult = await pool.query(userQuery, [userId]);
     
     if (userResult.rows.length === 0) {
-      // Return popular jobs if no profile
+      
       return await getPopularJobs(limit);
     }
 
     const profile = userResult.rows[0];
 
-    // Get user's saved jobs and applications to understand preferences
+    
     const preferencesQuery = `
       SELECT DISTINCT j.category, j.location, j.job_type
       FROM jobs j
@@ -385,7 +385,7 @@ const getJobRecommendations = async (userId, limit = 10) => {
     `;
     const preferencesResult = await pool.query(preferencesQuery, [userId]);
 
-    // Build recommendation query based on user profile
+    
     const recommendQuery = `
       SELECT DISTINCT
         j.*,
@@ -457,7 +457,7 @@ const getJobsByMultipleCriteria = async (criteriaGroups, pagination = {}) => {
   const { page = 1, limit = 10 } = pagination;
   const offset = (page - 1) * limit;
 
-  // Build OR conditions for each criteria group
+  
   const orConditions = criteriaGroups.map((group, index) => {
     const conditions = [];
     
@@ -497,14 +497,14 @@ const searchEmployers = async (searchTerm, filters = {}, pagination = {}) => {
   const values = [];
   let valueIndex = 1;
 
-  // Search in company name, description
+  
   if (searchTerm) {
     whereConditions.push(`(company_name ILIKE $${valueIndex} OR description ILIKE $${valueIndex})`);
     values.push(`%${searchTerm}%`);
     valueIndex++;
   }
 
-  // Verified filter
+  
   if (filters.isVerified !== undefined) {
     whereConditions.push(`is_verified = $${valueIndex}`);
     values.push(filters.isVerified);
@@ -513,12 +513,12 @@ const searchEmployers = async (searchTerm, filters = {}, pagination = {}) => {
 
   const whereClause = whereConditions.join(' AND ');
 
-  // Count query
+  
   const countQuery = `SELECT COUNT(*) FROM employers WHERE ${whereClause}`;
   const countResult = await pool.query(countQuery, values);
   const total = parseInt(countResult.rows[0].count);
 
-  // Main query
+  
   const query = `
     SELECT 
       e.*,

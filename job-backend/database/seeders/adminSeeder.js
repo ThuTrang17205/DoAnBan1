@@ -62,18 +62,18 @@ const adminExists = async (username, email) => {
  */
 const createAdmin = async (adminData) => {
   try {
-    // Check if admin already exists
+   
     const exists = await adminExists(adminData.username, adminData.email);
     
     if (exists) {
-      console.log(`⏭️  Admin "${adminData.username}" already exists, skipping...`);
+      console.log(`⏭  Admin "${adminData.username}" already exists, skipping...`);
       return null;
     }
 
-    // Hash password
+    
     const hashedPassword = await hashPassword(adminData.password);
 
-    // Insert admin
+    
     const query = `
       INSERT INTO admin (
         username,
@@ -100,13 +100,13 @@ const createAdmin = async (adminData) => {
     const result = await pool.query(query, values);
     const newAdmin = result.rows[0];
 
-    console.log(`✅ Created admin: ${newAdmin.username} (${newAdmin.role})`);
-    console.log(`   📧 Email: ${newAdmin.email}`);
-    console.log(`   🔑 Password: ${adminData.password} (⚠️ Change in production!)`);
+    console.log(` Created admin: ${newAdmin.username} (${newAdmin.role})`);
+    console.log(`    Email: ${newAdmin.email}`);
+    console.log(`    Password: ${adminData.password} ( Change in production!)`);
     
     return newAdmin;
   } catch (error) {
-    console.error(`❌ Error creating admin "${adminData.username}":`, error.message);
+    console.error(` Error creating admin "${adminData.username}":`, error.message);
     throw error;
   }
 };
@@ -115,7 +115,7 @@ const createAdmin = async (adminData) => {
  * Seed all admin accounts
  */
 const seedAdmins = async () => {
-  console.log('📝 Seeding admin accounts...\n');
+  console.log(' Seeding admin accounts...\n');
 
   try {
     let created = 0;
@@ -132,22 +132,22 @@ const seedAdmins = async () => {
     }
 
     console.log('═══════════════════════════════════════════════════════');
-    console.log(`📊 Summary: ${created} created, ${skipped} skipped`);
+    console.log(` Summary: ${created} created, ${skipped} skipped`);
     console.log('═══════════════════════════════════════════════════════\n');
 
     if (created > 0) {
-      console.log('🔐 Default Admin Credentials:');
+      console.log(' Default Admin Credentials:');
       console.log('┌─────────────────────────────────────────────────────┐');
       adminAccounts.forEach(admin => {
         console.log(`│ Username: ${admin.username.padEnd(20)} Password: ${admin.password.padEnd(12)} │`);
       });
       console.log('└─────────────────────────────────────────────────────┘');
-      console.log('⚠️  IMPORTANT: Change these passwords in production!\n');
+      console.log('  IMPORTANT: Change these passwords in production!\n');
     }
 
     return { created, skipped };
   } catch (error) {
-    console.error('❌ Error seeding admins:', error.message);
+    console.error(' Error seeding admins:', error.message);
     throw error;
   }
 };
@@ -157,7 +157,7 @@ const seedAdmins = async () => {
  */
 const clearAdmins = async () => {
   try {
-    console.log('🗑️  Clearing admin accounts (keeping superadmin)...');
+    console.log('  Clearing admin accounts (keeping superadmin)...');
     
     const query = `
       DELETE FROM admin 
@@ -167,14 +167,14 @@ const clearAdmins = async () => {
     
     const result = await pool.query(query);
     
-    console.log(`✅ Deleted ${result.rowCount} admin accounts`);
+    console.log(` Deleted ${result.rowCount} admin accounts`);
     result.rows.forEach(row => {
       console.log(`   - ${row.username}`);
     });
     
     return result.rowCount;
   } catch (error) {
-    console.error('❌ Error clearing admins:', error.message);
+    console.error(' Error clearing admins:', error.message);
     throw error;
   }
 };
@@ -187,7 +187,7 @@ const countAdmins = async () => {
     const result = await pool.query('SELECT COUNT(*) FROM admin');
     const count = parseInt(result.rows[0].count);
     
-    console.log(`📊 Total admin accounts: ${count}`);
+    console.log(` Total admin accounts: ${count}`);
     
     // Count by role
     const roleQuery = `
@@ -204,7 +204,7 @@ const countAdmins = async () => {
     
     return count;
   } catch (error) {
-    console.error('❌ Error counting admins:', error.message);
+    console.error(' Error counting admins:', error.message);
     throw error;
   }
 };
@@ -229,7 +229,7 @@ const listAdmins = async () => {
     
     const result = await pool.query(query);
     
-    console.log('\n📋 Admin Accounts:\n');
+    console.log('\n Admin Accounts:\n');
     console.log('┌────────────────────────────────────────────────────────────────────────┐');
     console.log('│ Username       │ Email                    │ Role        │ Active │');
     console.log('├────────────────────────────────────────────────────────────────────────┤');
@@ -246,7 +246,7 @@ const listAdmins = async () => {
     
     return result.rows;
   } catch (error) {
-    console.error('❌ Error listing admins:', error.message);
+    console.error(' Error listing admins:', error.message);
     throw error;
   }
 };
@@ -268,14 +268,14 @@ const updateAdminPassword = async (username, newPassword) => {
     const result = await pool.query(query, [hashedPassword, username]);
     
     if (result.rowCount === 0) {
-      console.log(`❌ Admin "${username}" not found`);
+      console.log(` Admin "${username}" not found`);
       return false;
     }
     
-    console.log(`✅ Password updated for admin: ${username}`);
+    console.log(` Password updated for admin: ${username}`);
     return true;
   } catch (error) {
-    console.error('❌ Error updating password:', error.message);
+    console.error(' Error updating password:', error.message);
     throw error;
   }
 };
@@ -295,22 +295,22 @@ const toggleAdminStatus = async (username) => {
     const result = await pool.query(query, [username]);
     
     if (result.rowCount === 0) {
-      console.log(`❌ Admin "${username}" not found`);
+      console.log(` Admin "${username}" not found`);
       return false;
     }
     
     const admin = result.rows[0];
     const status = admin.is_active ? 'activated' : 'deactivated';
-    console.log(`✅ Admin "${admin.username}" ${status}`);
+    console.log(` Admin "${admin.username}" ${status}`);
     
     return true;
   } catch (error) {
-    console.error('❌ Error toggling status:', error.message);
+    console.error(' Error toggling status:', error.message);
     throw error;
   }
 };
 
-// Export functions
+
 module.exports = {
   seedAdmins,
   clearAdmins,
@@ -319,10 +319,10 @@ module.exports = {
   createAdmin,
   updateAdminPassword,
   toggleAdminStatus,
-  adminAccounts // Export for reference
+  adminAccounts 
 };
 
-// Run directly from command line
+
 if (require.main === module) {
   const args = process.argv.slice(2);
   const command = args[0];
@@ -366,7 +366,7 @@ if (require.main === module) {
           break;
           
         default:
-          console.log('\n📝 Admin Seeder Commands:\n');
+          console.log('\n Admin Seeder Commands:\n');
           console.log('Seed admins:');
           console.log('  node database/seeders/adminSeeder.js seed\n');
           console.log('List admins:');
@@ -383,7 +383,7 @@ if (require.main === module) {
       
       process.exit(0);
     } catch (error) {
-      console.error('❌ Command failed:', error.message);
+      console.error(' Command failed:', error.message);
       process.exit(1);
     }
   })();

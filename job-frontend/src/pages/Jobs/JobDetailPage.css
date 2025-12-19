@@ -1,9 +1,10 @@
-/* JobDetailPage.css */
+/* JobDetailPage.css - FIX TOP SPACING */
 
 .job-detail-page {
   min-height: 100vh;
   background-color: #f5f7fa;
   padding: 2rem 0;
+  margin-top: 2rem; /* ADD: Kéo xuống thêm so với navbar */
 }
 
 .container {
@@ -271,7 +272,7 @@
   gap: 0.75rem;
   padding: 0.5rem 0;
   border-bottom: 1px solid #f1f5f9;
-  align-items: start; /* Changed from center to start */
+  align-items: start;
 }
 
 .detail-row:last-child {
@@ -288,10 +289,10 @@
   font-size: 0.9rem;
   color: #2d3748;
   font-weight: 600;
-  word-wrap: break-word; /* Add this */
-  word-break: break-word; /* Add this */
-  overflow-wrap: break-word; /* Add this */
-  hyphens: auto; /* Add this */
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .badge-open {
@@ -525,6 +526,11 @@ textarea.form-control {
 }
 
 @media (max-width: 768px) {
+  .job-detail-page {
+    margin-top: 1rem; /* RESPONSIVE: Giảm margin trên mobile */
+    padding: 1rem 0;
+  }
+  
   .job-header-content {
     flex-direction: column;
   }

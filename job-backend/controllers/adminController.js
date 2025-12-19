@@ -6,13 +6,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-// If you have database models, import them here
-// const Admin = require('../models/Admin');
-// const User = require('../models/User');
-// const Employer = require('../models/Employer');
-// const Job = require('../models/Job');
-// const Application = require('../models/Application');
- 
 
 
  // ==================== Admin MANAGEMENT ====================
@@ -38,44 +31,35 @@ exports.login = async (req, res) => {
       });
     }
 
-    // TODO: Replace with actual database query
-    // const admin = await Admin.findOne({ where: { username } });
-    
-    // TEMPORARY: Hardcoded admin for testing
     const mockAdmin = {
       id: 1,
       username: 'admin',
-      password: '$2b$10$rBV2uLZEPvKZ3Z1Z1Z1Z1O', // This is hashed 'admin123'
+      password: '$2b$10$rBV2uLZEPvKZ3Z1Z1Z1Z1O', 
       email: 'admin@jobportal.com',
       role: 'admin',
       fullName: 'Administrator'
     };
 
-    // Check if admin exists
+  
     if (username !== mockAdmin.username) {
-      console.log('❌ Admin not found');
+      console.log(' Admin not found');
       return res.status(401).json({
         success: false,
         message: 'Tên đăng nhập hoặc mật khẩu không đúng'
       });
     }
 
-    // Verify password
-    // TODO: Use bcrypt for production
-    // const isPasswordValid = await bcrypt.compare(password, admin.password);
-    
-    // TEMPORARY: Simple password check for testing
     const isPasswordValid = password === 'admin123';
 
     if (!isPasswordValid) {
-      console.log('❌ Invalid password');
+      console.log(' Invalid password');
       return res.status(401).json({
         success: false,
         message: 'Tên đăng nhập hoặc mật khẩu không đúng'
       });
     }
 
-    // Generate JWT token
+    
     const token = jwt.sign(
       { 
         id: mockAdmin.id, 
@@ -86,7 +70,7 @@ exports.login = async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    console.log('✅ Login successful');
+    console.log(' Login successful');
     console.log('  Token:', token.substring(0, 20) + '...');
 
     res.json({
@@ -103,7 +87,7 @@ exports.login = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Login error:', error);
+    console.error(' Login error:', error);
     res.status(500).json({
       success: false,
       message: 'Đã xảy ra lỗi khi đăng nhập'
@@ -118,7 +102,6 @@ exports.login = async (req, res) => {
  */
 exports.getStats = async (req, res) => {
   try {
-    // TODO: Replace with actual database queries
     const stats = {
       totalUsers: 0,
       totalEmployers: 0,
@@ -152,7 +135,7 @@ exports.getDashboardStats = async (req, res) => {
   try {
     const pool = require('../config/db');
 
-    // 1. Tổng số Users
+    
     const usersQuery = `
       SELECT 
         COUNT(*) as total,
@@ -168,7 +151,7 @@ exports.getDashboardStats = async (req, res) => {
       ? ((users.this_month - users.last_month) / users.last_month * 100).toFixed(0)
       : 0;
 
-    // 2. Tổng số Nhà tuyển dụng
+   
     const employersQuery = `
       SELECT 
         COUNT(*) as total,
@@ -184,7 +167,7 @@ exports.getDashboardStats = async (req, res) => {
       ? ((employers.this_month - employers.last_month) / employers.last_month * 100).toFixed(0)
       : 0;
 
-    // 3. Tổng số Jobs
+    
     const jobsQuery = `
       SELECT 
         COUNT(*) as total,
@@ -200,7 +183,7 @@ exports.getDashboardStats = async (req, res) => {
       ? ((jobs.this_month - jobs.last_month) / jobs.last_month * 100).toFixed(0)
       : 0;
 
-    // 4. Tổng số Applications
+   
     const applicationsQuery = `
       SELECT 
         COUNT(*) as total,
@@ -215,7 +198,7 @@ exports.getDashboardStats = async (req, res) => {
       ? ((applications.this_month - applications.last_month) / applications.last_month * 100).toFixed(0)
       : 0;
 
-    console.log('📊 Dashboard stats:', {
+    console.log(' Dashboard stats:', {
       users: users.total,
       employers: employers.total,
       jobs: jobs.total,
@@ -237,7 +220,7 @@ exports.getDashboardStats = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error getting dashboard stats:', error);
+    console.error(' Error getting dashboard stats:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy thống kê',
@@ -274,8 +257,8 @@ exports.createJob = async (req, res) => {
       status
     } = req.body;
 
-    console.log('📝 Creating new job');
-    console.log('📦 Job data:', req.body);
+    console.log(' Creating new job');
+    console.log(' Job data:', req.body);
 
     const pool = require('../config/db');
 
@@ -327,11 +310,11 @@ exports.createJob = async (req, res) => {
       status || 'open'
     ];
 
-    console.log('🔍 Executing query with values:', values);
+    console.log(' Executing query with values:', values);
 
     const result = await pool.query(query, values);
 
-    console.log('✅ Query result:', result.rows);
+    console.log(' Query result:', result.rows);
 
     res.status(201).json({
       success: true,
@@ -340,7 +323,7 @@ exports.createJob = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error creating job:', error);
+    console.error(' Error creating job:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi tạo công việc',
@@ -370,8 +353,8 @@ exports.updateJob = async (req, res) => {
       status
     } = req.body;
 
-    console.log('📝 Updating job:', jobId);
-    console.log('📦 Update data:', req.body);
+    console.log(' Updating job:', jobId);
+    console.log(' Update data:', req.body);
 
     const pool = require('../config/db');
 
@@ -407,11 +390,11 @@ exports.updateJob = async (req, res) => {
       jobId
     ];
 
-    console.log('🔍 Executing query with values:', values);
+    console.log(' Executing query with values:', values);
 
     const result = await pool.query(query, values);
 
-    console.log('✅ Query result:', result.rows);
+    console.log(' Query result:', result.rows);
 
     if (result.rows.length === 0) {
       return res.status(404).json({
@@ -427,7 +410,7 @@ exports.updateJob = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error updating job:', error);
+    console.error(' Error updating job:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi cập nhật công việc',
@@ -457,7 +440,7 @@ exports.getJobById = async (req, res) => {
       data: job
     });
   } catch (error) {
-    console.error('❌ Error getting job:', error);
+    console.error(' Error getting job:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy thông tin công việc',
@@ -478,7 +461,7 @@ exports.getAllUsers = async (req, res) => {
     const { page = 1, limit = 10, search = '', role = '' } = req.query;
     const offset = (page - 1) * limit;
 
-    // Build WHERE clause
+    
     let whereClause = '';
     const queryParams = [];
     let paramIndex = 1;
@@ -496,12 +479,12 @@ exports.getAllUsers = async (req, res) => {
       paramIndex++;
     }
 
-    // Get total count
+    
     const countQuery = `SELECT COUNT(*) FROM users${whereClause}`;
     const countResult = await pool.query(countQuery, queryParams);
     const total = parseInt(countResult.rows[0].count);
 
-    // Get users
+    
     const query = `
       SELECT 
         id, 
@@ -536,7 +519,7 @@ exports.getAllUsers = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error getting users:', error);
+    console.error(' Error getting users:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy danh sách users',
@@ -587,7 +570,7 @@ exports.getUserById = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error getting user:', error);
+    console.error(' Error getting user:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy thông tin user',
@@ -605,7 +588,7 @@ exports.deleteUser = async (req, res) => {
     const pool = require('../config/db');
     const userId = req.params.id;
 
-    // Không cho phép xóa chính mình
+    
     if (parseInt(userId) === req.user.id) {
       return res.status(400).json({
         success: false,
@@ -629,7 +612,7 @@ exports.deleteUser = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error deleting user:', error);
+    console.error(' Error deleting user:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi xóa user',
@@ -647,9 +630,7 @@ exports.toggleUserStatus = async (req, res) => {
     const pool = require('../config/db');
     const userId = req.params.id;
 
-    // Check if 'status' column exists, if not we'll use a workaround
-    // For now, let's just return success (you can add status column later)
-    
+
     res.json({
       success: true,
       message: 'Tính năng này yêu cầu thêm cột "status" vào bảng users',
@@ -657,7 +638,7 @@ exports.toggleUserStatus = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error toggling user status:', error);
+    console.error(' Error toggling user status:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi thay đổi trạng thái user',
@@ -903,7 +884,7 @@ exports.getAllApplications = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error getting applications:', error);
+    console.error(' Error getting applications:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy danh sách applications',
@@ -962,7 +943,7 @@ exports.getApplicationById = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error getting application:', error);
+    console.error(' Error getting application:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy thông tin application',
@@ -1013,7 +994,7 @@ exports.updateApplicationStatus = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error updating application status:', error);
+    console.error(' Error updating application status:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi cập nhật trạng thái',
@@ -1047,7 +1028,7 @@ exports.deleteApplication = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error deleting application:', error);
+    console.error(' Error deleting application:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi xóa application',

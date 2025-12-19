@@ -12,7 +12,7 @@ function AdminLoginForm() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Check if already logged in
+  
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userRole = localStorage.getItem('userRole');
@@ -108,13 +108,13 @@ function AdminLoginForm() {
   return (
     <div className="admin-login-container">
       <div className="admin-login-form">
-        {/* Header */}
+        
         <div className="admin-login-header">
           <h1> Admin Login</h1>
           <p>Đăng nhập vào trang quản trị</p>
         </div>
 
-        {/* Quick Fill Button */}
+       
         <button 
           type="button" 
           onClick={quickFill}
@@ -144,7 +144,7 @@ function AdminLoginForm() {
            Điền nhanh 
         </button>
 
-        {/* Success Message */}
+       
         {success && (
           <div style={{
             padding: '14px 16px',
@@ -164,7 +164,7 @@ function AdminLoginForm() {
           </div>
         )}
 
-        {/* Error Message */}
+       
         {error && (
           <div style={{
             padding: '14px 16px',
@@ -184,9 +184,8 @@ function AdminLoginForm() {
           </div>
         )}
 
-        {/* Login Form */}
         <form onSubmit={handleSubmit}>
-          {/* Username */}
+         
           <div className="form-group">
             <label htmlFor="username"> Tên đăng nhập</label>
             <input
@@ -202,7 +201,7 @@ function AdminLoginForm() {
             />
           </div>
 
-          {/* Password */}
+         
           <div className="form-group">
             <label htmlFor="password"> Mật khẩu</label>
             <input
@@ -218,7 +217,7 @@ function AdminLoginForm() {
             />
           </div>
 
-          {/* Submit Button */}
+          
           <button 
             type="submit" 
             disabled={loading} 
@@ -259,7 +258,7 @@ function AdminLoginForm() {
           </button>
         </form>
 
-        {/* Footer */}
+        
         <div style={{
           marginTop: '24px',
           textAlign: 'center',
@@ -271,7 +270,7 @@ function AdminLoginForm() {
           </p>
         </div>
 
-        {/* Debug Info */}
+        
         <div style={{
           marginTop: '30px',
           padding: '16px',
@@ -288,24 +287,18 @@ function AdminLoginForm() {
             fontWeight: '600',
             color: '#2d3748'
           }}>
-             Debug Info:
+            
           </h4>
           <pre style={{ 
             margin: 0, 
             whiteSpace: 'pre-wrap',
             lineHeight: '1.6'
           }}>
-{`Username: ${formData.username || '(chưa nhập)'}
-Password: ${formData.password ? '✓ đã nhập (' + formData.password.length + ' ký tự)' : '✗ chưa nhập'}
-Backend: http://localhost:5000/api/admin/login
-Token: ${localStorage.getItem('token') ? '✓ có' : '✗ không'}
-UserRole: ${localStorage.getItem('userRole') || '✗ không'}
-Ready: ${formData.username && formData.password ? ' YES' : ' NO'}`}
           </pre>
         </div>
       </div>
 
-      {/* CSS Animation */}
+     
       <style>{`
         @keyframes spin {
           to { transform: rotate(360deg); }

@@ -11,7 +11,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
     <div className="pagination">
       {currentPage > 1 && (
         <button onClick={() => onPageChange(currentPage - 1)}>
-          ← Trước
+           Trước
         </button>
       )}
 
@@ -27,7 +27,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
 
       {currentPage < totalPages && (
         <button onClick={() => onPageChange(currentPage + 1)}>
-          Sau →
+          Sau 
         </button>
       )}
     </div>

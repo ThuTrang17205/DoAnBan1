@@ -7,14 +7,14 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure upload directories exist
+
 const ensureDirectoryExists = (dir) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
 };
 
-// Upload directories
+
 const UPLOAD_DIRS = {
   RESUMES: 'uploads/resumes',
   AVATARS: 'uploads/avatars',
@@ -23,7 +23,7 @@ const UPLOAD_DIRS = {
   TEMP: 'uploads/temp'
 };
 
-// Create all directories
+
 Object.values(UPLOAD_DIRS).forEach(ensureDirectoryExists);
 
 /**
@@ -36,7 +36,7 @@ const createStorage = (destination) => {
       cb(null, destination);
     },
     filename: (req, file, cb) => {
-      // Generate unique filename: timestamp-randomstring-originalname
+     
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
       const ext = path.extname(file.originalname);
       const nameWithoutExt = path.basename(file.originalname, ext);
@@ -97,7 +97,7 @@ const resumeFileFilter = (req, file, cb) => {
 const uploadAvatar = multer({
   storage: createStorage(UPLOAD_DIRS.AVATARS),
   limits: {
-    fileSize: 2 * 1024 * 1024 // 2MB
+    fileSize: 2 * 1024 * 1024 
   },
   fileFilter: imageFileFilter
 }).single('avatar');
@@ -108,7 +108,7 @@ const uploadAvatar = multer({
 const uploadCompanyLogo = multer({
   storage: createStorage(UPLOAD_DIRS.COMPANY_LOGOS),
   limits: {
-    fileSize: 2 * 1024 * 1024 // 2MB
+    fileSize: 2 * 1024 * 1024 
   },
   fileFilter: imageFileFilter
 }).single('logo');
@@ -119,7 +119,7 @@ const uploadCompanyLogo = multer({
 const uploadResume = multer({
   storage: createStorage(UPLOAD_DIRS.RESUMES),
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB
+    fileSize: 5 * 1024 * 1024 
   },
   fileFilter: resumeFileFilter
 }).single('resume');
@@ -130,8 +130,8 @@ const uploadResume = multer({
 const uploadDocuments = multer({
   storage: createStorage(UPLOAD_DIRS.DOCUMENTS),
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB per file
-    files: 5 // Maximum 5 files
+    fileSize: 5 * 1024 * 1024, 
+    files: 5 
   },
   fileFilter: documentFileFilter
 }).array('documents', 5);
@@ -142,8 +142,8 @@ const uploadDocuments = multer({
 const uploadImages = multer({
   storage: createStorage(UPLOAD_DIRS.TEMP),
   limits: {
-    fileSize: 2 * 1024 * 1024, // 2MB per file
-    files: 10 // Maximum 10 images
+    fileSize: 2 * 1024 * 1024, 
+    files: 10 
   },
   fileFilter: imageFileFilter
 }).array('images', 10);
@@ -154,7 +154,7 @@ const uploadImages = multer({
 const createUploadMiddleware = (options = {}) => {
   const {
     destination = UPLOAD_DIRS.TEMP,
-    maxSize = 5 * 1024 * 1024, // 5MB default
+    maxSize = 5 * 1024 * 1024,
     maxFiles = 1,
     allowedTypes = /jpeg|jpg|png|pdf|doc|docx/,
     fieldName = 'file'
@@ -282,7 +282,7 @@ const cleanOldFiles = (directory, days = 30) => {
   try {
     const files = fs.readdirSync(directory);
     const now = Date.now();
-    const maxAge = days * 24 * 60 * 60 * 1000; // Convert days to milliseconds
+    const maxAge = days * 24 * 60 * 60 * 1000; 
 
     files.forEach(file => {
       const filePath = path.join(directory, file);
@@ -335,18 +335,18 @@ const validateUploadedFile = (req, res, next) => {
 };
 
 module.exports = {
-  // Upload middlewares
+
   uploadAvatar: handleUpload(uploadAvatar),
   uploadCompanyLogo: handleUpload(uploadCompanyLogo),
   uploadResume: handleUpload(uploadResume),
   uploadDocuments: handleUpload(uploadDocuments),
   uploadImages: handleUpload(uploadImages),
   
-  // Custom upload
+
   createUploadMiddleware,
   handleUpload,
 
-  // File management
+  
   deleteFile,
   deleteFiles,
   getFileUrl,
@@ -354,10 +354,10 @@ module.exports = {
   getFileSize,
   cleanOldFiles,
 
-  // Validation middleware
+
   requireFile,
   validateUploadedFile,
 
-  // Constants
+ 
   UPLOAD_DIRS
 };

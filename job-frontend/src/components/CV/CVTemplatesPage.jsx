@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './CVTemplatesPage.css';
+
 export default function CVTemplatesPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -110,117 +111,52 @@ export default function CVTemplatesPage() {
     : templates.filter(t => t.category === selectedCategory);
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
-      {}
-      <div style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
-        padding: '60px 20px',
-        textAlign: 'center'
-      }}>
-        <h1 style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '12px' }}>
-          Mẫu CV chuyên nghiệp
-        </h1>
-        <p style={{ fontSize: '18px', opacity: 0.9 }}>
-          Chọn từ nhiều mẫu CV được thiết kế chi tiết, tối ưu ATS
-        </p>
+    <div className="cv-templates-page">
+      {/* Hero Section */}
+      <div className="hero-section">
+        <h1>Mẫu CV chuyên nghiệp</h1>
+        <p>Chọn từ nhiều mẫu CV được thiết kế chi tiết, tối ưu ATS</p>
       </div>
 
       {/* Main Content */}
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '40px 20px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '30px' }}>
+      <div className="main-container">
+        <div className="content-wrapper">
           {/* Sidebar */}
-          <aside>
+          <aside className="sidebar">
             {/* Categories */}
-            <div style={{
-              background: 'white',
-              borderRadius: '12px',
-              padding: '24px',
-              marginBottom: '20px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-            }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>
-                Danh mục mẫu CV
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className="categories-card">
+              <h3>Danh mục mẫu CV</h3>
+              <div className="category-list">
                 {categories.map(cat => (
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.id)}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      padding: '12px 16px',
-                      border: 'none',
-                      borderRadius: '8px',
-                      background: selectedCategory === cat.id ? '#667eea' : 'transparent',
-                      color: selectedCategory === cat.id ? 'white' : '#333',
-                      cursor: 'pointer',
-                      fontSize: '14px',
-                      fontWeight: selectedCategory === cat.id ? '600' : '400',
-                      transition: 'all 0.2s'
-                    }}
+                    className={`category-btn ${selectedCategory === cat.id ? 'active' : ''}`}
                   >
                     <span>{cat.name}</span>
-                    <span style={{
-                      background: selectedCategory === cat.id ? 'rgba(255,255,255,0.2)' : '#f0f0f0',
-                      padding: '2px 8px',
-                      borderRadius: '12px',
-                      fontSize: '12px'
-                    }}>
-                      {cat.count}
-                    </span>
+                    <span className="count-badge">{cat.count}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Premium Banner */}
-            <div style={{
-              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-              borderRadius: '12px',
-              padding: '24px',
-              color: 'white',
-              textAlign: 'center'
-            }}>
-              <div style={{ fontSize: '32px', marginBottom: '8px' }}>⭐</div>
-              <h4 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>
-                Nâng cấp tài khoản
-              </h4>
-              <p style={{ fontSize: '13px', opacity: 0.9, marginBottom: '16px' }}>
-                Truy cập không giới hạn tất cả mẫu CV cao cấp
-              </p>
-              <button style={{
-                width: '100%',
-                padding: '12px',
-                border: 'none',
-                borderRadius: '8px',
-                background: 'white',
-                color: '#f5576c',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}>
-                Nâng cấp ngay
-              </button>
+            <div className="premium-banner">
+              <div className="premium-icon">⭐</div>
+              <h4>Nâng cấp tài khoản</h4>
+              <p>Truy cập không giới hạn tất cả mẫu CV cao cấp</p>
+              <button className="premium-btn">Nâng cấp ngay</button>
             </div>
           </aside>
 
-          {}
-          <div>
-            <div style={{ marginBottom: '24px' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '4px' }}>
-                {categories.find(c => c.id === selectedCategory)?.name}
-              </h2>
-              <p style={{ color: '#666' }}>{filteredTemplates.length} mẫu CV có sẵn</p>
+          {/* Templates Grid */}
+          <div className="templates-section">
+            <div>
+              <h2>{categories.find(c => c.id === selectedCategory)?.name}</h2>
+              <p>{filteredTemplates.length} mẫu CV có sẵn</p>
             </div>
 
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-              gap: '24px'
-            }}>
+            <div className="templates-grid">
               {filteredTemplates.map(template => (
                 <CVTemplateCard
                   key={template.id}
@@ -246,100 +182,30 @@ export default function CVTemplatesPage() {
 
 function CVTemplateCard({ template, onClick }) {
   return (
-    <div style={{
-      background: 'white',
-      borderRadius: '12px',
-      overflow: 'hidden',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-      transition: 'all 0.3s',
-      cursor: 'pointer'
-    }}
-    onMouseEnter={e => {
-      e.currentTarget.style.transform = 'translateY(-4px)';
-      e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.12)';
-    }}
-    onMouseLeave={e => {
-      e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
-    }}
-    onClick={onClick}>
+    <div className="cv-template-card" onClick={onClick}>
       {/* CV Preview */}
-      <div style={{
-        position: 'relative',
-        background: '#f5f5f5',
-        padding: '30px 20px',
-        height: '480px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
+      <div className="cv-preview-area">
         {template.isPremium && (
-          <div style={{
-            position: 'absolute',
-            top: '12px',
-            right: '12px',
-            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-            color: 'white',
-            padding: '6px 12px',
-            borderRadius: '20px',
-            fontSize: '11px',
-            fontWeight: 'bold',
-            zIndex: 10
-          }}>
-            ⭐ PREMIUM
-          </div>
+          <div className="premium-badge">⭐ PREMIUM</div>
         )}
         
         {renderCVPreview(template)}
       </div>
 
       {/* Info */}
-      <div style={{ padding: '20px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>
-          {template.name}
-        </h3>
-        <div style={{
-          display: 'flex',
-          gap: '6px',
-          flexWrap: 'wrap',
-          marginBottom: '16px'
-        }}>
+      <div className="template-info">
+        <h3>{template.name}</h3>
+        <div className="template-tags">
           {template.tags.map(tag => (
-            <span key={tag} style={{
-              background: '#f0f0f0',
-              color: '#666',
-              padding: '4px 10px',
-              borderRadius: '12px',
-              fontSize: '11px'
-            }}>
-              {tag}
-            </span>
+            <span key={tag} className="template-tag">{tag}</span>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button style={{
-            flex: 1,
-            padding: '10px',
-            border: '1px solid #ddd',
-            borderRadius: '8px',
-            background: 'white',
-            cursor: 'pointer',
-            fontSize: '13px',
-            fontWeight: '500'
-          }}>
-             Xem
-          </button>
-          <button style={{
-            flex: 1,
-            padding: '10px',
-            border: 'none',
-            borderRadius: '8px',
-            background: template.accentColor,
-            color: 'white',
-            cursor: 'pointer',
-            fontSize: '13px',
-            fontWeight: '500'
-          }}>
+        <div className="template-actions">
+          <button className="btn-view"> Xem</button>
+          <button 
+            className="btn-use" 
+            style={{ background: template.accentColor }}
+          >
              Dùng
           </button>
         </div>
@@ -349,84 +215,155 @@ function CVTemplateCard({ template, onClick }) {
 }
 
 function renderCVPreview(template) {
-  // Template 1: Lê Quang Dũng
+  // Template 1: Lê Quang Dũng - Professional 2 columns
   if (template.id === 1) {
     return (
       <div style={{
-        width: '100%',
-        maxWidth: '300px',
+        width: '240px',
+        height: '340px',
         background: 'white',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-        fontSize: '8px',
-        fontFamily: 'Arial, sans-serif'
+        boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+        fontSize: '7px',
+        fontFamily: 'Arial, sans-serif',
+        overflow: 'hidden'
       }}>
+        {/* Header with gray background */}
         <div style={{
           background: '#e8e8e8',
-          padding: '20px 16px',
+          padding: '14px 12px',
           display: 'flex',
-          gap: '12px'
+          gap: '10px',
+          borderBottom: '2px solid #d0d0d0'
         }}>
           <div style={{
-            width: '50px',
-            height: '50px',
-            background: '#d0d0d0',
+            width: '42px',
+            height: '42px',
+            background: '#c0c0c0',
             border: '2px solid #999',
             flexShrink: 0
           }}></div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '2px' }}>LÊ QUANG DŨNG</div>
-            <div style={{ fontSize: '7px', color: '#666', marginBottom: '6px' }}>Business Development Executive</div>
-            <div style={{ fontSize: '6px', color: '#555', lineHeight: '1.4' }}>
-              <div>📅 15/03/1998</div>
-              <div>📞 0123456789</div>
-              <div>✉️ email@gmail.vn</div>
+            <div style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '2px', color: '#1a1a1a' }}>
+              LÊ QUANG DŨNG
+            </div>
+            <div style={{ fontSize: '6.5px', color: '#555', marginBottom: '5px', fontWeight: '600' }}>
+              Business Development Executive
+            </div>
+            <div style={{ fontSize: '5.5px', color: '#666', lineHeight: '1.5' }}>
+              <div>📅 15/03/1998 | 👤 Nam</div>
+              <div>📞 0123-456-789</div>
+              <div>✉️ lequangdung@email.com</div>
+              <div>📍 Hà Nội, Việt Nam</div>
             </div>
           </div>
         </div>
-        <div style={{ padding: '16px' }}>
-          <div style={{ marginBottom: '12px' }}>
+        
+        {/* Body content */}
+        <div style={{ padding: '12px' }}>
+          {/* Objective */}
+          <div style={{ marginBottom: '10px' }}>
             <div style={{
-              fontSize: '8px',
+              fontSize: '7.5px',
               fontWeight: 'bold',
-              borderBottom: '1.5px solid #333',
-              paddingBottom: '3px',
-              marginBottom: '6px'
-            }}>MỤC TIÊU NGHỀ NGHIỆP</div>
+              color: '#1a1a1a',
+              borderBottom: '1.5px solid #2563eb',
+              paddingBottom: '2px',
+              marginBottom: '5px',
+              textTransform: 'uppercase'
+            }}>
+              Mục Tiêu Nghề Nghiệp
+            </div>
             <div style={{ fontSize: '6px', color: '#555', lineHeight: '1.5' }}>
-              <div style={{ marginBottom: '2px', height: '6px', background: '#e0e0e0', width: '100%' }}></div>
-              <div style={{ marginBottom: '2px', height: '6px', background: '#e0e0e0', width: '98%' }}></div>
-              <div style={{ marginBottom: '2px', height: '6px', background: '#e0e0e0', width: '95%' }}></div>
+              Mong muốn trở thành Business Development Manager tại một công ty lớn, góp phần phát triển thị trường và tăng trưởng doanh thu bền vững.
             </div>
           </div>
-          <div style={{ marginBottom: '12px' }}>
+
+          {/* Experience */}
+          <div style={{ marginBottom: '10px' }}>
             <div style={{
-              fontSize: '8px',
+              fontSize: '7.5px',
               fontWeight: 'bold',
-              borderBottom: '1.5px solid #333',
-              paddingBottom: '3px',
-              marginBottom: '6px'
-            }}>HỌC VẤN</div>
-            <div style={{ fontSize: '6px', marginBottom: '4px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '1px' }}>2016 - 2020</div>
-              <div style={{ color: '#555', marginBottom: '1px' }}>Trường ĐH Ngoại Thương</div>
-              <div style={{ height: '5px', background: '#e0e0e0', width: '70%', marginBottom: '1px' }}></div>
-              <div style={{ height: '5px', background: '#e0e0e0', width: '60%' }}></div>
+              color: '#1a1a1a',
+              borderBottom: '1.5px solid #2563eb',
+              paddingBottom: '2px',
+              marginBottom: '5px',
+              textTransform: 'uppercase'
+            }}>
+              Kinh Nghiệm Làm Việc
+            </div>
+            <div style={{ marginBottom: '6px' }}>
+              <div style={{ fontSize: '6.5px', fontWeight: 'bold', color: '#2563eb', marginBottom: '1px' }}>
+                03/2022 - Hiện tại
+              </div>
+              <div style={{ fontSize: '7px', fontWeight: 'bold', marginBottom: '1px' }}>
+                Business Development Executive
+              </div>
+              <div style={{ fontSize: '6px', color: '#666', marginBottom: '3px', fontStyle: 'italic' }}>
+                FPT Software - Hà Nội
+              </div>
+              <ul style={{ margin: 0, paddingLeft: '12px', fontSize: '5.5px', color: '#555', lineHeight: '1.6' }}>
+                <li>Phát triển 50+ khách hàng doanh nghiệp mới</li>
+                <li>Đạt 120% target doanh số quý 4/2024</li>
+                <li>Quản lý portfolio 100+ khách hàng</li>
+              </ul>
             </div>
           </div>
+
+          {/* Education */}
+          <div style={{ marginBottom: '10px' }}>
+            <div style={{
+              fontSize: '7.5px',
+              fontWeight: 'bold',
+              color: '#1a1a1a',
+              borderBottom: '1.5px solid #2563eb',
+              paddingBottom: '2px',
+              marginBottom: '5px',
+              textTransform: 'uppercase'
+            }}>
+              Học Vấn
+            </div>
+            <div>
+              <div style={{ fontSize: '6.5px', fontWeight: 'bold', color: '#2563eb', marginBottom: '1px' }}>
+                2016 - 2020
+              </div>
+              <div style={{ fontSize: '7px', fontWeight: 'bold', marginBottom: '1px' }}>
+                Cử nhân Kinh tế Quốc tế
+              </div>
+              <div style={{ fontSize: '6px', color: '#666', marginBottom: '2px' }}>
+                Đại học Ngoại Thương Hà Nội
+              </div>
+              <div style={{ fontSize: '5.5px', color: '#555' }}>
+                GPA: 3.6/4.0 | Tốt nghiệp Khá
+              </div>
+            </div>
+          </div>
+
+          {/* Skills */}
           <div>
             <div style={{
-              fontSize: '8px',
+              fontSize: '7.5px',
               fontWeight: 'bold',
-              borderBottom: '1.5px solid #333',
-              paddingBottom: '3px',
-              marginBottom: '6px'
-            }}>KINH NGHIỆM</div>
-            <div style={{ fontSize: '6px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '1px' }}>03/2022 - 02/2025</div>
-              <div style={{ color: '#555', marginBottom: '2px' }}>Business Development Executive</div>
-              <div style={{ height: '5px', background: '#e0e0e0', width: '100%', marginBottom: '1px' }}></div>
-              <div style={{ height: '5px', background: '#e0e0e0', width: '95%', marginBottom: '1px' }}></div>
-              <div style={{ height: '5px', background: '#e0e0e0', width: '90%' }}></div>
+              color: '#1a1a1a',
+              borderBottom: '1.5px solid #2563eb',
+              paddingBottom: '2px',
+              marginBottom: '5px',
+              textTransform: 'uppercase'
+            }}>
+              Kỹ Năng
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
+              {['Sales', 'Negotiation', 'CRM', 'B2B', 'Marketing'].map(skill => (
+                <span key={skill} style={{
+                  fontSize: '5.5px',
+                  background: '#e3f2fd',
+                  color: '#2563eb',
+                  padding: '2px 5px',
+                  borderRadius: '3px',
+                  fontWeight: '600'
+                }}>
+                  {skill}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -434,107 +371,179 @@ function renderCVPreview(template) {
     );
   }
 
-  
+  // Template 2: Nguyễn Minh Trang - Modern with badge
   if (template.id === 2) {
     return (
       <div style={{
-        width: '100%',
-        maxWidth: '300px',
+        width: '240px',
+        height: '340px',
         background: 'white',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-        fontSize: '8px',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+        fontSize: '7px',
         fontFamily: 'Arial, sans-serif',
-        position: 'relative'
+        position: 'relative',
+        overflow: 'hidden'
       }}>
+        {/* New Badge */}
         <div style={{
           position: 'absolute',
-          top: '10px',
-          left: '16px',
+          top: '8px',
+          left: '12px',
           background: template.accentColor,
           color: 'white',
-          padding: '4px 10px',
-          borderRadius: '12px',
-          fontSize: '8px',
+          padding: '3px 8px',
+          borderRadius: '10px',
+          fontSize: '7px',
           fontWeight: 'bold',
           zIndex: 10
-        }}>✿ Mới</div>
+        }}>
+          ✿ Mới
+        </div>
+
+        {/* Header */}
         <div style={{
-          background: 'white',
-          padding: '30px 16px 16px',
-          display: 'flex',
-          gap: '12px',
+          padding: '20px 12px 12px',
           borderBottom: '2px solid #f0f0f0'
         }}>
-          <div style={{
-            width: '50px',
-            height: '50px',
-            background: '#f5f5f5',
-            border: '2px solid #ddd',
-            borderRadius: '6px',
-            flexShrink: 0
-          }}></div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '2px' }}>NGUYỄN MINH TRANG</div>
-            <div style={{ fontSize: '7px', color: '#7f8c8d', marginBottom: '6px' }}>Audit intern</div>
-            <div style={{ fontSize: '6px', color: '#555', lineHeight: '1.3', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
-              <div>📅 06/12/2003</div>
-              <div>📞 (034) 612 6612</div>
-              <div>👤 Nữ</div>
-              <div>✉️ hotro@topcv.vn</div>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'start' }}>
+            <div style={{
+              width: '42px',
+              height: '42px',
+              background: '#f5f5f5',
+              border: '2px solid #ddd',
+              borderRadius: '6px',
+              flexShrink: 0
+            }}></div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '2px', color: '#1a1a1a' }}>
+                NGUYỄN MINH TRANG
+              </div>
+              <div style={{ fontSize: '6.5px', color: '#7f8c8d', marginBottom: '4px' }}>
+                Audit Intern
+              </div>
+              <div style={{ 
+                fontSize: '5.5px', 
+                color: '#666', 
+                lineHeight: '1.4',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '2px'
+              }}>
+                <div>📅 06/12/2003</div>
+                <div>📞 034-612-6612</div>
+                <div>👤 Nữ</div>
+                <div>✉️ trang@email.com</div>
+              </div>
             </div>
           </div>
         </div>
-        <div style={{ padding: '16px' }}>
-          <div style={{ marginBottom: '12px' }}>
+
+        {/* Content */}
+        <div style={{ padding: '12px' }}>
+          {/* Objective */}
+          <div style={{ marginBottom: '10px' }}>
             <div style={{
-              fontSize: '8px',
+              fontSize: '7.5px',
               fontWeight: 'bold',
+              color: '#1a1a1a',
               textAlign: 'center',
               borderBottom: '1.5px solid #34495e',
-              paddingBottom: '4px',
-              marginBottom: '6px'
-            }}>MỤC TIÊU NGHỀ NGHIỆP</div>
-            <div style={{ fontSize: '6px', color: '#555', lineHeight: '1.5' }}>
-              <div style={{ marginBottom: '2px', height: '5px', background: '#e0e0e0' }}></div>
-              <div style={{ marginBottom: '2px', height: '5px', background: '#e0e0e0', width: '98%' }}></div>
-              <div style={{ marginBottom: '4px', height: '5px', background: '#e0e0e0', width: '70%' }}></div>
+              paddingBottom: '3px',
+              marginBottom: '5px'
+            }}>
+              MỤC TIÊU NGHỀ NGHIỆP
+            </div>
+            <div style={{ fontSize: '6px', color: '#555', lineHeight: '1.5', textAlign: 'justify' }}>
+              Sinh viên năm cuối mong muốn có cơ hội thực tập tại vị trí Audit để tích lũy kinh nghiệm và phát triển kỹ năng chuyên môn trong lĩnh vực kiểm toán.
             </div>
           </div>
-          <div style={{ marginBottom: '12px' }}>
+
+          {/* Education */}
+          <div style={{ marginBottom: '10px' }}>
             <div style={{
-              fontSize: '8px',
+              fontSize: '7.5px',
               fontWeight: 'bold',
+              color: '#1a1a1a',
               textAlign: 'center',
               borderBottom: '1.5px solid #34495e',
-              paddingBottom: '4px',
-              marginBottom: '6px'
-            }}>HỌC VẤN</div>
-            <div style={{ fontSize: '6px', display: 'grid', gridTemplateColumns: '45px 1fr', gap: '8px' }}>
-              <div style={{ fontWeight: 'bold' }}>2021 - 2025</div>
-              <div>
-                <div style={{ fontWeight: 'bold', marginBottom: '1px' }}>ĐH Ngoại thương HN</div>
-                <div style={{ color: '#7f8c8d', marginBottom: '2px', fontSize: '5px' }}>Ngân hàng & Tài chính</div>
-                <div style={{ height: '4px', background: '#e0e0e0', width: '90%', marginBottom: '1px' }}></div>
-                <div style={{ height: '4px', background: '#e0e0e0', width: '70%' }}></div>
+              paddingBottom: '3px',
+              marginBottom: '5px'
+            }}>
+              HỌC VẤN
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ fontSize: '6px', fontWeight: 'bold', color: '#34495e', width: '45px', flexShrink: 0 }}>
+                2021 - 2025
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '7px', fontWeight: 'bold', marginBottom: '1px' }}>
+                  Đại học Ngoại thương Hà Nội
+                </div>
+                <div style={{ fontSize: '6px', color: '#7f8c8d', marginBottom: '2px' }}>
+                  Chuyên ngành: Ngân hàng & Tài chính
+                </div>
+                <div style={{ fontSize: '5.5px', color: '#555' }}>
+                  GPA: 3.4/4.0 | Dự kiến tốt nghiệp 06/2025
+                </div>
               </div>
             </div>
           </div>
+
+          {/* Activities */}
+          <div style={{ marginBottom: '10px' }}>
+            <div style={{
+              fontSize: '7.5px',
+              fontWeight: 'bold',
+              color: '#1a1a1a',
+              textAlign: 'center',
+              borderBottom: '1.5px solid #34495e',
+              paddingBottom: '3px',
+              marginBottom: '5px'
+            }}>
+              HOẠT ĐỘNG
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ fontSize: '6px', fontWeight: 'bold', color: '#34495e', width: '45px', flexShrink: 0 }}>
+                2022 - 2025
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '6.5px', fontWeight: 'bold', marginBottom: '2px' }}>
+                  Thành viên CLB Nguồn nhân lực
+                </div>
+                <ul style={{ margin: 0, paddingLeft: '10px', fontSize: '5.5px', color: '#555', lineHeight: '1.6' }}>
+                  <li>Tổ chức 5+ workshop về phát triển nghề nghiệp</li>
+                  <li>Hỗ trợ 200+ sinh viên tìm việc làm part-time</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Skills */}
           <div>
             <div style={{
-              fontSize: '8px',
+              fontSize: '7.5px',
               fontWeight: 'bold',
+              color: '#1a1a1a',
               textAlign: 'center',
               borderBottom: '1.5px solid #34495e',
-              paddingBottom: '4px',
-              marginBottom: '6px'
-            }}>HOẠT ĐỘNG</div>
-            <div style={{ fontSize: '6px', display: 'grid', gridTemplateColumns: '45px 1fr', gap: '8px' }}>
-              <div style={{ fontWeight: 'bold' }}>2022 - 2025</div>
-              <div>
-                <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>CLB Nguồn nhân lực</div>
-                <div style={{ height: '4px', background: '#e0e0e0', width: '100%', marginBottom: '1px' }}></div>
-                <div style={{ height: '4px', background: '#e0e0e0', width: '80%' }}></div>
-              </div>
+              paddingBottom: '3px',
+              marginBottom: '5px'
+            }}>
+              KỸ NĂNG
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', justifyContent: 'center' }}>
+              {['Excel', 'MS Office', 'Tiếng Anh', 'Teamwork'].map(skill => (
+                <span key={skill} style={{
+                  fontSize: '5.5px',
+                  background: '#e8f8f5',
+                  color: '#00C853',
+                  padding: '2px 5px',
+                  borderRadius: '3px',
+                  fontWeight: '600'
+                }}>
+                  {skill}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -542,215 +551,485 @@ function renderCVPreview(template) {
     );
   }
 
-
+  // Template 3: Nguyễn Quỳnh Như - 3 columns
   if (template.id === 3) {
     return (
       <div style={{
-        width: '100%',
-        maxWidth: '300px',
+        width: '240px',
+        height: '340px',
         background: 'white',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-        fontSize: '7px',
-        fontFamily: 'Arial, sans-serif'
+        boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+        fontSize: '6.5px',
+        fontFamily: 'Arial, sans-serif',
+        overflow: 'hidden'
       }}>
+        {/* Header */}
         <div style={{
           background: '#f8f9fa',
-          padding: '16px',
-          display: 'flex',
-          gap: '10px'
+          padding: '12px',
+          borderBottom: '2px solid #e0e0e0'
         }}>
-          <div style={{
-            width: '45px',
-            height: '55px',
-            background: '#d0d5dd',
-            flexShrink: 0
-          }}></div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '2px' }}>Nguyễn Quỳnh Như</div>
-            <div style={{ fontSize: '7px', fontWeight: 'bold', marginBottom: '4px', paddingBottom: '3px', borderBottom: '1.5px solid #333' }}>Quản lý nhà hàng</div>
-            <div style={{ fontSize: '5px', color: '#555', lineHeight: '1.4' }}>
-              <div style={{ marginBottom: '2px', height: '4px', background: '#e0e0e0', width: '100%' }}></div>
-              <div style={{ marginBottom: '2px', height: '4px', background: '#e0e0e0', width: '95%' }}></div>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+            <div style={{
+              width: '38px',
+              height: '46px',
+              background: '#d0d5dd',
+              flexShrink: 0
+            }}></div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '2px' }}>
+                Nguyễn Quỳnh Như
+              </div>
+              <div style={{
+                fontSize: '7px',
+                fontWeight: 'bold',
+                color: '#34495e',
+                paddingBottom: '3px',
+                borderBottom: '1.5px solid #333'
+              }}>
+                Quản lý nhà hàng
+              </div>
             </div>
           </div>
         </div>
+
+        {/* 3 Column Info */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '8px',
-          padding: '12px 16px',
-          borderBottom: '1.5px solid #e0e0e0'
+          gap: '6px',
+          padding: '10px 12px',
+          borderBottom: '1.5px solid #e0e0e0',
+          background: '#fafafa'
         }}>
           <div>
-            <div style={{ fontSize: '7px', fontWeight: 'bold', marginBottom: '4px', paddingBottom: '2px', borderBottom: '1.5px solid #333' }}>THÔNG TIN</div>
-            <div style={{ fontSize: '5px', color: '#555' }}>
-              <div style={{ marginBottom: '2px' }}>📅 15/05/1995</div>
-              <div style={{ marginBottom: '2px' }}>✉️ hotro@topcv.vn</div>
-              <div style={{ marginBottom: '2px' }}>📞 (024) 6680</div>
+            <div style={{
+              fontSize: '6.5px',
+              fontWeight: 'bold',
+              marginBottom: '4px',
+              paddingBottom: '2px',
+              borderBottom: '1.5px solid #333',
+              textTransform: 'uppercase'
+            }}>
+              Thông tin
+            </div>
+            <div style={{ fontSize: '5px', color: '#555', lineHeight: '1.5' }}>
+              <div>📅 15/05/1995</div>
+              <div>📞 024-6680</div>
+              <div>✉️ nhuquynh@</div>
+              <div>📍 HN, VN</div>
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '7px', fontWeight: 'bold', marginBottom: '4px', paddingBottom: '2px', borderBottom: '1.5px solid #333' }}>HỌC VẤN</div>
+            <div style={{
+              fontSize: '6.5px',
+              fontWeight: 'bold',
+              marginBottom: '4px',
+              paddingBottom: '2px',
+              borderBottom: '1.5px solid #333',
+              textTransform: 'uppercase'
+            }}>
+              Học vấn
+            </div>
             <div style={{ fontSize: '5px', color: '#555' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '1px' }}>Đại học TopCV</div>
-              <div style={{ marginBottom: '1px' }}>2015 - 2017</div>
-              <div style={{ height: '4px', background: '#e0e0e0', width: '80%' }}></div>
+              <div style={{ fontWeight: 'bold', marginBottom: '1px' }}>ĐH Kinh tế</div>
+              <div>2013-2017</div>
+              <div>Quản trị KS</div>
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '7px', fontWeight: 'bold', marginBottom: '4px', paddingBottom: '2px', borderBottom: '1.5px solid #333' }}>CHỨNG CHỈ</div>
+            <div style={{
+              fontSize: '6.5px',
+              fontWeight: 'bold',
+              marginBottom: '4px',
+              paddingBottom: '2px',
+              borderBottom: '1.5px solid #333',
+              textTransform: 'uppercase'
+            }}>
+              Chứng chỉ
+            </div>
             <div style={{ fontSize: '5px', color: '#555' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '1px' }}>2022</div>
-              <div style={{ height: '4px', background: '#e0e0e0', width: '90%' }}></div>
+              <div style={{ fontWeight: 'bold' }}>Food Safety</div>
+              <div>2022</div>
             </div>
           </div>
         </div>
-        <div style={{ padding: '12px 16px' }}>
+
+        {/* Experience */}
+        <div style={{ padding: '10px 12px' }}>
           <div style={{
             fontSize: '7px',
             fontWeight: 'bold',
             marginBottom: '6px',
             paddingBottom: '2px',
-            borderBottom: '1.5px solid #333'
-          }}>KINH NGHIỆM</div>
-          <div style={{ fontSize: '5px', marginBottom: '8px' }}>
-            <div style={{ fontWeight: 'bold', marginBottom: '1px' }}>01/2022 - Hiện tại</div>
-            <div style={{ fontSize: '6px', fontWeight: 'bold', marginBottom: '1px' }}>Quản lý nhà hàng</div>
-            <div style={{ color: '#555', marginBottom: '2px' }}>RKW Hotel</div>
-            <div style={{ height: '4px', background: '#e0e0e0', width: '100%', marginBottom: '1px' }}></div>
-            <div style={{ height: '4px', background: '#e0e0e0', width: '85%' }}></div>
+            borderBottom: '1.5px solid #333',
+            textTransform: 'uppercase'
+          }}>
+            Kinh Nghiệm Làm Việc
+          </div>
+          
+          <div style={{ marginBottom: '8px' }}>
+            <div style={{ fontSize: '6px', fontWeight: 'bold', color: '#34495e', marginBottom: '1px' }}>
+              01/2022 - Hiện tại
+            </div>
+            <div style={{ fontSize: '7px', fontWeight: 'bold', marginBottom: '1px' }}>
+              Quản lý nhà hàng
+            </div>
+            <div style={{ fontSize: '5.5px', color: '#666', marginBottom: '3px', fontStyle: 'italic' }}>
+              RKW Hotel & Restaurant - Hà Nội
+            </div>
+            <ul style={{ margin: 0, paddingLeft: '10px', fontSize: '5px', color: '#555', lineHeight: '1.6' }}>
+              <li>Quản lý 30+ nhân viên bộ phận F&B</li>
+              <li>Tăng doanh thu 25% năm 2024</li>
+              <li>Đảm bảo chất lượng dịch vụ 5 sao</li>
+              <li>Xử lý khiếu nại & giữ chân khách hàng</li>
+            </ul>
+          </div>
+
+          <div>
+            <div style={{ fontSize: '6px', fontWeight: 'bold', color: '#34495e', marginBottom: '1px' }}>
+              06/2019 - 12/2021
+            </div>
+            <div style={{ fontSize: '7px', fontWeight: 'bold', marginBottom: '1px' }}>
+              Trưởng ca nhà hàng
+            </div>
+            <div style={{ fontSize: '5.5px', color: '#666', marginBottom: '3px', fontStyle: 'italic' }}>
+              Golden Palace Restaurant
+            </div>
+            <ul style={{ margin: 0, paddingLeft: '10px', fontSize: '5px', color: '#555', lineHeight: '1.6' }}>
+              <li>Điều phối 15 nhân viên phục vụ</li>
+              <li>Đào tạo nhân viên mới</li>
+              <li>Kiểm soát chất lượng món ăn</li>
+            </ul>
           </div>
         </div>
       </div>
     );
   }
 
- 
+  // Template 4: Mai Anh Designer - Sidebar creative
   if (template.id === 4) {
     return (
       <div style={{
-        width: '100%',
-        maxWidth: '300px',
+        width: '240px',
+        height: '340px',
         background: 'white',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
         display: 'grid',
-        gridTemplateColumns: '95px 1fr',
-        fontSize: '7px',
-        fontFamily: 'Arial, sans-serif'
+        gridTemplateColumns: '85px 1fr',
+        fontSize: '6.5px',
+        fontFamily: 'Arial, sans-serif',
+        overflow: 'hidden'
       }}>
+        {/* Sidebar */}
         <div style={{
           background: '#f8f9fa',
-          padding: '16px 10px'
+          padding: '12px 8px'
         }}>
+          {/* Avatar */}
           <div style={{
-            width: '60px',
-            height: '60px',
+            width: '52px',
+            height: '52px',
             borderRadius: '50%',
-            background: '#d0d5dd',
+            background: 'linear-gradient(135deg, #a8e6cf, #4CAF50)',
             border: '3px solid white',
-            margin: '0 auto 10px',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+            margin: '0 auto 8px',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
           }}></div>
-          <div style={{ fontSize: '10px', fontWeight: 'bold', textAlign: 'center', marginBottom: '3px' }}>NGUYỄN MAI ANH</div>
-          <div style={{ fontSize: '6px', color: '#666', textAlign: 'center', marginBottom: '12px' }}>Designer</div>
-          <div style={{ marginBottom: '12px' }}>
+          
+          <div style={{ fontSize: '9px', fontWeight: 'bold', textAlign: 'center', marginBottom: '2px', color: '#1a1a1a' }}>
+            NGUYỄN MAI ANH
+          </div>
+          <div style={{ fontSize: '6px', color: '#666', textAlign: 'center', marginBottom: '10px' }}>
+            UI/UX Designer
+          </div>
+
+          {/* Contact Info */}
+          <div style={{ marginBottom: '10px' }}>
             <div style={{
-              fontSize: '7px',
+              fontSize: '6.5px',
               fontWeight: 'bold',
-              marginBottom: '6px',
-              paddingBottom: '3px',
+              marginBottom: '5px',
+              paddingBottom: '2px',
               borderBottom: `2px solid ${template.accentColor}`
-            }}>Thông tin</div>
-            <div style={{ fontSize: '5px', color: '#555', lineHeight: '1.6' }}>
-              <div style={{ marginBottom: '3px' }}>📞 024 6680</div>
-              <div style={{ fontSize: '4px' }}>✉️ hotro@topcv.vn</div>
+            }}>
+              Thông tin
+            </div>
+            <div style={{ fontSize: '5px', color: '#555', lineHeight: '1.7' }}>
+              <div>📞 024-6680-xxx</div>
+              <div>✉️ maianh@</div>
+              <div>email.com</div>
+              <div>📍 Hà Nội</div>
+              <div>🌐 portfolio.io</div>
             </div>
           </div>
-          <div>
+
+          {/* Skills */}
+          <div style={{ marginBottom: '10px' }}>
             <div style={{
-              fontSize: '7px',
+              fontSize: '6.5px',
               fontWeight: 'bold',
-              marginBottom: '6px',
-              paddingBottom: '3px',
+              marginBottom: '5px',
+              paddingBottom: '2px',
               borderBottom: `2px solid ${template.accentColor}`
-            }}>Kỹ năng</div>
-            <div style={{ fontSize: '5px', color: '#555' }}>
-              {['User Interview', 'User Research', 'Prototyping'].map((skill, i) => (
-                <div key={i} style={{ marginBottom: '3px', paddingLeft: '8px', position: 'relative' }}>
-                  <span style={{ position: 'absolute', left: 0, color: template.accentColor, fontWeight: 'bold' }}>•</span>
+            }}>
+              Kỹ năng
+            </div>
+            <div style={{ fontSize: '5px', color: '#555', lineHeight: '1.7' }}>
+              {['Figma', 'Adobe XD', 'Sketch', 'Prototyping', 'User Research', 'Wireframe'].map((skill, i) => (
+                <div key={i} style={{ marginBottom: '2px', paddingLeft: '8px', position: 'relative' }}>
+                  <span style={{
+                    position: 'absolute',
+                    left: 0,
+                    color: template.accentColor,
+                    fontWeight: 'bold'
+                  }}>•</span>
                   {skill}
                 </div>
               ))}
             </div>
           </div>
+
+          {/* Languages */}
+          <div>
+            <div style={{
+              fontSize: '6.5px',
+              fontWeight: 'bold',
+              marginBottom: '5px',
+              paddingBottom: '2px',
+              borderBottom: `2px solid ${template.accentColor}`
+            }}>
+              Ngôn ngữ
+            </div>
+            <div style={{ fontSize: '5px', color: '#555', lineHeight: '1.6' }}>
+              <div style={{ marginBottom: '2px' }}>
+                <div style={{ fontWeight: 'bold' }}>Tiếng Việt</div>
+                <div>Bản ngữ</div>
+              </div>
+              <div>
+                <div style={{ fontWeight: 'bold' }}>English</div>
+                <div>IELTS 7.0</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div style={{ padding: '16px 12px' }}>
-          <div style={{ marginBottom: '12px' }}>
+
+        {/* Main Content */}
+        <div style={{ padding: '12px 10px' }}>
+          {/* Education */}
+          <div style={{ marginBottom: '10px' }}>
             <div style={{
               fontSize: '7px',
               fontWeight: 'bold',
-              marginBottom: '6px',
-              paddingBottom: '3px',
+              marginBottom: '5px',
+              paddingBottom: '2px',
               borderBottom: `2px solid ${template.accentColor}`,
-              display: 'inline-block'
-            }}>Học vấn</div>
-            <div style={{ fontSize: '5px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '1px' }}>ĐH MỸ THUẬT TOPCV</div>
-              <div style={{ fontSize: '4px', color: '#888', marginBottom: '1px' }}>09/2015 - 05/2019</div>
-              <div style={{ height: '4px', background: '#e0e0e0', width: '80%' }}></div>
+              display: 'inline-block',
+              textTransform: 'uppercase'
+            }}>
+              Học vấn
+            </div>
+            <div>
+              <div style={{ fontSize: '7px', fontWeight: 'bold', marginBottom: '1px' }}>
+                ĐH Mỹ thuật Công nghiệp
+              </div>
+              <div style={{ fontSize: '5.5px', color: '#888', marginBottom: '2px' }}>
+                09/2015 - 05/2019
+              </div>
+              <div style={{ fontSize: '6px', color: '#555', marginBottom: '2px' }}>
+                Cử nhân Thiết kế Đồ họa
+              </div>
+              <div style={{ fontSize: '5px', color: '#555' }}>
+                GPA: 3.7/4.0 | Tốt nghiệp Giỏi
+              </div>
             </div>
           </div>
+
+          {/* Experience */}
+          <div style={{ marginBottom: '10px' }}>
+            <div style={{
+              fontSize: '7px',
+              fontWeight: 'bold',
+              marginBottom: '5px',
+              paddingBottom: '2px',
+              borderBottom: `2px solid ${template.accentColor}`,
+              display: 'inline-block',
+              textTransform: 'uppercase'
+            }}>
+              Kinh nghiệm
+            </div>
+            
+            <div style={{ marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '1px' }}>
+                <div style={{ fontSize: '7px', fontWeight: 'bold' }}>
+                  Senior UI/UX Designer
+                </div>
+                <div style={{ fontSize: '5.5px', color: '#888' }}>
+                  03/2020 - Nay
+                </div>
+              </div>
+              <div style={{ fontSize: '6px', color: '#666', marginBottom: '3px', fontStyle: 'italic' }}>
+                Tech Corp Vietnam
+              </div>
+              <ul style={{ margin: 0, paddingLeft: '10px', fontSize: '5px', color: '#555', lineHeight: '1.6' }}>
+                <li>Thiết kế UI/UX cho 20+ dự án web & mobile</li>
+                <li>Tăng conversion rate 35% qua A/B testing</li>
+                <li>Lead team 4 designers</li>
+                <li>Xây dựng design system cho công ty</li>
+              </ul>
+            </div>
+
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '1px' }}>
+                <div style={{ fontSize: '7px', fontWeight: 'bold' }}>
+                  UI Designer
+                </div>
+                <div style={{ fontSize: '5.5px', color: '#888' }}>
+                  06/2019 - 02/2020
+                </div>
+              </div>
+              <div style={{ fontSize: '6px', color: '#666', marginBottom: '3px', fontStyle: 'italic' }}>
+                Creative Agency
+              </div>
+              <ul style={{ margin: 0, paddingLeft: '10px', fontSize: '5px', color: '#555', lineHeight: '1.6' }}>
+                <li>Thiết kế giao diện website & landing page</li>
+                <li>Làm việc với 10+ clients khác nhau</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Projects */}
           <div>
             <div style={{
               fontSize: '7px',
               fontWeight: 'bold',
-              marginBottom: '6px',
-              paddingBottom: '3px',
+              marginBottom: '5px',
+              paddingBottom: '2px',
               borderBottom: `2px solid ${template.accentColor}`,
-              display: 'inline-block'
-            }}>Kinh nghiệm</div>
-            <div style={{ fontSize: '5px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '1px' }}>Công ty ABC | 03/2020</div>
-              <div style={{ fontSize: '6px', fontWeight: 'bold', marginBottom: '2px' }}>Senior Designer</div>
-              <div style={{ height: '4px', background: '#e0e0e0', width: '100%', marginBottom: '1px' }}></div>
-              <div style={{ height: '4px', background: '#e0e0e0', width: '85%' }}></div>
+              display: 'inline-block',
+              textTransform: 'uppercase'
+            }}>
+              Dự án nổi bật
             </div>
+            <ul style={{ margin: 0, paddingLeft: '10px', fontSize: '5px', color: '#555', lineHeight: '1.6' }}>
+              <li><strong>E-commerce Platform:</strong> Redesign UI tăng 40% sales</li>
+              <li><strong>Banking App:</strong> UX cho 500K+ users</li>
+            </ul>
           </div>
         </div>
       </div>
     );
   }
 
-  
+  // Default template for others (5-9)
   return (
     <div style={{
-      width: '100%',
-      maxWidth: '300px',
+      width: '240px',
+      height: '340px',
       background: 'white',
-      boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-      padding: '20px',
-      fontSize: '8px',
-      fontFamily: 'Arial, sans-serif'
+      boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+      padding: '16px 14px',
+      fontSize: '7px',
+      fontFamily: 'Arial, sans-serif',
+      overflow: 'hidden'
     }}>
-      <div style={{ marginBottom: '16px', paddingBottom: '12px', borderBottom: `2px solid ${template.accentColor}` }}>
-        <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '4px' }}>
+      {/* Header */}
+      <div style={{
+        marginBottom: '14px',
+        paddingBottom: '10px',
+        borderBottom: `2px solid ${template.accentColor}`
+      }}>
+        <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px', color: '#1a1a1a' }}>
           {template.name.toUpperCase()}
         </div>
-        <div style={{ fontSize: '7px', color: '#666' }}>Professional CV Template</div>
-      </div>
-      <div style={{ marginBottom: '12px' }}>
-        <div style={{ fontSize: '8px', fontWeight: 'bold', color: template.accentColor, marginBottom: '6px' }}>KINH NGHIỆM</div>
-        <div style={{ fontSize: '6px', color: '#555' }}>
-          <div style={{ marginBottom: '2px', height: '5px', background: '#e0e0e0', width: '100%' }}></div>
-          <div style={{ marginBottom: '2px', height: '5px', background: '#e0e0e0', width: '95%' }}></div>
-          <div style={{ height: '5px', background: '#e0e0e0', width: '80%' }}></div>
+        <div style={{ fontSize: '6.5px', color: '#666' }}>
+          Professional Position Title
         </div>
       </div>
+
+      {/* Contact Info */}
+      <div style={{ marginBottom: '12px', fontSize: '6px', color: '#555', lineHeight: '1.6' }}>
+        <div>📞 0123-456-789 | ✉️ email@example.com</div>
+        <div>📍 Hà Nội, Việt Nam</div>
+      </div>
+
+      {/* Experience Section */}
+      <div style={{ marginBottom: '12px' }}>
+        <div style={{
+          fontSize: '8px',
+          fontWeight: 'bold',
+          color: template.accentColor,
+          marginBottom: '6px',
+          textTransform: 'uppercase'
+        }}>
+          Kinh Nghiệm Làm Việc
+        </div>
+        <div style={{ marginBottom: '8px' }}>
+          <div style={{ fontSize: '6.5px', fontWeight: 'bold', marginBottom: '1px' }}>
+            2020 - Hiện tại
+          </div>
+          <div style={{ fontSize: '7px', fontWeight: 'bold', marginBottom: '1px' }}>
+            Senior Position Title
+          </div>
+          <div style={{ fontSize: '6px', color: '#666', marginBottom: '3px', fontStyle: 'italic' }}>
+            Company Name - Location
+          </div>
+          <ul style={{ margin: 0, paddingLeft: '12px', fontSize: '5.5px', color: '#555', lineHeight: '1.6' }}>
+            <li>Mô tả công việc và thành tích đạt được</li>
+            <li>Các dự án quan trọng đã thực hiện</li>
+            <li>Kỹ năng và kinh nghiệm tích lũy</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Education Section */}
+      <div style={{ marginBottom: '12px' }}>
+        <div style={{
+          fontSize: '8px',
+          fontWeight: 'bold',
+          color: template.accentColor,
+          marginBottom: '6px',
+          textTransform: 'uppercase'
+        }}>
+          Học Vấn
+        </div>
+        <div>
+          <div style={{ fontSize: '6.5px', fontWeight: 'bold', marginBottom: '1px' }}>
+            2016 - 2020
+          </div>
+          <div style={{ fontSize: '7px', fontWeight: 'bold', marginBottom: '1px' }}>
+            Cử nhân Chuyên ngành
+          </div>
+          <div style={{ fontSize: '6px', color: '#666' }}>
+            Tên trường đại học
+          </div>
+        </div>
+      </div>
+
+      {/* Skills Section */}
       <div>
-        <div style={{ fontSize: '8px', fontWeight: 'bold', color: template.accentColor, marginBottom: '6px' }}>HỌC VẤN</div>
-        <div style={{ fontSize: '6px', color: '#555' }}>
-          <div style={{ marginBottom: '2px', height: '5px', background: '#e0e0e0', width: '90%' }}></div>
-          <div style={{ height: '5px', background: '#e0e0e0', width: '70%' }}></div>
+        <div style={{
+          fontSize: '8px',
+          fontWeight: 'bold',
+          color: template.accentColor,
+          marginBottom: '6px',
+          textTransform: 'uppercase'
+        }}>
+          Kỹ Năng
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+          {['Skill 1', 'Skill 2', 'Skill 3', 'Skill 4', 'Skill 5'].map(skill => (
+            <span key={skill} style={{
+              fontSize: '5.5px',
+              background: `${template.accentColor}15`,
+              color: template.accentColor,
+              padding: '3px 6px',
+              borderRadius: '4px',
+              fontWeight: '600'
+            }}>
+              {skill}
+            </span>
+          ))}
         </div>
       </div>
     </div>
@@ -759,141 +1038,55 @@ function renderCVPreview(template) {
 
 function CVPreviewModal({ template, onClose }) {
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0,0,0,0.7)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      padding: '20px'
-    }} onClick={onClose}>
-      <div style={{
-        background: 'white',
-        borderRadius: '16px',
-        maxWidth: '1200px',
-        width: '100%',
-        maxHeight: '90vh',
-        overflow: 'hidden',
-        display: 'grid',
-        gridTemplateColumns: '1.5fr 1fr',
-        position: 'relative'
-      }} onClick={e => e.stopPropagation()}>
-        <button onClick={onClose} style={{
-          position: 'absolute',
-          top: '16px',
-          right: '16px',
-          width: '40px',
-          height: '40px',
-          border: 'none',
-          borderRadius: '50%',
-          background: 'white',
-          fontSize: '24px',
-          cursor: 'pointer',
-          zIndex: 10,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-        }}>
-          ×
-        </button>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-container" onClick={e => e.stopPropagation()}>
+        <button onClick={onClose} className="close-button">×</button>
 
-        {/* Left - CV Preview */}
-        <div style={{
-          background: '#f5f5f5',
-          padding: '40px',
-          overflowY: 'auto',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <div style={{ transform: 'scale(1.5)' }}>
-            {renderCVPreview(template)}
-          </div>
-        </div>
-
-        {/* Right - Details */}
-        <div style={{
-          padding: '40px',
-          overflowY: 'auto'
-        }}>
-          <div style={{ marginBottom: '12px' }}>
-            <h2 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '8px' }}>
-              {template.name}
-            </h2>
-            {template.isPremium && (
-              <span style={{
-                background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                color: 'white',
-                padding: '6px 12px',
-                borderRadius: '20px',
-                fontSize: '12px',
-                fontWeight: 'bold',
-                display: 'inline-block'
-              }}>
-                ⭐ PREMIUM
-              </span>
-            )}
-          </div>
-
-          <div style={{ marginBottom: '24px' }}>
-            <h4 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '8px' }}>
-              Về mẫu CV này
-            </h4>
-            <p style={{ fontSize: '14px', color: '#666', lineHeight: '1.6' }}>
-              {template.description}
-            </p>
-          </div>
-
-          <div style={{ marginBottom: '24px' }}>
-            <h4 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px' }}>
-              Phù hợp với
-            </h4>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              {template.tags.map(tag => (
-                <span key={tag} style={{
-                  background: '#f0f0f0',
-                  color: '#666',
-                  padding: '8px 16px',
-                  borderRadius: '20px',
-                  fontSize: '13px',
-                  fontWeight: '500'
-                }}>
-                  {tag}
-                </span>
-              ))}
+        <div className="modal-layout">
+          {/* Left - CV Preview */}
+          <div className="modal-left">
+            <div className="preview-scaled">
+              {renderCVPreview(template)}
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <button style={{
-              width: '100%',
-              padding: '16px',
-              border: 'none',
-              borderRadius: '12px',
-              background: template.accentColor,
-              color: 'white',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}>
-               Sử dụng mẫu này
-            </button>
-            <button style={{
-              width: '100%',
-              padding: '16px',
-              border: `2px solid ${template.accentColor}`,
-              borderRadius: '12px',
-              background: 'white',
-              color: template.accentColor,
-              fontSize: '16px',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}>
-               Tải xuống
-            </button>
+          {/* Right - Info */}
+          <div className="modal-right">
+            <div className="modal-header">
+              <h2 className="modal-title">{template.name}</h2>
+              {template.isPremium && (
+                <span className="modal-premium-badge">⭐ PREMIUM</span>
+              )}
+            </div>
+
+            <div className="modal-section">
+              <h4>Về mẫu CV này</h4>
+              <p>{template.description}</p>
+            </div>
+
+            <div className="modal-section">
+              <h4>Phù hợp với</h4>
+              <div className="modal-tags">
+                {template.tags.map(tag => (
+                  <span key={tag} className="modal-tag">{tag}</span>
+                ))}
+              </div>
+            </div>
+
+            <div className="modal-actions">
+              <button 
+                className="btn-use-modal"
+                style={{ background: template.accentColor }}
+              >
+                 Sử dụng mẫu này
+              </button>
+              <button 
+                className="btn-download-modal"
+                style={{ border: `2px solid ${template.accentColor}`, color: template.accentColor }}
+              >
+                 Tải xuống
+              </button>
+            </div>
           </div>
         </div>
       </div>
